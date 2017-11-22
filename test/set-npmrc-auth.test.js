@@ -6,7 +6,7 @@ import clearModule from 'clear-module';
 import SemanticReleaseError from '@semantic-release/error';
 import setNpmrcAuth from '../lib/set-npmrc-auth';
 
-test.beforeEach(async t => {
+test.beforeEach(t => {
   // Save the current process.env
   t.context.env = Object.assign({}, process.env);
   // Delete env paramaters that could have been set on the machine running the tests
@@ -113,7 +113,7 @@ test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
   t.is(error.code, 'ENONPMTOKEN');
 });
 
-test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
+test.serial('Throw error if "NPM_PASSWORD" is missing', async t => {
   process.env.NPM_USERNAME = 'npm_username';
   process.env.NPM_EMAIL = 'npm_email';
   const error = await t.throws(setNpmrcAuth({name: 'package-name'}, t.context.logger));
