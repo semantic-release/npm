@@ -5,7 +5,7 @@ import execa from 'execa';
 import {stub} from 'sinon';
 import updatePackageVersion from '../lib/update-package-version';
 
-test.beforeEach(async t => {
+test.beforeEach(t => {
   t.context.cwd = process.cwd();
   process.chdir(tempy.directory());
 

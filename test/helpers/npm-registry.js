@@ -42,7 +42,7 @@ async function start() {
 const url = `http://${SERVER_HOST}:${SERVER_PORT}/registry/_design/app/_rewrite/`;
 
 const authEnv = {
-  npm_config_registry: url,
+  npm_config_registry: url, // eslint-disable-line camelcase
   NPM_USERNAME,
   NPM_PASSWORD,
   NPM_EMAIL,

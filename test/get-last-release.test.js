@@ -3,19 +3,19 @@ import test from 'ava';
 import nock from 'nock';
 import {stub} from 'sinon';
 import tempy from 'tempy';
-import {registry, mock, available, unpublished} from './helpers/mock-registry';
 import lastRelease from '../lib/get-last-release';
+import {registry, mock, available, unpublished} from './helpers/mock-registry';
 
 let processStdout;
 let processStderr;
 
-test.before(t => {
+test.before(() => {
   // Disable npm logger during tests
   processStdout = stub(process.stdout, 'write');
   processStderr = stub(process.stderr, 'write');
 });
 
-test.beforeEach(async t => {
+test.beforeEach(t => {
   // Save the current process.env
   t.context.env = Object.assign({}, process.env);
   process.env.NPM_TOKEN = 'npm_token';
@@ -43,7 +43,7 @@ test.afterEach.always(t => {
   process.chdir(t.context.cwd);
 });
 
-test.after.always(t => {
+test.after.always(() => {
   // Restore stdout and stderr
   processStdout.restore();
   processStderr.restore();

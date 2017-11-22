@@ -11,7 +11,7 @@ import npmRegistry from './helpers/npm-registry';
 let processStderr;
 let processStdout;
 
-test.before(async t => {
+test.before(async () => {
   // Start the local NPM registry
   await npmRegistry.start();
   // Disable npm logger during tests
@@ -19,7 +19,7 @@ test.before(async t => {
   processStdout = stub(process.stdout, 'write');
 });
 
-test.beforeEach(async t => {
+test.beforeEach(t => {
   // Save the current process.env
   t.context.env = Object.assign({}, process.env);
   // Delete env paramaters that could have been set on the machine running the tests
@@ -48,7 +48,7 @@ test.beforeEach(async t => {
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(async t => {
+test.afterEach.always(t => {
   // Clear `rc` from the npm cache as it cache the relative path of .npmrc files, preventing to load a new file after changing current working directory
   clearModule('rc');
   // Restore process.env
@@ -57,7 +57,7 @@ test.afterEach.always(async t => {
   process.chdir(t.context.cwd);
 });
 
-test.after.always(async t => {
+test.after.always(async () => {
   // Stop the local NPM registry
   await npmRegistry.stop();
   // Restore stdout and stderr
