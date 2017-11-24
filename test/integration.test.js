@@ -1,4 +1,3 @@
-import {promisify} from 'util';
 import {writeJson, readFile, appendFile} from 'fs-extra';
 import test from 'ava';
 import execa from 'execa';
@@ -68,7 +67,7 @@ test.after.always(async () => {
 test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   const error = await t.throws(
-    promisify(t.context.m.verifyConditions)({}, {pkg: {name: 'invalid-token'}, logger: t.context.logger})
+    t.context.m.verifyConditions({}, {pkg: {name: 'invalid-token'}, logger: t.context.logger})
   );
 
   t.true(error instanceof SemanticReleaseError);
@@ -82,7 +81,7 @@ test.serial('Throws error if NPM token is invalid', async t => {
 test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
-  await t.notThrows(promisify(t.context.m.verifyConditions)({}, {pkg, logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {pkg, logger: t.context.logger}));
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /_auth =/);
@@ -92,7 +91,7 @@ test.serial('Verify npm auth and package', async t => {
 test.serial('Return nothing if no version if published', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'not-published', publishConfig: {registry: npmRegistry.url}};
-  const nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
 
   t.deepEqual(nextRelease, {});
 });
@@ -111,7 +110,7 @@ test.serial('Return last version published', async t => {
 
   await execa('npm', ['publish']);
 
-  const nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
   t.is(nextRelease.version, '1.0.0');
 });
 
@@ -134,7 +133,7 @@ test.serial('Return last version published on a dist-tag', async t => {
   // Publish version 1.1.0 on next
   await execa('npm', ['publish', '--tag=next']);
 
-  const nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
   t.is(nextRelease.version, '1.1.0');
 });
 
@@ -153,7 +152,7 @@ test.serial('Return nothing for an unpublished package', async t => {
   await execa('npm', ['publish']);
   await execa('npm', ['unpublish', 'unpublished', '--force']);
 
-  const nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
   t.deepEqual(nextRelease, {});
 });
 
@@ -162,7 +161,7 @@ test.serial('Publish a package', async t => {
   const pkg = {name: 'publish', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
 
-  await promisify(t.context.m.publish)({}, {pkg, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  await t.context.m.publish({}, {pkg, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
 
   t.is((await execa('npm', ['view', 'publish', 'version'])).stdout, '1.0.0');
 });
@@ -172,13 +171,13 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
 
-  await t.notThrows(promisify(t.context.m.verifyConditions)({}, {pkg, logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {pkg, logger: t.context.logger}));
 
-  let nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  let nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
   t.deepEqual(nextRelease, {});
 
-  await promisify(t.context.m.publish)({}, {pkg, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  await t.context.m.publish({}, {pkg, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
 
-  nextRelease = await promisify(t.context.m.getLastRelease)({}, {pkg, logger: t.context.logger});
+  nextRelease = await t.context.m.getLastRelease({}, {pkg, logger: t.context.logger});
   t.is(nextRelease.version, '1.0.0');
 });
