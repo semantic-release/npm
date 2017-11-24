@@ -27,7 +27,7 @@ test.beforeEach(t => {
 });
 
 test.afterEach.always(t => {
-  // Clear `rc` from the npm cache as it cache the relative path of .npmrc files, preventing to load a new file after changing current working directory
+  // Clear `rc` from the npm cache as it cache the relative path of .npmrc files, preventing to load a new file after changing current working directory. See https://github.com/dominictarr/rc/issues/101
   clearModule('rc');
   // Restore process.env
   process.env = Object.assign({}, t.context.env);

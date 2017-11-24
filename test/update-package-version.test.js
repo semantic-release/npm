@@ -1,5 +1,5 @@
-import {writeJson, readJson} from 'fs-extra';
 import test from 'ava';
+import {writeJson, readJson} from 'fs-extra';
 import tempy from 'tempy';
 import execa from 'execa';
 import {stub} from 'sinon';

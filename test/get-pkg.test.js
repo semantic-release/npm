@@ -1,0 +1,49 @@
+import test from 'ava';
+import {writeJson, writeFile} from 'fs-extra';
+import tempy from 'tempy';
+import getPkg from '../lib/get-pkg';
+
+test.beforeEach(t => {
+  // Save the current working diretory
+  t.context.cwd = process.cwd();
+  // Change current working directory to a temp directory
+  process.chdir(tempy.directory());
+});
+
+test.afterEach.always(t => {
+  // Restore the current working directory
+  process.chdir(t.context.cwd);
+});
+
+test.serial('Verify name and return parsed package.json', async t => {
+  const pkg = {name: 'package', version: '0.0.0'};
+  await writeJson('./package.json', pkg);
+
+  const result = await getPkg();
+  t.is(pkg.name, result.name);
+  t.is(pkg.version, result.version);
+});
+
+test.serial('Throw error if missing package.json', async t => {
+  const error = await t.throws(getPkg());
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'ENOPKG');
+});
+
+test.serial('Throw error if missing package name', async t => {
+  await writeJson('./package.json', {version: '0.0.0'});
+
+  const error = await t.throws(getPkg());
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'ENOPKGNAME');
+});
+
+test.serial('Throw error if package.json is malformed', async t => {
+  await writeFile('./package.json', "{name: 'package',}");
+
+  const error = await t.throws(getPkg());
+
+  t.is(error.name, 'JSONError');
+});
