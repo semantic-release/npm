@@ -1,4 +1,3 @@
-const {callbackify} = require('util');
 const verifyNpm = require('./lib/verify');
 const publishNpm = require('./lib/publish');
 const getLastReleaseNpm = require('./lib/get-last-release');
@@ -26,8 +25,4 @@ async function publish(pluginConfig, {pkg, nextRelease: {version}, logger}) {
   await publishNpm(version, logger);
 }
 
-module.exports = {
-  verifyConditions: callbackify(verifyConditions),
-  getLastRelease: callbackify(getLastRelease),
-  publish: callbackify(publish),
-};
+module.exports = {verifyConditions, getLastRelease, publish};
