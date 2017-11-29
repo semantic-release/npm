@@ -45,12 +45,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
   await setNpmrcAuth('http://custom.registry.com', t.context.logger);
 
   const npmrc = (await readFile('.npmrc')).toString();
-  t.regex(
-    npmrc,
-    new RegExp(
-      `_auth = ${Buffer.from('npm_username:npm_pasword', 'utf8').toString('base64')}\\W+email = \\\${NPM_EMAIL}`
-    )
-  );
+  t.is(npmrc, `\n_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
 
   t.true(t.context.log.calledWith('Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.'));
 });

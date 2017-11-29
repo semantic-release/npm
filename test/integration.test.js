@@ -11,11 +11,11 @@ let processStderr;
 let processStdout;
 
 test.before(async () => {
-  // Start the local NPM registry
-  await npmRegistry.start();
   // Disable npm logger during tests
   processStderr = stub(process.stderr, 'write');
   processStdout = stub(process.stdout, 'write');
+  // Start the local NPM registry
+  await npmRegistry.start();
 });
 
 test.beforeEach(t => {
