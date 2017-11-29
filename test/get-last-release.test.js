@@ -139,6 +139,31 @@ test.serial('Get nothing from not yet published package name (unavailable w/o st
   t.true(registryMock.isDone());
 });
 
+test.serial('Send bearer authorization using NPM_TOKEN', async t => {
+  const name = 'available';
+  const registryMock = available(name, ['authorization', 'Bearer npm_token']);
+  await appendFile('./.npmrc', `registry = ${registry}\nalways-auth = true`);
+  const release = await lastRelease({name}, t.context.logger);
+
+  t.is(release.version, '1.33.7');
+  t.is(release.gitHead, 'HEAD');
+  t.true(registryMock.isDone());
+});
+
+test.serial('Uses basic auth when always-auth=true in ".npmrc"', async t => {
+  const name = 'available';
+  delete process.env.NPM_TOKEN;
+  process.env.NPM_USERNAME = 'username';
+  process.env.NPM_PASSWORD = 'password';
+  const registryMock = available(name, null, {user: 'username', pass: 'password'});
+  await appendFile('./.npmrc', `registry = ${registry}\nalways-auth = true`);
+  const release = await lastRelease({name}, t.context.logger);
+
+  t.is(release.version, '1.33.7');
+  t.is(release.gitHead, 'HEAD');
+  t.true(registryMock.isDone());
+});
+
 test.serial('Throws error on server error', async t => {
   const name = 'server-error';
   const registryMock = mock(name)
