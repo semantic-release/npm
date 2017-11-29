@@ -4,7 +4,7 @@ import nock from 'nock';
 import {stub} from 'sinon';
 import tempy from 'tempy';
 import lastRelease from '../lib/get-last-release';
-import {registry, mock, available, unpublished} from './helpers/mock-registry';
+import {registry, mock, availableModule, unpublishedModule} from './helpers/mock-registry';
 
 let processStdout;
 let processStderr;
@@ -51,7 +51,7 @@ test.after.always(() => {
 
 test.serial('Get release from package name', async t => {
   const name = 'available';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
   t.is(release.version, '1.33.7');
@@ -61,7 +61,7 @@ test.serial('Get release from package name', async t => {
 
 test.serial("Get release from a tagged package's name", async t => {
   const name = 'tagged';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
   const release = await lastRelease({name, publishConfig: {registry, tag: 'foo'}}, t.context.logger);
 
   t.is(release.version, '0.8.15');
@@ -71,7 +71,7 @@ test.serial("Get release from a tagged package's name", async t => {
 
 test.serial('Get release from the latest fallback tag', async t => {
   const name = 'tagged';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
   const release = await lastRelease({name, publishConfig: {registry, tag: 'bar'}}, t.context.logger);
 
   t.is(release.version, '1.33.7');
@@ -81,7 +81,7 @@ test.serial('Get release from the latest fallback tag', async t => {
 
 test.serial('Get release from scoped package name', async t => {
   const name = '@scoped/available';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
 
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
   t.is(release.version, '1.33.7');
@@ -91,7 +91,7 @@ test.serial('Get release from scoped package name', async t => {
 
 test.serial('Get nothing from completely unpublished package name', async t => {
   const name = 'completely-unpublished';
-  const registryMock = unpublished(name);
+  const registryMock = mock(name).reply(200, unpublishedModule);
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
   t.is(release.version, undefined);
@@ -118,7 +118,7 @@ test.serial('Get nothing from not yet published package name (unavailable w/o re
 
 test.serial('Get registry from ".npmrc"', async t => {
   const name = 'available';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
   await appendFile('./.npmrc', `registry = ${registry}`);
   const release = await lastRelease({name}, t.context.logger);
 
@@ -141,7 +141,10 @@ test.serial('Get nothing from not yet published package name (unavailable w/o st
 
 test.serial('Send bearer authorization using NPM_TOKEN', async t => {
   const name = 'available';
-  const registryMock = available(name, ['authorization', 'Bearer npm_token']);
+  const registryMock = mock(name, {reqheaders: {authorization: `Bearer ${process.env.NPM_TOKEN}`}}).reply(
+    200,
+    availableModule
+  );
   await appendFile('./.npmrc', `registry = ${registry}\nalways-auth = true`);
   const release = await lastRelease({name}, t.context.logger);
 
@@ -155,7 +158,9 @@ test.serial('Uses basic auth when always-auth=true in ".npmrc"', async t => {
   delete process.env.NPM_TOKEN;
   process.env.NPM_USERNAME = 'username';
   process.env.NPM_PASSWORD = 'password';
-  const registryMock = available(name, null, {user: 'username', pass: 'password'});
+  const registryMock = mock(name)
+    .basicAuth({user: 'username', pass: 'password'})
+    .reply(200, availableModule);
   await appendFile('./.npmrc', `registry = ${registry}\nalways-auth = true`);
   const release = await lastRelease({name}, t.context.logger);
 
@@ -177,7 +182,7 @@ test.serial('Throws error on server error', async t => {
 
 test.serial('Handle missing trailing slash on registry URL', async t => {
   const name = 'available';
-  const registryMock = available(name);
+  const registryMock = mock(name).reply(200, availableModule);
   const release = await lastRelease({name, publishConfig: {registry: 'http://registry.npmjs.org'}}, t.context.logger);
 
   t.is(release.version, '1.33.7');
