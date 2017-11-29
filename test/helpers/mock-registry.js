@@ -12,14 +12,22 @@ const unpublishedModule = {
 
 export const registry = REGISTRY_URL;
 
-export function mock(packageName) {
-  return nock(REGISTRY_URL).get(`/${packageName.replace('/', '%2F')}`);
+export function mock(packageName, matchHeader, basicAuth) {
+  let req = nock(REGISTRY_URL);
+  if (matchHeader) {
+    req = req.matchHeader.apply(req, matchHeader);
+  }
+  req = req.get(`/${packageName.replace('/', '%2F')}`);
+  if (basicAuth) {
+    req = req.basicAuth(basicAuth);
+  }
+  return req;
 }
 
-export function available(packageName) {
-  return mock(packageName).reply(200, availableModule);
+export function available(packageName, matchHeader, basicAuth) {
+  return mock(packageName, matchHeader, basicAuth).reply(200, availableModule);
 }
 
-export function unpublished(packageName) {
-  return mock(packageName).reply(200, unpublishedModule);
+export function unpublished(packageName, matchHeader, basicAuth) {
+  return mock(packageName, matchHeader, basicAuth).reply(200, unpublishedModule);
 }
