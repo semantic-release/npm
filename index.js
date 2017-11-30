@@ -28,7 +28,7 @@ async function publish(pluginConfig, {nextRelease: {version}, logger}) {
     await verifyNpm(pkg, logger);
     verified = true;
   }
-  await publishNpm(version, logger);
+  await publishNpm(pkg, version, logger);
 }
 
 module.exports = {verifyConditions, getLastRelease, publish};
