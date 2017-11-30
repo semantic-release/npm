@@ -39,8 +39,6 @@ test.beforeEach(t => {
 });
 
 test.afterEach.always(t => {
-  // Clear `rc` from the npm cache as it cache the relative path of .npmrc files, preventing to load a new file after changing current working directory
-  clearModule('rc');
   // Restore process.env
   process.env = Object.assign({}, t.context.env);
   // Restore the current working directory
@@ -48,18 +46,17 @@ test.afterEach.always(t => {
 });
 
 test.after.always(async () => {
-  // Stop the local NPM registry
-  await npmRegistry.stop();
   // Restore stdout and stderr
   processStderr.restore();
   processStdout.restore();
+  // Stop the local NPM registry
+  await npmRegistry.stop();
 });
 
 test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
-  await appendFile('./.npmrc', `\nregistry = ${npmRegistry.url}`);
   const error = await t.throws(t.context.m.verifyConditions({}, {logger: t.context.logger}));
 
   t.true(error instanceof SemanticReleaseError);
@@ -72,6 +69,18 @@ test.serial('Throws error if NPM token is invalid', async t => {
 
 test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
+  const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
+  await writeJson('./package.json', pkg);
+  await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
+
+  const npmrc = (await readFile('.npmrc')).toString();
+  t.regex(npmrc, /_auth =/);
+  t.regex(npmrc, /email =/);
+});
+
+test.serial('Verify npm auth and package with "npm_config_registry" env var set by yarn', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  process.env.npm_config_registry = 'https://registry.yarnpkg.com'; // eslint-disable-line camelcase
   const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
   await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
