@@ -1,9 +1,11 @@
 import Docker from 'dockerode';
 import getStream from 'get-stream';
 import got from 'got';
-import delay from 'delay';
+import pRetry from 'p-retry';
 
-const SERVER_PORT = 5984;
+const IMAGE = 'npmjs/npm-docker-couchdb:1.6.1';
+const SERVER_PORT = 25986;
+const COUCHDB_PORT = 5984;
 const SERVER_HOST = 'localhost';
 const NPM_USERNAME = 'integration';
 const NPM_PASSWORD = 'suchsecure';
@@ -11,17 +13,32 @@ const NPM_EMAIL = 'integration@test.com';
 const docker = new Docker();
 let container;
 
+/**
+ * Download the `npm-docker-couchdb` Docker image, create a new container and start it.
+ *
+ * @return {Promise} Promise that resolves when the container is started.
+ */
 async function start() {
-  await getStream(await docker.pull('npmjs/npm-docker-couchdb:1.6.1'));
+  await getStream(await docker.pull(IMAGE));
 
   container = await docker.createContainer({
-    Image: 'npmjs/npm-docker-couchdb:1.6.1',
-    PortBindings: {[`${SERVER_PORT}/tcp`]: [{HostPort: `${SERVER_PORT}`}]},
+    Tty: true,
+    Image: IMAGE,
+    PortBindings: {[`${COUCHDB_PORT}/tcp`]: [{HostPort: `${SERVER_PORT}`}]},
   });
 
   await container.start();
-  // Add a delay as the registry take some time to be ready even if the docker container is started
-  await delay(5000);
+
+  try {
+    // Wait for the registry to be ready
+    await pRetry(() => got(`http://${SERVER_HOST}:${SERVER_PORT}/registry/_design/app`, {cache: false}), {
+      retries: 7,
+      minTimeout: 1000,
+      factor: 2,
+    });
+  } catch (err) {
+    throw new Error(`Couldn't start npm-docker-couchdb after 2 min`);
+  }
 
   // Create user
   await got(`http://${SERVER_HOST}:${SERVER_PORT}/_users/org.couchdb.user:${NPM_USERNAME}`, {
@@ -48,8 +65,14 @@ const authEnv = {
   NPM_EMAIL,
 };
 
+/**
+ * Stop and remote the `npm-docker-couchdb` Docker container.
+ *
+ * @return {Promise} Promise that resolves when the container is stopped.
+ */
 async function stop() {
-  return container.stop();
+  await container.stop();
+  await container.remove();
 }
 
 export default {start, stop, authEnv, url};
