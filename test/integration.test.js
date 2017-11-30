@@ -26,22 +26,13 @@ test.beforeEach(t => {
   delete process.env.NPM_USERNAME;
   delete process.env.NPM_PASSWORD;
   delete process.env.NPM_EMAIL;
-  // Delete all `npm_config` environment variable set by CI as they take precedence over the `.npmrc` because the process that runs the tests is started before the `.npmrc` is created
-  for (let i = 0, keys = Object.keys(process.env); i < keys.length; i++) {
-    if (keys[i].startsWith('npm_config')) {
-      delete process.env[keys[i]];
-    }
-  }
   // Save the current working diretory
   t.context.cwd = process.cwd();
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
-  // Prevent to use `.npmrc` from the home directory in case there is a valid token set there
-  process.env.HOME = process.cwd();
-  process.env.USERPROFILE = process.cwd();
   // Clear npm cache to refresh the module state
-  clearModule('../index');
-  t.context.m = require('../index');
+  clearModule('..');
+  t.context.m = require('..');
   // Stub the logger
   t.context.log = stub();
   t.context.logger = {log: t.context.log};
@@ -68,6 +59,7 @@ test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
+  await appendFile('./.npmrc', `\nregistry = ${npmRegistry.url}`);
   const error = await t.throws(t.context.m.verifyConditions({}, {logger: t.context.logger}));
 
   t.true(error instanceof SemanticReleaseError);
