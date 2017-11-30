@@ -94,7 +94,7 @@ test.serial('Get nothing from completely unpublished package name', async t => {
   const registryMock = mock(name).reply(200, unpublishedModule);
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
-  t.is(release.version, undefined);
+  t.falsy(release);
   t.true(registryMock.isDone());
 });
 
@@ -103,7 +103,7 @@ test.serial('Get nothing from not yet published package name (unavailable)', asy
   const registryMock = mock(name).reply(404, {});
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
-  t.is(release.version, undefined);
+  t.falsy(release);
   t.true(registryMock.isDone());
 });
 
@@ -112,7 +112,7 @@ test.serial('Get nothing from not yet published package name (unavailable w/o re
   const registryMock = mock(name).reply(404);
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
-  t.is(release.version, undefined);
+  t.falsy(release);
   t.true(registryMock.isDone());
 });
 
@@ -135,7 +135,7 @@ test.serial('Get nothing from not yet published package name (unavailable w/o st
   await appendFile('./.npmrc', 'fetch-retry-factor = 1\nfetch-retry-mintimeout = 1\nfetch-retry-maxtimeout = 1');
   const release = await lastRelease({name, publishConfig: {registry}}, t.context.logger);
 
-  t.is(release.version, undefined);
+  t.falsy(release);
   t.true(registryMock.isDone());
 });
 

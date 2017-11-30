@@ -95,7 +95,7 @@ test.serial('Return nothing if no version if published', async t => {
   await writeJson('./package.json', pkg);
   const nextRelease = await t.context.m.getLastRelease({}, {logger: t.context.logger});
 
-  t.deepEqual(nextRelease, {});
+  t.falsy(nextRelease);
 });
 
 test.serial('Return last version published', async t => {
@@ -155,7 +155,7 @@ test.serial('Return nothing for an unpublished package', async t => {
   await execa('npm', ['unpublish', 'unpublished', '--force']);
 
   const nextRelease = await t.context.m.getLastRelease({}, {logger: t.context.logger});
-  t.deepEqual(nextRelease, {});
+  t.falsy(nextRelease);
 });
 
 test.serial('Publish a package', async t => {
@@ -176,7 +176,7 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
   await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
 
   let nextRelease = await t.context.m.getLastRelease({}, {logger: t.context.logger});
-  t.deepEqual(nextRelease, {});
+  t.falsy(nextRelease);
 
   await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
 
