@@ -1,5 +1,5 @@
-import {writeJson, readFile, appendFile} from 'fs-extra';
 import test from 'ava';
+import {writeJson, readJson, readFile, appendFile, pathExists} from 'fs-extra';
 import execa from 'execa';
 import {stub} from 'sinon';
 import tempy from 'tempy';
@@ -57,7 +57,7 @@ test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
-  const error = await t.throws(t.context.m.verifyConditions({}, {logger: t.context.logger}));
+  const error = await t.throws(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
   t.true(error instanceof SemanticReleaseError);
   t.is(error.code, 'EINVALIDNPMTOKEN');
@@ -71,7 +71,7 @@ test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
-  await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /_auth =/);
@@ -83,7 +83,7 @@ test.serial('Verify npm auth and package with "npm_config_registry" env var set 
   process.env.npm_config_registry = 'https://registry.yarnpkg.com'; // eslint-disable-line camelcase
   const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
-  await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /_auth =/);
@@ -159,14 +159,67 @@ test.serial('Return nothing for an unpublished package', async t => {
   t.falsy(nextRelease);
 });
 
-test.serial('Publish a package', async t => {
+test('Throw SemanticReleaseError if publish "npmPublish" option is not a Boolean', async t => {
+  const pkg = {name: 'invalid-npmPublish', publishConfig: {registry: npmRegistry.url}};
+  await writeJson('./package.json', pkg);
+  const npmPublish = 42;
+  const error = await t.throws(
+    t.context.m.verifyConditions(
+      {},
+      {
+        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish}]},
+        logger: t.context.logger,
+      }
+    )
+  );
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'EINVALIDNPMPUBLISH');
+});
+
+test('Throw SemanticReleaseError if publish "tarballDir" option is not a String', async t => {
+  const pkg = {name: 'invalid-tarballDir', publishConfig: {registry: npmRegistry.url}};
+  await writeJson('./package.json', pkg);
+  const tarballDir = 42;
+  const error = await t.throws(
+    t.context.m.verifyConditions(
+      {},
+      {
+        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', tarballDir}]},
+        logger: t.context.logger,
+      }
+    )
+  );
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'EINVALIDTARBALLDIR');
+});
+
+test.serial('Publish the package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
-  const pkg = {name: 'publish', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
 
   await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
 
-  t.is((await execa('npm', ['view', 'publish', 'version'])).stdout, '1.0.0');
+  t.is((await readJson('./package.json')).version, '1.0.0');
+  t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
+  t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
+});
+
+test.serial('Create the package and skip publish', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
+  await writeJson('./package.json', pkg);
+
+  await t.context.m.publish(
+    {npmPublish: false, tarballDir: 'dist'},
+    {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+  );
+
+  t.is((await readJson('./package.json')).version, '1.0.0');
+  t.true(await pathExists(`./dist/${pkg.name}-1.0.0.tgz`));
+  await t.throws(execa('npm', ['view', pkg.name, 'version']));
 });
 
 test.serial('Verify token and set up auth only on the fist call', async t => {
@@ -174,7 +227,7 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await writeJson('./package.json', pkg);
 
-  await t.notThrows(t.context.m.verifyConditions({}, {logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
   let nextRelease = await t.context.m.getLastRelease({}, {logger: t.context.logger});
   t.falsy(nextRelease);
