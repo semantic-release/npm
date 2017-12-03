@@ -4,6 +4,7 @@ import nock from 'nock';
 import {stub} from 'sinon';
 import tempy from 'tempy';
 import lastRelease from '../lib/get-last-release';
+import toNerfDart from '../lib/nerf-dart';
 import {registry, mock, availableModule, unpublishedModule} from './helpers/mock-registry';
 
 let processStdout;
@@ -162,6 +163,22 @@ test.serial('Uses basic auth when always-auth=true in ".npmrc"', async t => {
     .basicAuth({user: 'username', pass: 'password'})
     .reply(200, availableModule);
   await appendFile('./.npmrc', `registry = ${registry}\nalways-auth = true`);
+  const release = await lastRelease({name}, t.context.logger);
+
+  t.is(release.version, '1.33.7');
+  t.is(release.gitHead, 'HEAD');
+  t.true(registryMock.isDone());
+});
+
+test.serial('Reads scoped always-auth=true in ".npmrc"', async t => {
+  const name = 'available';
+  delete process.env.NPM_TOKEN;
+  process.env.NPM_USERNAME = 'username';
+  process.env.NPM_PASSWORD = 'password';
+  const registryMock = mock(name)
+    .basicAuth({user: 'username', pass: 'password'})
+    .reply(200, availableModule);
+  await appendFile('./.npmrc', `registry = ${registry}\n${toNerfDart(registry)}:always-auth = true`);
   const release = await lastRelease({name}, t.context.logger);
 
   t.is(release.version, '1.33.7');
