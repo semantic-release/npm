@@ -35,7 +35,7 @@ test.serial('Set auth with "NPM_TOKEN"', async t => {
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /\/\/custom.registry.com\/:_authToken = \$\{NPM_TOKEN\}/);
-  t.is(t.context.log.args[1][0], 'Wrote NPM_TOKEN to .npmrc.');
+  t.deepEqual(t.context.log.args[1], ['Wrote NPM_TOKEN to .npmrc.']);
 });
 
 test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async t => {
@@ -47,7 +47,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.is(npmrc, `\n_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
-  t.is(t.context.log.args[1][0], 'Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.');
+  t.deepEqual(t.context.log.args[1], ['Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.']);
 });
 
 test.serial('Do not modify ".npmrc" if auth is already configured', async t => {
