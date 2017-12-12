@@ -6,18 +6,15 @@ import tempy from 'tempy';
 import lastRelease from '../lib/get-last-release';
 import {registry, mock, availableModule, unpublishedModule} from './helpers/mock-registry';
 
-let processStdout;
-let processStderr;
-
-test.before(() => {
-  // Disable npm logger during tests
-  processStdout = stub(process.stdout, 'write');
-  processStderr = stub(process.stderr, 'write');
-});
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
+// Save the current working diretory
+const cwd = process.cwd();
+// Disable logs during tests
+stub(process.stdout, 'write');
+stub(process.stderr, 'write');
 
 test.beforeEach(t => {
-  // Save the current process.env
-  t.context.env = Object.assign({}, process.env);
   process.env.NPM_TOKEN = 'npm_token';
   // Delete all `npm_config` environment variable set by CI as they take precedence over the `.npmrc` because the process that runs the tests is started before the `.npmrc` is created
   for (let i = 0, keys = Object.keys(process.env); i < keys.length; i++) {
@@ -25,8 +22,6 @@ test.beforeEach(t => {
       delete process.env[keys[i]];
     }
   }
-  // Save the current working diretory
-  t.context.cwd = process.cwd();
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
   // Stub the logger
@@ -34,19 +29,13 @@ test.beforeEach(t => {
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore process.env
-  process.env = Object.assign({}, t.context.env);
+  process.env = envBackup;
+  // Restore the current working directory
+  process.chdir(cwd);
   // Clear nock
   nock.cleanAll();
-  // Restore the current working directory
-  process.chdir(t.context.cwd);
-});
-
-test.after.always(() => {
-  // Restore stdout and stderr
-  processStdout.restore();
-  processStderr.restore();
 });
 
 test.serial('Get release from package name', async t => {
