@@ -4,16 +4,17 @@ import {stub} from 'sinon';
 import tempy from 'tempy';
 import setNpmrcAuth from '../lib/set-npmrc-auth';
 
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
+// Save the current working diretory
+const cwd = process.cwd();
+
 test.beforeEach(t => {
-  // Save the current process.env
-  t.context.env = Object.assign({}, process.env);
   // Delete env paramaters that could have been set on the machine running the tests
   delete process.env.NPM_TOKEN;
   delete process.env.NPM_USERNAME;
   delete process.env.NPM_PASSWORD;
   delete process.env.NPM_EMAIL;
-  // Save the current working diretory
-  t.context.cwd = process.cwd();
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
   // Stub the logger
@@ -21,11 +22,11 @@ test.beforeEach(t => {
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore process.env
-  process.env = Object.assign({}, t.context.env);
+  process.env = envBackup;
   // Restore the current working directory
-  process.chdir(t.context.cwd);
+  process.chdir(cwd);
 });
 
 test.serial('Set auth with "NPM_TOKEN"', async t => {
@@ -34,7 +35,7 @@ test.serial('Set auth with "NPM_TOKEN"', async t => {
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /\/\/custom.registry.com\/:_authToken = \$\{NPM_TOKEN\}/);
-  t.true(t.context.log.calledWith('Wrote NPM_TOKEN to .npmrc.'));
+  t.is(t.context.log.args[1][0], 'Wrote NPM_TOKEN to .npmrc.');
 });
 
 test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async t => {
@@ -46,15 +47,14 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.is(npmrc, `\n_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
-
-  t.true(t.context.log.calledWith('Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.'));
+  t.is(t.context.log.args[1][0], 'Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.');
 });
 
 test.serial('Do not modify ".npmrc" if auth is already configured', async t => {
   await appendFile('./.npmrc', `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
   await setNpmrcAuth('http://custom.registry.com', t.context.logger);
 
-  t.true(t.context.log.calledOnce);
+  t.is(t.context.log.callCount, 1);
 });
 
 test.serial('Do not modify ".npmrc" if auth is already configured for a scoped package', async t => {
@@ -64,7 +64,7 @@ test.serial('Do not modify ".npmrc" if auth is already configured for a scoped p
   );
   await setNpmrcAuth('http://custom.registry.com', t.context.logger);
 
-  t.true(t.context.log.calledOnce);
+  t.is(t.context.log.callCount, 1);
 });
 
 test.serial('Throw error if "NPM_TOKEN" is missing', async t => {

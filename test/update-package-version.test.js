@@ -5,17 +5,19 @@ import execa from 'execa';
 import {stub} from 'sinon';
 import updatePackageVersion from '../lib/update-package-version';
 
+// Save the current working diretory
+const cwd = process.cwd();
+
 test.beforeEach(t => {
-  t.context.cwd = process.cwd();
   process.chdir(tempy.directory());
 
   t.context.log = stub();
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore the current working directory
-  process.chdir(t.context.cwd);
+  process.chdir(cwd);
 });
 
 test.serial('Updade package.json', async t => {
@@ -27,7 +29,7 @@ test.serial('Updade package.json', async t => {
   // Verify package.json has been updated
   t.is((await readJson('./package.json')).version, '1.0.0');
   // Verify the logger has been called with the version updated
-  t.true(t.context.log.calledWithMatch(/package.json/, '1.0.0'));
+  t.deepEqual(t.context.log.args[0], ['Wrote version %s to package.json', '1.0.0']);
 });
 
 test.serial('Updade package.json and npm-shrinkwrap.json', async t => {
@@ -42,6 +44,6 @@ test.serial('Updade package.json and npm-shrinkwrap.json', async t => {
   t.is((await readJson('./package.json')).version, '1.0.0');
   t.is((await readJson('./npm-shrinkwrap.json')).version, '1.0.0');
   // Verify the logger has been called with the version updated
-  t.true(t.context.log.calledWithMatch(/package.json/, '1.0.0'));
-  t.true(t.context.log.calledWithMatch(/npm-shrinkwrap.json/, '1.0.0'));
+  t.deepEqual(t.context.log.args[0], ['Wrote version %s to package.json', '1.0.0']);
+  t.deepEqual(t.context.log.args[1], ['Wrote version %s to npm-shrinkwrap.json', '1.0.0']);
 });

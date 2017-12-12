@@ -7,27 +7,25 @@ import clearModule from 'clear-module';
 import SemanticReleaseError from '@semantic-release/error';
 import npmRegistry from './helpers/npm-registry';
 
-let processStderr;
-let processStdout;
+// Save the current process.env
+const envBackup = Object.assign({}, process.env);
+// Save the current working diretory
+const cwd = process.cwd();
+// Disable logs during tests
+stub(process.stdout, 'write');
+stub(process.stderr, 'write');
 
 test.before(async () => {
-  // Disable npm logger during tests
-  processStderr = stub(process.stderr, 'write');
-  processStdout = stub(process.stdout, 'write');
   // Start the local NPM registry
   await npmRegistry.start();
 });
 
 test.beforeEach(t => {
-  // Save the current process.env
-  t.context.env = Object.assign({}, process.env);
   // Delete env paramaters that could have been set on the machine running the tests
   delete process.env.NPM_TOKEN;
   delete process.env.NPM_USERNAME;
   delete process.env.NPM_PASSWORD;
   delete process.env.NPM_EMAIL;
-  // Save the current working diretory
-  t.context.cwd = process.cwd();
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
   // Clear npm cache to refresh the module state
@@ -38,17 +36,14 @@ test.beforeEach(t => {
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore process.env
-  process.env = Object.assign({}, t.context.env);
+  process.env = envBackup;
   // Restore the current working directory
-  process.chdir(t.context.cwd);
+  process.chdir(cwd);
 });
 
 test.after.always(async () => {
-  // Restore stdout and stderr
-  processStderr.restore();
-  processStdout.restore();
   // Stop the local NPM registry
   await npmRegistry.stop();
 });

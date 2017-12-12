@@ -3,18 +3,17 @@ import {appendFile} from 'fs-extra';
 import tempy from 'tempy';
 import getRegistry from '../lib/get-registry';
 
-test.beforeEach(t => {
-  // Save the current process.env
-  t.context.env = Object.assign({}, process.env);
-  // Save the current working diretory
-  t.context.cwd = process.cwd();
+// Save the current working diretory
+const cwd = process.cwd();
+
+test.beforeEach(() => {
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore the current working directory
-  process.chdir(t.context.cwd);
+  process.chdir(cwd);
 });
 
 test.serial('Get default registry', async t => {

@@ -3,16 +3,17 @@ import {writeJson, writeFile} from 'fs-extra';
 import tempy from 'tempy';
 import getPkg from '../lib/get-pkg';
 
-test.beforeEach(t => {
-  // Save the current working diretory
-  t.context.cwd = process.cwd();
+// Save the current working diretory
+const cwd = process.cwd();
+
+test.beforeEach(() => {
   // Change current working directory to a temp directory
   process.chdir(tempy.directory());
 });
 
-test.afterEach.always(t => {
+test.afterEach.always(() => {
   // Restore the current working directory
-  process.chdir(t.context.cwd);
+  process.chdir(cwd);
 });
 
 test.serial('Verify name and return parsed package.json', async t => {
