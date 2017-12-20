@@ -23,3 +23,11 @@ test('Throw SemanticReleaseError if "tarballDir" option is not a String', async 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDTARBALLDIR');
 });
+
+test('Throw SemanticReleaseError if "pkgRoot" option is not a String', async t => {
+  const pkgRoot = 42;
+  const error = await t.throws(verify({pkgRoot}, {}, t.context.logger));
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'EINVALIDPKGROOT');
+});

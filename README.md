@@ -39,10 +39,13 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 
 ### Options
 
-| Options      | Description                                                                                                            | Default |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------- | ------- |
-| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.     | `true`  |
-| `tarballDir` | Directory path in which to generate the the package tarball. If `false` the tarball is not be kept on the file system. | `false` |
+| Options      | Description                                                                                                         | Default |
+|--------------|---------------------------------------------------------------------------------------------------------------------|---------|
+| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `true`  |
+| `pkgRoot`    | Directory path to publish.                                                                                          | `.`     |
+| `tarballDir` | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false` |
+
+**Note**: The `pkgRoot` directory must contains a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
 ### Npm configuration
 
@@ -74,7 +77,7 @@ Each individual plugin can be disabled, replaced or used with other plugins in t
 }
 ```
 
-The `npmPublish` and `tarballDir` option can be used to skip the publishing to the `npm` registry and instead, release the package tarball with another plugin. For example with the [github](https://github.com/semantic-release/github):
+The `npmPublish` and `tarballDir` option can be used to skip the publishing to the `npm` registry and instead, release the package tarball with another plugin. For example with the [github](https://github.com/semantic-release/github) plugin:
 
 ```json
 {
@@ -92,6 +95,30 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
         "assets": "dist/*.tgz"
       },
     ]
+  }
+}
+```
+
+When publishing from a sub-directory with the `pkgRoot` option, the `package.json` and `npm-shrinkwrap.json` updated with the new version can be moved to another directory with a `postpublish` [npm script](https://docs.npmjs.com/misc/scripts). For example with the [git](https://github.com/semantic-release/git) plugin:
+
+```json
+{
+  "release": {
+    "verifyConditions": ["@semantic-release/conditions-travis", "@semantic-release/npm", "@semantic-release/git"],
+    "getLastRelease": "@semantic-release/npm",
+    "publish": [
+      {
+        "path": "@semantic-release/npm",
+        "pkgRoot": "dist"
+      },
+      {
+        "path": "@semantic-release/git",
+        "assets": ["package.json", "npm-shrinkwrap.json"]
+      },
+    ]
+  },
+  "scripts": {
+    "postpublish": "cp -r dist/package.json . && cp -r dist/npm-shrinkwrap.json ."
   }
 }
 ```
