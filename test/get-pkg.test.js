@@ -1,5 +1,5 @@
 import test from 'ava';
-import {writeJson, writeFile} from 'fs-extra';
+import {outputJson, writeFile} from 'fs-extra';
 import tempy from 'tempy';
 import getPkg from '../lib/get-pkg';
 
@@ -18,9 +18,18 @@ test.afterEach.always(() => {
 
 test.serial('Verify name and return parsed package.json', async t => {
   const pkg = {name: 'package', version: '0.0.0'};
-  await writeJson('./package.json', pkg);
+  await outputJson('./package.json', pkg);
 
   const result = await getPkg();
+  t.is(pkg.name, result.name);
+  t.is(pkg.version, result.version);
+});
+
+test.serial('Verify name and return parsed package.json from a sub-directory', async t => {
+  const pkg = {name: 'package', version: '0.0.0'};
+  await outputJson('./dist/package.json', pkg);
+
+  const result = await getPkg('dist');
   t.is(pkg.name, result.name);
   t.is(pkg.version, result.version);
 });
@@ -33,7 +42,7 @@ test.serial('Throw error if missing package.json', async t => {
 });
 
 test.serial('Throw error if missing package name', async t => {
-  await writeJson('./package.json', {version: '0.0.0'});
+  await outputJson('./package.json', {version: '0.0.0'});
 
   const error = await t.throws(getPkg());
 
