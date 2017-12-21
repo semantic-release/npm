@@ -1,11 +1,15 @@
 import test from 'ava';
 import {stub} from 'sinon';
-import verify from '../lib/verify';
+import verify from '../lib/verify-config';
 
 test.beforeEach(t => {
   // Stub the logger functions
   t.context.log = stub();
   t.context.logger = {log: t.context.log};
+});
+
+test('Verify "npmPublish", "tarballDir" and "pkgRoot" options', async t => {
+  await t.notThrows(verify({npmPublish: true, tarballDir: 'release', pkgRoot: 'dist'}, {}, t.context.logger));
 });
 
 test('Throw SemanticReleaseError if "npmPublish" option is not a Boolean', async t => {

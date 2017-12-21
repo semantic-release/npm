@@ -48,6 +48,13 @@ test.after.always(async () => {
   await npmRegistry.stop();
 });
 
+test.serial('Skip npm auth verification if "npmPublish" is false', async t => {
+  process.env.NPM_TOKEN = 'wrong_token';
+  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+  await outputJson('./package.json', pkg);
+  await t.notThrows(t.context.m.verifyConditions({npmPublish: false}, {options: {}, logger: t.context.logger}));
+});
+
 test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -61,6 +68,50 @@ test.serial('Throws error if NPM token is invalid', async t => {
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /:_authToken/);
 });
+
+test.serial(
+  'Throws error if NPM token is invalid if "npmPublish" is false and npm plugin used for "getLastRelease"',
+  async t => {
+    process.env.NPM_TOKEN = 'wrong_token';
+    const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+    await outputJson('./package.json', pkg);
+    const error = await t.throws(
+      t.context.m.verifyConditions(
+        {npmPublish: false},
+        {options: {getLastRelease: '@semantic-release/npm'}, logger: t.context.logger}
+      )
+    );
+
+    t.true(error instanceof SemanticReleaseError);
+    t.is(error.code, 'EINVALIDNPMTOKEN');
+    t.is(error.message, 'Invalid npm token.');
+
+    const npmrc = (await readFile('.npmrc')).toString();
+    t.regex(npmrc, /:_authToken/);
+  }
+);
+
+test.serial(
+  'Throws error if NPM token is invalid if "npmPublish" is false and npm plugin used for "getLastRelease" as an object',
+  async t => {
+    process.env.NPM_TOKEN = 'wrong_token';
+    const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+    await outputJson('./package.json', pkg);
+    const error = await t.throws(
+      t.context.m.verifyConditions(
+        {npmPublish: false},
+        {options: {getLastRelease: {path: '@semantic-release/npm'}}, logger: t.context.logger}
+      )
+    );
+
+    t.true(error instanceof SemanticReleaseError);
+    t.is(error.code, 'EINVALIDNPMTOKEN');
+    t.is(error.message, 'Invalid npm token.');
+
+    const npmrc = (await readFile('.npmrc')).toString();
+    t.regex(npmrc, /:_authToken/);
+  }
+);
 
 test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
