@@ -6,6 +6,7 @@ import tempy from 'tempy';
 import clearModule from 'clear-module';
 import SemanticReleaseError from '@semantic-release/error';
 import npmRegistry from './helpers/npm-registry';
+import {gitRepo, gitCommit, gitTagVersion, gitPackRefs} from './helpers/git-utils';
 
 // Save the current process.env
 const envBackup = Object.assign({}, process.env);
@@ -363,4 +364,22 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
 
   nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
   t.is(nextRelease.version, '1.0.0');
+});
+
+test.serial('Retrieve gitHead with tag for package released on a git repository with packed-refs', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  const pkg = {name: 'test-packed-ref', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
+
+  // Create a git repository, set the current working directory at the root of the repo
+  await gitRepo();
+  await outputJson('./package.json', pkg);
+  // Add commits to the master branch
+  const commit = await gitCommit('First');
+  await gitPackRefs();
+  // Create the tag corresponding to version 1.0.0
+  await gitTagVersion('1.0.0');
+  await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+
+  const nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
+  t.is(nextRelease.gitHead.substring(0, 7), commit.hash);
 });
