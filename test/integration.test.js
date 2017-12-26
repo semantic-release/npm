@@ -116,7 +116,7 @@ test.serial(
 
 test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
-  const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
@@ -127,7 +127,7 @@ test.serial('Verify npm auth and package', async t => {
 
 test.serial('Verify npm auth and package from a sub-directory', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
-  const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./dist/package.json', pkg);
   await t.notThrows(t.context.m.verifyConditions({pkgRoot: 'dist'}, {options: {}, logger: t.context.logger}));
 
@@ -139,7 +139,7 @@ test.serial('Verify npm auth and package from a sub-directory', async t => {
 test.serial('Verify npm auth and package with "npm_config_registry" env var set by yarn', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   process.env.npm_config_registry = 'https://registry.yarnpkg.com'; // eslint-disable-line camelcase
-  const pkg = {name: 'valid-token', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
@@ -150,7 +150,7 @@ test.serial('Verify npm auth and package with "npm_config_registry" env var set 
 
 test.serial('Return nothing if no version if published', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
-  const pkg = {name: 'not-published', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'not-published', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   const nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
 
@@ -243,7 +243,7 @@ test('Throw SemanticReleaseError if publish "pkgRoot" option in getLastRelease i
 });
 
 test('Throw SemanticReleaseError if publish "npmPublish" option in verifyConditions is not a Boolean', async t => {
-  const pkg = {name: 'invalid-npmPublish', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'invalid-npmPublish', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   const npmPublish = 42;
   const error = await t.throws(
@@ -261,7 +261,7 @@ test('Throw SemanticReleaseError if publish "npmPublish" option in verifyConditi
 });
 
 test('Throw SemanticReleaseError if publish "tarballDir" option in verifyConditions is not a String', async t => {
-  const pkg = {name: 'invalid-tarballDir', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'invalid-tarballDir', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   const tarballDir = 42;
   const error = await t.throws(
@@ -279,7 +279,7 @@ test('Throw SemanticReleaseError if publish "tarballDir" option in verifyConditi
 });
 
 test('Throw SemanticReleaseError if publish "pkgRoot" option in verifyConditions is not a String', async t => {
-  const pkg = {name: 'invalid-pkgRoot', publishConfig: {registry: npmRegistry.url}};
+  const pkg = {name: 'invalid-pkgRoot', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./dist/package.json', pkg);
   const pkgRoot = 42;
   const error = await t.throws(
