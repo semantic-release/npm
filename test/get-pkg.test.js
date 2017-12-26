@@ -16,7 +16,7 @@ test.afterEach.always(() => {
   process.chdir(cwd);
 });
 
-test.serial('Verify name and return parsed package.json', async t => {
+test.serial('Verify name and version then return parsed package.json', async t => {
   const pkg = {name: 'package', version: '0.0.0'};
   await outputJson('./package.json', pkg);
 
@@ -25,7 +25,7 @@ test.serial('Verify name and return parsed package.json', async t => {
   t.is(pkg.version, result.version);
 });
 
-test.serial('Verify name and return parsed package.json from a sub-directory', async t => {
+test.serial('Verify name and version then return parsed package.json from a sub-directory', async t => {
   const pkg = {name: 'package', version: '0.0.0'};
   await outputJson('./dist/package.json', pkg);
 
@@ -48,6 +48,15 @@ test.serial('Throw error if missing package name', async t => {
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKGNAME');
+});
+
+test.serial('Throw error if missing package version', async t => {
+  await outputJson('./package.json', {name: 'package'});
+
+  const error = await t.throws(getPkg());
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'ENOPKGVERSION');
 });
 
 test.serial('Throw error if package.json is malformed', async t => {
