@@ -37,15 +37,13 @@ async function verifyConditions(pluginConfig, {options: {publish, getLastRelease
   verified = true;
 }
 
-async function getLastRelease(pluginConfig, {options, logger}) {
+async function getLastRelease(pluginConfig, {options: {publish, branch}, logger}) {
   setLegacyToken();
   // Reload package.json in case a previous external step updated it
   const pkg = await getPkg(pluginConfig.pkgRoot);
   if (!verified) {
-    if (options.publish) {
-      const publishPlugin = castArray(options.publish).find(
-        config => config.path && config.path === '@semantic-release/npm'
-      );
+    if (publish) {
+      const publishPlugin = castArray(publish).find(config => config.path && config.path === '@semantic-release/npm');
       if (publishPlugin && publishPlugin.pkgRoot) {
         pluginConfig.pkgRoot = publishPlugin.pkgRoot;
       }
@@ -54,7 +52,7 @@ async function getLastRelease(pluginConfig, {options, logger}) {
     await verifyNpmAuth(pluginConfig, pkg, logger);
     verified = true;
   }
-  return getLastReleaseNpm(pkg, logger);
+  return getLastReleaseNpm(pkg, branch, logger);
 }
 
 async function publish(pluginConfig, {nextRelease: {version}, logger}) {

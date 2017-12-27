@@ -2,7 +2,6 @@ import test from 'ava';
 import {outputJson, readJson, readFile, appendFile, pathExists} from 'fs-extra';
 import execa from 'execa';
 import {stub} from 'sinon';
-import tempy from 'tempy';
 import clearModule from 'clear-module';
 import SemanticReleaseError from '@semantic-release/error';
 import npmRegistry from './helpers/npm-registry';
@@ -21,14 +20,15 @@ test.before(async () => {
   await npmRegistry.start();
 });
 
-test.beforeEach(t => {
+test.beforeEach(async t => {
   // Delete env paramaters that could have been set on the machine running the tests
   delete process.env.NPM_TOKEN;
   delete process.env.NPM_USERNAME;
   delete process.env.NPM_PASSWORD;
   delete process.env.NPM_EMAIL;
-  // Change current working directory to a temp directory
-  process.chdir(tempy.directory());
+  // Create a git repository, set the current working directory at the root of the repo
+  await gitRepo();
+  await gitCommit('Initial commit');
   // Clear npm cache to refresh the module state
   clearModule('..');
   t.context.m = require('..');
@@ -152,7 +152,7 @@ test.serial('Return nothing if no version if published', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'not-published', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
-  const nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {options: {branch: 'master'}, logger: t.context.logger});
 
   t.falsy(nextRelease);
 });
@@ -171,7 +171,7 @@ test.serial('Return last version published', async t => {
 
   await execa('npm', ['publish']);
 
-  const nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {options: {branch: 'master'}, logger: t.context.logger});
   t.is(nextRelease.version, '1.0.0');
 });
 
@@ -198,7 +198,7 @@ test.serial('Return last version published on a dist-tag', async t => {
   // Publish version 1.1.0 on next
   await execa('npm', ['publish', '--tag=next']);
 
-  const nextRelease = await t.context.m.getLastRelease({}, {options: {}, logger: t.context.logger});
+  const nextRelease = await t.context.m.getLastRelease({}, {options: {branch: 'master'}, logger: t.context.logger});
   t.is(nextRelease.version, '1.1.0');
 });
 
@@ -219,7 +219,7 @@ test.serial('Return nothing for an unpublished package', async t => {
 
   const nextRelease = await t.context.m.getLastRelease(
     {},
-    {options: {publish: ['@semantic-release/npm']}, logger: t.context.logger}
+    {options: {branch: 'master', publish: ['@semantic-release/npm']}, logger: t.context.logger}
   );
   t.falsy(nextRelease);
 });
@@ -232,7 +232,7 @@ test('Throw SemanticReleaseError if publish "pkgRoot" option in getLastRelease i
     t.context.m.getLastRelease(
       {},
       {
-        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', pkgRoot}]},
+        options: {branch: 'master', publish: ['@semantic-release/github', {path: '@semantic-release/npm', pkgRoot}]},
         logger: t.context.logger,
       }
     )
@@ -369,9 +369,6 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
 test.serial('Retrieve gitHead with tag for package released on a git repository with packed-refs', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'test-packed-ref', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-
-  // Create a git repository, set the current working directory at the root of the repo
-  await gitRepo();
   await outputJson('./package.json', pkg);
   // Add commits to the master branch
   const commit = await gitCommit('First');
