@@ -84,7 +84,7 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
 ```json
 {
   "release": {
-    "verifyConditions": ["@semantic-release/conditions-travis", "@semantic-release/npm", "@semantic-release/git", "@semantic-release/github"],
+    "verifyConditions": ["@semantic-release/npm", "@semantic-release/git", "@semantic-release/github"],
     "getLastRelease": "@semantic-release/git",
     "publish": [
       {
@@ -106,7 +106,7 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
 ```json
 {
   "release": {
-    "verifyConditions": ["@semantic-release/conditions-travis", "@semantic-release/npm", "@semantic-release/git"],
+    "verifyConditions": ["@semantic-release/npm", "@semantic-release/git"],
     "getLastRelease": "@semantic-release/npm",
     "publish": [
       {
