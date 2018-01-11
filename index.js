@@ -61,8 +61,10 @@ async function publish(pluginConfig, {nextRelease: {version}, logger}) {
   const pkg = await getPkg(pluginConfig.pkgRoot);
   if (!verified) {
     await verifyNpmConfig(pluginConfig, pkg, logger);
-    await verifyNpmAuth(pluginConfig, pkg, logger);
-    verified = true;
+    if (pluginConfig.npmPublish !== false) {
+      await verifyNpmAuth(pluginConfig, pkg, logger);
+      verified = true;
+    }
   }
   await publishNpm(pluginConfig, pkg, version, logger);
 }
