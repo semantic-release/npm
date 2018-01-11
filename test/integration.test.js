@@ -26,6 +26,7 @@ test.beforeEach(async t => {
   delete process.env.NPM_USERNAME;
   delete process.env.NPM_PASSWORD;
   delete process.env.NPM_EMAIL;
+  delete process.env.DEFAULT_NPM_REGISTRY;
   // Create a git repository, set the current working directory at the root of the repo
   await gitRepo();
   await gitCommit('Initial commit');
@@ -58,6 +59,7 @@ test.serial('Skip npm auth verification if "npmPublish" is false', async t => {
 
 test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
+  process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   const error = await t.throws(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
@@ -70,10 +72,21 @@ test.serial('Throws error if NPM token is invalid', async t => {
   t.regex(npmrc, /:_authToken/);
 });
 
+test.serial('Skip Token validation if the registry configured is not the default one', async t => {
+  process.env.NPM_TOKEN = 'wrong_token';
+  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: 'http://custom-registry.com/'}};
+  await outputJson('./package.json', pkg);
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
+
+  const npmrc = (await readFile('.npmrc')).toString();
+  t.regex(npmrc, /:_authToken/);
+});
+
 test.serial(
   'Throws error if NPM token is invalid if "npmPublish" is false and npm plugin used for "getLastRelease"',
   async t => {
     process.env.NPM_TOKEN = 'wrong_token';
+    process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;
     const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
     await outputJson('./package.json', pkg);
     const error = await t.throws(
@@ -96,6 +109,7 @@ test.serial(
   'Throws error if NPM token is invalid if "npmPublish" is false and npm plugin used for "getLastRelease" as an object',
   async t => {
     process.env.NPM_TOKEN = 'wrong_token';
+    process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;
     const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
     await outputJson('./package.json', pkg);
     const error = await t.throws(
