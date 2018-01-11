@@ -328,6 +328,12 @@ test.serial('Publish the package from a sub-directory', async t => {
 
 test.serial('Create the package and skip publish', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
+  // Delete the authentication to make sure they are not required when skipping publish to registry
+  delete process.env.NPM_TOKEN;
+  delete process.env.NPM_USERNAME;
+  delete process.env.NPM_PASSWORD;
+  delete process.env.NPM_EMAIL;
+
   const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
 
