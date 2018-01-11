@@ -224,9 +224,9 @@ test.serial('Return nothing for an unpublished package', async t => {
   t.falsy(nextRelease);
 });
 
-test('Throw SemanticReleaseError if publish "pkgRoot" option in getLastRelease is not a String', async t => {
-  const pkg = {name: 'invalid-pkgRoot', publishConfig: {registry: npmRegistry.url}};
-  await outputJson('./dist/package.json', pkg);
+test.serial('Throw SemanticReleaseError if publish "pkgRoot" option in getLastRelease is not a String', async t => {
+  const pkg = {name: 'invalid-pkgRoot', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
+  await outputJson('./package.json', pkg);
   const pkgRoot = 42;
   const error = await t.throws(
     t.context.m.getLastRelease(
@@ -242,45 +242,51 @@ test('Throw SemanticReleaseError if publish "pkgRoot" option in getLastRelease i
   t.is(error.code, 'EINVALIDPKGROOT');
 });
 
-test('Throw SemanticReleaseError if publish "npmPublish" option in verifyConditions is not a Boolean', async t => {
-  const pkg = {name: 'invalid-npmPublish', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-  await outputJson('./package.json', pkg);
-  const npmPublish = 42;
-  const error = await t.throws(
-    t.context.m.verifyConditions(
-      {},
-      {
-        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish}]},
-        logger: t.context.logger,
-      }
-    )
-  );
+test.serial(
+  'Throw SemanticReleaseError if publish "npmPublish" option in verifyConditions is not a Boolean',
+  async t => {
+    const pkg = {name: 'invalid-npmPublish', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
+    await outputJson('./package.json', pkg);
+    const npmPublish = 42;
+    const error = await t.throws(
+      t.context.m.verifyConditions(
+        {},
+        {
+          options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish}]},
+          logger: t.context.logger,
+        }
+      )
+    );
 
-  t.is(error.name, 'SemanticReleaseError');
-  t.is(error.code, 'EINVALIDNPMPUBLISH');
-});
+    t.is(error.name, 'SemanticReleaseError');
+    t.is(error.code, 'EINVALIDNPMPUBLISH');
+  }
+);
 
-test('Throw SemanticReleaseError if publish "tarballDir" option in verifyConditions is not a String', async t => {
-  const pkg = {name: 'invalid-tarballDir', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-  await outputJson('./package.json', pkg);
-  const tarballDir = 42;
-  const error = await t.throws(
-    t.context.m.verifyConditions(
-      {},
-      {
-        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', tarballDir}]},
-        logger: t.context.logger,
-      }
-    )
-  );
+test.serial(
+  'Throw SemanticReleaseError if publish "tarballDir" option in verifyConditions is not a String',
+  async t => {
+    const pkg = {name: 'invalid-tarballDir', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
+    await outputJson('./package.json', pkg);
+    const tarballDir = 42;
+    const error = await t.throws(
+      t.context.m.verifyConditions(
+        {},
+        {
+          options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', tarballDir}]},
+          logger: t.context.logger,
+        }
+      )
+    );
 
-  t.is(error.name, 'SemanticReleaseError');
-  t.is(error.code, 'EINVALIDTARBALLDIR');
-});
+    t.is(error.name, 'SemanticReleaseError');
+    t.is(error.code, 'EINVALIDTARBALLDIR');
+  }
+);
 
-test('Throw SemanticReleaseError if publish "pkgRoot" option in verifyConditions is not a String', async t => {
+test.serial('Throw SemanticReleaseError if publish "pkgRoot" option in verifyConditions is not a String', async t => {
   const pkg = {name: 'invalid-pkgRoot', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-  await outputJson('./dist/package.json', pkg);
+  await outputJson('./package.json', pkg);
   const pkgRoot = 42;
   const error = await t.throws(
     t.context.m.verifyConditions(
