@@ -10,10 +10,6 @@ Set of [semantic-release](https://github.com/semantic-release/semantic-release) 
 
 Verify the presence of the `NPM_TOKEN` environment variable, create or update the `.npmrc` file with the token and verify the token is valid.
 
-## getLastRelease
-
-Determine the last release of the package on the `npm` registry.
-
 ## publish
 
 Update the `package.json` version, [create](https://docs.npmjs.com/cli/pack) the `npm` package tarball and [publish](https://docs.npmjs.com/cli/publish) to the `npm` registry.
@@ -73,7 +69,6 @@ Each individual plugin can be disabled, replaced or used with other plugins in t
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "verify-other-condition"],
-    "getLastRelease": "custom-get-last-release",
     "publish": ["@semantic-release/npm", "custom-publish"]
   }
 }
@@ -85,7 +80,6 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "@semantic-release/git", "@semantic-release/github"],
-    "getLastRelease": "@semantic-release/git",
     "publish": [
       {
         "path": "@semantic-release/npm",
@@ -107,7 +101,6 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "@semantic-release/git"],
-    "getLastRelease": "@semantic-release/npm",
     "publish": [
       {
         "path": "@semantic-release/npm",
