@@ -49,6 +49,21 @@ test.serial('Updade package.json and npm-shrinkwrap.json', async t => {
   t.deepEqual(t.context.log.args[1], ['Wrote version %s to %s', '1.0.0', 'npm-shrinkwrap.json']);
 });
 
+test.serial('Updade package.json and package-lock.json', async t => {
+  // Create package.json in repository root
+  await outputJson('./package.json', {version: '0.0.0-dev'});
+  // Create a npm-shrinkwrap.json file
+  await execa('npm', ['install']);
+
+  await updatePackageVersion('1.0.0', '.', t.context.logger);
+
+  // Verify package.json and npm-shrinkwrap.json have been updated
+  t.is((await readJson('./package.json')).version, '1.0.0');
+  t.is((await readJson('./package-lock.json')).version, '1.0.0');
+  // Verify the logger has been called with the version updated
+  t.deepEqual(t.context.log.args[0], ['Wrote version %s to %s', '1.0.0', 'package.json']);
+  t.deepEqual(t.context.log.args[1], ['Wrote version %s to %s', '1.0.0', 'package-lock.json']);
+});
 
 test.serial('Updade package.json and npm-shrinkwrap.json in a sub-directory', async t => {
   // Create package.json in repository root
