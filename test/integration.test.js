@@ -181,8 +181,23 @@ test.serial('Publish the package', async t => {
   const pkg = {name: 'publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
 
-  await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  const result = await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
 
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
+  t.is((await readJson('./package.json')).version, '1.0.0');
+  t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
+  t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
+});
+
+test.serial('Publish the package on a dist-tag', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;
+  const pkg = {name: 'publish-tag', version: '0.0.0', publishConfig: {registry: npmRegistry.url, tag: 'next'}};
+  await outputJson('./package.json', pkg);
+
+  const result = await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+
+  t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
   t.is((await readJson('./package.json')).version, '1.0.0');
   t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
   t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
@@ -193,8 +208,12 @@ test.serial('Publish the package from a sub-directory', async t => {
   const pkg = {name: 'publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./dist/package.json', pkg);
 
-  await t.context.m.publish({pkgRoot: 'dist'}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  const result = await t.context.m.publish(
+    {pkgRoot: 'dist'},
+    {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+  );
 
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson('./dist/package.json')).version, '1.0.0');
   t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
   t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
@@ -211,11 +230,12 @@ test.serial('Create the package and skip publish', async t => {
   const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
 
-  await t.context.m.publish(
+  const result = await t.context.m.publish(
     {npmPublish: false, tarballDir: 'tarball'},
     {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
   );
 
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson('./package.json')).version, '1.0.0');
   t.true(await pathExists(`./tarball/${pkg.name}-1.0.0.tgz`));
   await t.throws(execa('npm', ['view', pkg.name, 'version']));
@@ -226,11 +246,12 @@ test.serial('Create the package and skip publish from a sub-directory', async t 
   const pkg = {name: 'skip-publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./dist/package.json', pkg);
 
-  await t.context.m.publish(
+  const result = await t.context.m.publish(
     {npmPublish: false, tarballDir: './tarball', pkgRoot: './dist'},
     {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
   );
 
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson('./dist/package.json')).version, '1.0.0');
   t.true(await pathExists(`./tarball/${pkg.name}-1.0.0.tgz`));
   await t.throws(execa('npm', ['view', pkg.name, 'version']));
@@ -243,5 +264,6 @@ test.serial('Verify token and set up auth only on the fist call', async t => {
 
   await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
-  await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  const result = await t.context.m.publish({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
 });
