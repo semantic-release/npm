@@ -35,7 +35,7 @@ test.serial('Verify name and version then return parsed package.json from a sub-
 });
 
 test.serial('Throw error if missing package.json', async t => {
-  const error = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg());
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKG');
@@ -44,7 +44,7 @@ test.serial('Throw error if missing package.json', async t => {
 test.serial('Throw error if missing package name', async t => {
   await outputJson('./package.json', {version: '0.0.0'});
 
-  const error = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg());
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKGNAME');
@@ -53,16 +53,27 @@ test.serial('Throw error if missing package name', async t => {
 test.serial('Throw error if missing package version', async t => {
   await outputJson('./package.json', {name: 'package'});
 
-  const error = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg());
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKGVERSION');
 });
 
+test.serial('Throw errors if missing package version and name', async t => {
+  await outputJson('./package.json', {});
+
+  const errors = [...(await t.throws(getPkg()))];
+
+  t.is(errors[0].name, 'SemanticReleaseError');
+  t.is(errors[0].code, 'ENOPKGNAME');
+  t.is(errors[1].name, 'SemanticReleaseError');
+  t.is(errors[1].code, 'ENOPKGVERSION');
+});
+
 test.serial('Throw error if package.json is malformed', async t => {
   await writeFile('./package.json', "{name: 'package',}");
 
-  const error = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg());
 
   t.is(error.name, 'JSONError');
 });
