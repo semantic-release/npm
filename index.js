@@ -1,4 +1,5 @@
 const {castArray} = require('lodash');
+const AggregateError = require('aggregate-error');
 const setLegacyToken = require('./lib/set-legacy-token');
 const getPkg = require('./lib/get-pkg');
 const verifyNpmConfig = require('./lib/verify-config');
@@ -10,39 +11,50 @@ let verified;
 async function verifyConditions(pluginConfig, {options: {publish}, logger}) {
   // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong
   if (publish) {
-    const publishPlugin = castArray(publish).find(config => config.path && config.path === '@semantic-release/npm');
-    if (publishPlugin && publishPlugin.npmPublish) {
-      pluginConfig.npmPublish = publishPlugin.npmPublish;
-    }
-    if (publishPlugin && publishPlugin.tarballDir) {
-      pluginConfig.tarballDir = publishPlugin.tarballDir;
-    }
-    if (publishPlugin && publishPlugin.pkgRoot) {
-      pluginConfig.pkgRoot = publishPlugin.pkgRoot;
-    }
+    const publishPlugin =
+      castArray(publish).find(config => config.path && config.path === '@semantic-release/npm') || {};
+
+    pluginConfig.npmPublish = pluginConfig.npmPublish || publishPlugin.npmPublish;
+    pluginConfig.tarballDir = pluginConfig.tarballDir || publishPlugin.tarballDir;
+    pluginConfig.pkgRoot = pluginConfig.pkgRoot || publishPlugin.pkgRoot;
   }
 
-  const pkg = await getPkg(pluginConfig.pkgRoot);
-  await verifyNpmConfig(pluginConfig, pkg, logger);
+  const errors = verifyNpmConfig(pluginConfig);
 
-  // Verify the npm authentication only if `npmPublish` is not false
-  if (pluginConfig.npmPublish !== false) {
-    setLegacyToken();
-    await verifyNpmAuth(pluginConfig, pkg, logger);
+  try {
+    const pkg = await getPkg(pluginConfig.pkgRoot);
+
+    // Verify the npm authentication only if `npmPublish` is not false
+    if (pluginConfig.npmPublish !== false) {
+      setLegacyToken();
+      await verifyNpmAuth(pluginConfig, pkg, logger);
+    }
+  } catch (err) {
+    errors.push(...err);
+  }
+  if (errors.length > 0) {
+    throw new AggregateError(errors);
   }
   verified = true;
 }
 
 async function publish(pluginConfig, {nextRelease: {version}, logger}) {
+  let pkg;
+  const errors = verifyNpmConfig(pluginConfig);
+
   setLegacyToken();
-  // Reload package.json in case a previous external step updated it
-  const pkg = await getPkg(pluginConfig.pkgRoot);
-  if (!verified) {
-    await verifyNpmConfig(pluginConfig, pkg, logger);
-    if (pluginConfig.npmPublish !== false) {
+
+  try {
+    // Reload package.json in case a previous external step updated it
+    pkg = await getPkg(pluginConfig.pkgRoot);
+    if (!verified && pluginConfig.npmPublish !== false) {
       await verifyNpmAuth(pluginConfig, pkg, logger);
     }
-    verified = true;
+  } catch (err) {
+    errors.push(...err);
+  }
+  if (errors.length > 0) {
+    throw new AggregateError(errors);
   }
   return publishNpm(pluginConfig, pkg, version, logger);
 }

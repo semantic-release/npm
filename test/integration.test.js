@@ -13,7 +13,6 @@ const envBackup = Object.assign({}, process.env);
 const cwd = process.cwd();
 // Disable logs during tests
 stub(process.stdout, 'write');
-stub(process.stderr, 'write');
 
 test.before(async () => {
   // Start the local NPM registry
@@ -61,7 +60,8 @@ test.serial('Throws error if NPM token is invalid', async t => {
   process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
-  const error = await t.throws(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
+
+  const [error] = await t.throws(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
 
   t.true(error instanceof SemanticReleaseError);
   t.is(error.code, 'EINVALIDNPMTOKEN');
@@ -83,7 +83,7 @@ test.serial('Skip Token validation if the registry configured is not the default
 
 test.serial('Verify npm auth and package', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
-  console.log(process.env);
+
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
   await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
@@ -109,71 +109,43 @@ test.serial('Verify npm auth and package with "npm_config_registry" env var set 
   process.env.npm_config_registry = 'https://registry.yarnpkg.com'; // eslint-disable-line camelcase
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
-  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {publish: []}, logger: t.context.logger}));
 
   const npmrc = (await readFile('.npmrc')).toString();
   t.regex(npmrc, /_auth =/);
   t.regex(npmrc, /email =/);
 });
 
-test.serial(
-  'Throw SemanticReleaseError if publish "npmPublish" option in verifyConditions is not a Boolean',
-  async t => {
-    const pkg = {name: 'invalid-npmPublish', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-    await outputJson('./package.json', pkg);
-    const npmPublish = 42;
-    const error = await t.throws(
-      t.context.m.verifyConditions(
-        {},
-        {
-          options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish}]},
-          logger: t.context.logger,
-        }
-      )
-    );
-
-    t.is(error.name, 'SemanticReleaseError');
-    t.is(error.code, 'EINVALIDNPMPUBLISH');
-  }
-);
-
-test.serial(
-  'Throw SemanticReleaseError if publish "tarballDir" option in verifyConditions is not a String',
-  async t => {
-    const pkg = {name: 'invalid-tarballDir', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
-    await outputJson('./package.json', pkg);
-    const tarballDir = 42;
-    const error = await t.throws(
-      t.context.m.verifyConditions(
-        {},
-        {
-          options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', tarballDir}]},
-          logger: t.context.logger,
-        }
-      )
-    );
-
-    t.is(error.name, 'SemanticReleaseError');
-    t.is(error.code, 'EINVALIDTARBALLDIR');
-  }
-);
-
-test.serial('Throw SemanticReleaseError if publish "pkgRoot" option in verifyConditions is not a String', async t => {
-  const pkg = {name: 'invalid-pkgRoot', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
+test.serial('Throw SemanticReleaseError Array if config option are not valid in verifyConditions', async t => {
+  const pkg = {publishConfig: {registry: npmRegistry.url}};
   await outputJson('./package.json', pkg);
+  const npmPublish = 42;
+  const tarballDir = 42;
   const pkgRoot = 42;
-  const error = await t.throws(
-    t.context.m.verifyConditions(
-      {},
-      {
-        options: {publish: ['@semantic-release/github', {path: '@semantic-release/npm', pkgRoot}]},
-        logger: t.context.logger,
-      }
-    )
-  );
+  const errors = [
+    ...(await t.throws(
+      t.context.m.verifyConditions(
+        {},
+        {
+          options: {
+            publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish, tarballDir, pkgRoot}],
+          },
+          logger: t.context.logger,
+        }
+      )
+    )),
+  ];
 
-  t.is(error.name, 'SemanticReleaseError');
-  t.is(error.code, 'EINVALIDPKGROOT');
+  t.is(errors[0].name, 'SemanticReleaseError');
+  t.is(errors[0].code, 'EINVALIDNPMPUBLISH');
+  t.is(errors[1].name, 'SemanticReleaseError');
+  t.is(errors[1].code, 'EINVALIDTARBALLDIR');
+  t.is(errors[2].name, 'SemanticReleaseError');
+  t.is(errors[2].code, 'EINVALIDPKGROOT');
+  t.is(errors[3].name, 'SemanticReleaseError');
+  t.is(errors[3].code, 'ENOPKGNAME');
+  t.is(errors[4].name, 'SemanticReleaseError');
+  t.is(errors[4].code, 'ENOPKGVERSION');
 });
 
 test.serial('Publish the package', async t => {
@@ -255,6 +227,38 @@ test.serial('Create the package and skip publish from a sub-directory', async t 
   t.is((await readJson('./dist/package.json')).version, '1.0.0');
   t.true(await pathExists(`./tarball/${pkg.name}-1.0.0.tgz`));
   await t.throws(execa('npm', ['view', pkg.name, 'version']));
+});
+
+test.serial('Throw SemanticReleaseError Array if config option are not valid in publish', async t => {
+  const pkg = {publishConfig: {registry: npmRegistry.url}};
+  await outputJson('./package.json', pkg);
+  const npmPublish = 42;
+  const tarballDir = 42;
+  const pkgRoot = 42;
+
+  const errors = [
+    ...(await t.throws(
+      t.context.m.publish(
+        {npmPublish, tarballDir, pkgRoot},
+        {
+          options: {publish: ['@semantic-release/github', '@semantic-release/npm']},
+          nextRelease: {version: '1.0.0'},
+          logger: t.context.logger,
+        }
+      )
+    )),
+  ];
+
+  t.is(errors[0].name, 'SemanticReleaseError');
+  t.is(errors[0].code, 'EINVALIDNPMPUBLISH');
+  t.is(errors[1].name, 'SemanticReleaseError');
+  t.is(errors[1].code, 'EINVALIDTARBALLDIR');
+  t.is(errors[2].name, 'SemanticReleaseError');
+  t.is(errors[2].code, 'EINVALIDPKGROOT');
+  t.is(errors[3].name, 'SemanticReleaseError');
+  t.is(errors[3].code, 'ENOPKGNAME');
+  t.is(errors[4].name, 'SemanticReleaseError');
+  t.is(errors[4].code, 'ENOPKGVERSION');
 });
 
 test.serial('Verify token and set up auth only on the fist call', async t => {
