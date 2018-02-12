@@ -13,9 +13,12 @@ Set of [semantic-release](https://github.com/semantic-release/semantic-release) 
 
 Verify the presence of the `NPM_TOKEN` environment variable, create or update the `.npmrc` file with the token and verify the token is valid.
 
-## publish
+## prepare
 
-Update the `package.json` version, [create](https://docs.npmjs.com/cli/pack) the `npm` package tarball and [publish](https://docs.npmjs.com/cli/publish) to the `npm` registry.
+Update the `package.json` version and [create](https://docs.npmjs.com/cli/pack) the `npm` package tarball.
+
+## publish
+[Publish](https://docs.npmjs.com/cli/publish) to the `npm` registry.
 
 ## Configuration
 
