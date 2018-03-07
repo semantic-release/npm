@@ -55,6 +55,18 @@ test.serial('Skip npm auth verification if "npmPublish" is false', async t => {
   await t.notThrows(t.context.m.verifyConditions({npmPublish: false}, {options: {}, logger: t.context.logger}));
 });
 
+test.serial('Skip npm token verification if "npmPublish" is false', async t => {
+  delete process.env.NPM_TOKEN;
+  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+  await outputJson('./package.json', pkg);
+  await t.notThrows(
+    t.context.m.verifyConditions(
+      {npmPublish: false},
+      {options: {publish: ['@semantic-release/npm']}, logger: t.context.logger}
+    )
+  );
+});
+
 test.serial('Throws error if NPM token is invalid', async t => {
   process.env.NPM_TOKEN = 'wrong_token';
   process.env.DEFAULT_NPM_REGISTRY = npmRegistry.url;

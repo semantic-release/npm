@@ -1,4 +1,4 @@
-const {castArray} = require('lodash');
+const {defaultTo, castArray} = require('lodash');
 const AggregateError = require('aggregate-error');
 const setLegacyToken = require('./lib/set-legacy-token');
 const getPkg = require('./lib/get-pkg');
@@ -16,9 +16,9 @@ async function verifyConditions(pluginConfig, {options: {publish}, logger}) {
     const publishPlugin =
       castArray(publish).find(config => config.path && config.path === '@semantic-release/npm') || {};
 
-    pluginConfig.npmPublish = pluginConfig.npmPublish || publishPlugin.npmPublish;
-    pluginConfig.tarballDir = pluginConfig.tarballDir || publishPlugin.tarballDir;
-    pluginConfig.pkgRoot = pluginConfig.pkgRoot || publishPlugin.pkgRoot;
+    pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
+    pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
+    pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
   }
 
   const errors = verifyNpmConfig(pluginConfig);
