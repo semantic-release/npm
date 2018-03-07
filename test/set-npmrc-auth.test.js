@@ -68,7 +68,7 @@ test.serial('Do not modify ".npmrc" if auth is already configured for a scoped p
 });
 
 test.serial('Throw error if "NPM_TOKEN" is missing', async t => {
-  const error = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
+  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -78,7 +78,7 @@ test.serial('Throw error if "NPM_TOKEN" is missing', async t => {
 test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
   process.env.NPM_PASSWORD = 'npm_pasword';
   process.env.NPM_EMAIL = 'npm_email';
-  const error = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
+  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -88,7 +88,7 @@ test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
 test.serial('Throw error if "NPM_PASSWORD" is missing', async t => {
   process.env.NPM_USERNAME = 'npm_username';
   process.env.NPM_EMAIL = 'npm_email';
-  const error = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
+  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -98,7 +98,7 @@ test.serial('Throw error if "NPM_PASSWORD" is missing', async t => {
 test.serial('Throw error if "NPM_EMAIL" is missing', async t => {
   process.env.NPM_USERNAME = 'npm_username';
   process.env.NPM_PASSWORD = 'npm_password';
-  const error = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
+  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', t.context.logger));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
