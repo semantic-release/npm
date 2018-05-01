@@ -19,7 +19,7 @@
     "@semantic-release/error": "^2.2.0",
     "aggregate-error": "^1.0.0",
     "execa": "^0.10.0",
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^6.0.0",
     "lodash": "^4.17.4",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^2.0.1",
