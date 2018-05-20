@@ -1,5 +1,5 @@
 import test from 'ava';
-import {outputJson, readJson} from 'fs-extra';
+import {outputJson, readJson, outputFile, readFile} from 'fs-extra';
 import tempy from 'tempy';
 import execa from 'execa';
 import {stub} from 'sinon';
@@ -81,4 +81,33 @@ test.serial('Updade package.json and npm-shrinkwrap.json in a sub-directory', as
   // Verify the logger has been called with the version updated
   t.deepEqual(t.context.log.args[0], ['Wrote version %s to %s', '1.0.0', 'dist/package.json']);
   t.deepEqual(t.context.log.args[1], ['Wrote version %s to %s', '1.0.0', 'dist/npm-shrinkwrap.json']);
+});
+
+test.serial('Preserve indentation and newline', async t => {
+  // Create package.json in repository root
+  await outputFile('./package.json', `{\r\n        "name": "package-name",\r\n        "version": "0.0.0-dev"\r\n}\r\n`);
+
+  await updatePackageVersion('1.0.0', '.', t.context.logger);
+
+  // Verify package.json has been updated
+  t.is(
+    await readFile('./package.json', 'utf-8'),
+    `{\r\n        "name": "package-name",\r\n        "version": "1.0.0"\r\n}\r\n`
+  );
+
+  // Verify the logger has been called with the version updated
+  t.deepEqual(t.context.log.args[0], ['Wrote version %s to %s', '1.0.0', 'package.json']);
+});
+
+test.serial('Use default indentation and newline if it cannot be detected', async t => {
+  // Create package.json in repository root
+  await outputFile('./package.json', `{"name": "package-name","version": "0.0.0-dev"}`);
+
+  await updatePackageVersion('1.0.0', '.', t.context.logger);
+
+  // Verify package.json has been updated
+  t.is(await readFile('./package.json', 'utf-8'), `{\n  "name": "package-name",\n  "version": "1.0.0"\n}\n`);
+
+  // Verify the logger has been called with the version updated
+  t.deepEqual(t.context.log.args[0], ['Wrote version %s to %s', '1.0.0', 'package.json']);
 });
