@@ -24,7 +24,7 @@
     "fs-extra": "^6.0.0",
     "lodash": "^4.17.4",
     "nerf-dart": "^1.0.0",
-    "normalize-url": "^2.0.1",
+    "normalize-url": "^3.0.0",
     "parse-json": "^4.0.0",
     "read-pkg": "^3.0.0",
     "registry-auth-token": "^3.3.1"
