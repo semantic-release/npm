@@ -75,6 +75,7 @@ Each individual plugin can be disabled, replaced or used with other plugins in t
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "verify-other-condition"],
+    "prepare": ["@semantic-release/npm", "custom-prepare"],
     "publish": ["@semantic-release/npm", "custom-publish"]
   }
 }
@@ -86,17 +87,11 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "@semantic-release/git", "@semantic-release/github"],
-    "publish": [
-      {
-        "path": "@semantic-release/npm",
-        "npmPublish": false,
-        "tarballDir": "dist"
-      },
-      {
-        "path": "@semantic-release/github",
-        "assets": "dist/*.tgz"
-      },
-    ]
+    "prepare": ["@semantic-release/npm"],
+    "publish": ["@semantic-release/npm", "@semantic-release/github"],
+    "npmPublish": false,
+    "tarballDir": "dist",
+    "assets": "dist/*.tgz"
   }
 }
 ```
@@ -107,16 +102,10 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
 {
   "release": {
     "verifyConditions": ["@semantic-release/npm", "@semantic-release/git"],
-    "publish": [
-      {
-        "path": "@semantic-release/npm",
-        "pkgRoot": "dist"
-      },
-      {
-        "path": "@semantic-release/git",
-        "assets": ["package.json", "npm-shrinkwrap.json"]
-      },
-    ]
+    "prepare": ["@semantic-release/npm", "@semantic-release/git"],
+    "publish": ["@semantic-release/npm"],
+    "pkgRoot": "dist",
+    "assets": ["package.json", "npm-shrinkwrap.json"]
   },
   "scripts": {
     "postpublish": "cp -r dist/package.json . && cp -r dist/npm-shrinkwrap.json ."
