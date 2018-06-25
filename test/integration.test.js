@@ -155,7 +155,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[2].name, 'SemanticReleaseError');
   t.is(errors[2].code, 'EINVALIDPKGROOT');
   t.is(errors[3].name, 'SemanticReleaseError');
-  t.is(errors[3].code, 'ENOPKGNAME');
+  t.is(errors[3].code, 'ENOPKG');
 });
 
 test.serial('Publish the package', async t => {
@@ -266,7 +266,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[2].name, 'SemanticReleaseError');
   t.is(errors[2].code, 'EINVALIDPKGROOT');
   t.is(errors[3].name, 'SemanticReleaseError');
-  t.is(errors[3].code, 'ENOPKGNAME');
+  t.is(errors[3].code, 'ENOPKG');
 });
 
 test.serial('Prepare the package', async t => {
@@ -331,7 +331,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[2].name, 'SemanticReleaseError');
   t.is(errors[2].code, 'EINVALIDPKGROOT');
   t.is(errors[3].name, 'SemanticReleaseError');
-  t.is(errors[3].code, 'ENOPKGNAME');
+  t.is(errors[3].code, 'ENOPKG');
 });
 
 test.serial('Verify token and set up auth only on the fist call, then prepare on prepare call only', async t => {
