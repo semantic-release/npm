@@ -51,6 +51,8 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 
 **Note**: The `pkgRoot` directory must contains a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
+**Note**: If you use a [shareable configuration](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/shareable-configurations.md#shareable-configurations) that defines one of these options you can set it to `false` in your [**semantic-release** configuration](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/configuration.md#configuration) in order to use the default value.
+
 ### Npm configuration
 
 The plugins are based on `npm` and will use the configuration from [`.npmrc`](https://docs.npmjs.com/files/npmrc). See [npm config](https://docs.npmjs.com/misc/config) for the option list.
