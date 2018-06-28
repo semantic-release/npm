@@ -69,7 +69,7 @@ The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://
 
 ### Usage
 
-The plugins are used by default by [semantic-release](https://github.com/semantic-release/semantic-release) so no specific configuration is requiered to use them.
+The plugins are used by default by [semantic-release](https://github.com/semantic-release/semantic-release) so no specific configuration is required to use them.
 
 Each individual plugin can be disabled, replaced or used with other plugins in the `package.json`:
 
