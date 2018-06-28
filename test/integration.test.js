@@ -275,7 +275,7 @@ test('Publish the package on a dist-tag', async t => {
       stdout: t.context.stdout,
       stderr: t.context.stderr,
       logger: t.context.logger,
-      nextRelease: {version: '1.0.0'},
+      nextRelease: {channel: 'next', version: '1.0.0'},
     }
   );
 
@@ -556,7 +556,7 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
     }
   );
 
-  const result = await t.context.m.publish(
+  let result = await t.context.m.publish(
     {},
     {
       cwd,
@@ -565,8 +565,14 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
       stdout: t.context.stdout,
       stderr: t.context.stderr,
       logger: t.context.logger,
-      nextRelease: {version: '1.0.0'},
+      nextRelease: {channel: 'next', version: '1.0.0'},
     }
   );
+  t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: undefined});
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'dist-tags.next'], {cwd, env}), '1.0.0');
+
+  result = await t.context.m.addChannel({}, {logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env}), '1.0.0');
 });
