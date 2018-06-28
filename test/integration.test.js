@@ -168,7 +168,7 @@ test.serial('Publish the package', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson('./package.json')).version, '1.0.0');
   t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
-  t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version']), '1.0.0');
 });
 
 test.serial('Publish the package on a dist-tag', async t => {
@@ -182,7 +182,7 @@ test.serial('Publish the package on a dist-tag', async t => {
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
   t.is((await readJson('./package.json')).version, '1.0.0');
   t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
-  t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version']), '1.0.0');
 });
 
 test.serial('Publish the package from a sub-directory', async t => {
@@ -198,7 +198,7 @@ test.serial('Publish the package from a sub-directory', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson('./dist/package.json')).version, '1.0.0');
   t.false(await pathExists(`./${pkg.name}-1.0.0.tgz`));
-  t.is((await execa('npm', ['view', pkg.name, 'version'])).stdout, '1.0.0');
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version']), '1.0.0');
 });
 
 test.serial('Create the package and skip publish', async t => {
