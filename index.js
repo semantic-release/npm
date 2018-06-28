@@ -10,11 +10,11 @@ const publishNpm = require('./lib/publish');
 let verified;
 let prepared;
 
-async function verifyConditions(pluginConfig, {options: {publish}, logger}) {
+async function verifyConditions(pluginConfig, context) {
   // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong
-  if (publish) {
+  if (context.options.publish) {
     const publishPlugin =
-      castArray(publish).find(config => config.path && config.path === '@semantic-release/npm') || {};
+      castArray(context.options.publish).find(config => config.path && config.path === '@semantic-release/npm') || {};
 
     pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
     pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
@@ -29,7 +29,7 @@ async function verifyConditions(pluginConfig, {options: {publish}, logger}) {
     // Verify the npm authentication only if `npmPublish` is not false
     if (pluginConfig.npmPublish !== false) {
       setLegacyToken();
-      await verifyNpmAuth(pluginConfig, pkg, logger);
+      await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
     errors.push(...err);
@@ -40,7 +40,7 @@ async function verifyConditions(pluginConfig, {options: {publish}, logger}) {
   verified = true;
 }
 
-async function prepare(pluginConfig, {nextRelease: {version}, logger}) {
+async function prepare(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
@@ -49,7 +49,7 @@ async function prepare(pluginConfig, {nextRelease: {version}, logger}) {
     pkg = await getPkg(pluginConfig.pkgRoot);
     if (!verified && pluginConfig.npmPublish !== false) {
       setLegacyToken();
-      await verifyNpmAuth(pluginConfig, pkg, logger);
+      await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
     errors.push(...err);
@@ -57,11 +57,11 @@ async function prepare(pluginConfig, {nextRelease: {version}, logger}) {
   if (errors.length > 0) {
     throw new AggregateError(errors);
   }
-  await prepareNpm(pluginConfig, version, logger);
+  await prepareNpm(pluginConfig, context);
   prepared = true;
 }
 
-async function publish(pluginConfig, {nextRelease: {version}, logger}) {
+async function publish(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
@@ -71,7 +71,7 @@ async function publish(pluginConfig, {nextRelease: {version}, logger}) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig.pkgRoot);
     if (!verified && pluginConfig.npmPublish !== false) {
-      await verifyNpmAuth(pluginConfig, pkg, logger);
+      await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
     errors.push(...err);
@@ -80,9 +80,9 @@ async function publish(pluginConfig, {nextRelease: {version}, logger}) {
     throw new AggregateError(errors);
   }
   if (!prepared) {
-    await prepareNpm(pluginConfig, version, logger);
+    await prepareNpm(pluginConfig, context);
   }
-  return publishNpm(pluginConfig, pkg, version, logger);
+  return publishNpm(pluginConfig, pkg, context);
 }
 
 module.exports = {verifyConditions, prepare, publish};
