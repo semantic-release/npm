@@ -17,27 +17,22 @@ test.afterEach.always(() => {
 });
 
 test.serial('Get default registry', async t => {
-  const registry = await getRegistry({}, 'package-name');
-
-  t.is(registry, 'https://registry.npmjs.org/');
+  t.is(await getRegistry(undefined, 'package-name'), 'https://registry.npmjs.org/');
+  t.is(await getRegistry({}, 'package-name'), 'https://registry.npmjs.org/');
 });
 
 test.serial('Get the registry configured in ".npmrc" and normalize trailing slash', async t => {
   await appendFile('./.npmrc', 'registry = https://custom1.registry.com');
-  const registry = await getRegistry({}, 'package-name');
 
-  t.is(registry, 'https://custom1.registry.com/');
+  t.is(await getRegistry({}, 'package-name'), 'https://custom1.registry.com/');
 });
 
 test.serial('Get the registry configured from "publishConfig"', async t => {
-  const registry = await getRegistry({registry: 'https://custom2.registry.com/'}, 'package-name');
-
-  t.is(registry, 'https://custom2.registry.com/');
+  t.is(await getRegistry({registry: 'https://custom2.registry.com/'}, 'package-name'), 'https://custom2.registry.com/');
 });
 
 test.serial('Get the registry configured in ".npmrc" for scoped package', async t => {
   await appendFile('./.npmrc', '@scope:registry = https://custom3.registry.com');
-  const registry = await getRegistry({}, '@scope/package-name');
 
-  t.is(registry, 'https://custom3.registry.com/');
+  t.is(await getRegistry({}, '@scope/package-name'), 'https://custom3.registry.com/');
 });
