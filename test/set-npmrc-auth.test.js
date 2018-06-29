@@ -42,11 +42,12 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
   process.env.NPM_USERNAME = 'npm_username';
   process.env.NPM_PASSWORD = 'npm_pasword';
   process.env.NPM_EMAIL = 'npm_email';
+  process.env.LEGACY_TOKEN = 'legacy_token';
 
   await setNpmrcAuth('http://custom.registry.com', t.context.logger);
 
   const npmrc = (await readFile('.npmrc')).toString();
-  t.is(npmrc, `\n_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
+  t.is(npmrc, `\n_auth = ${process.env.LEGACY_TOKEN}\nemail = ${process.env.NPM_EMAIL}`);
   t.deepEqual(t.context.log.args[1], ['Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to .npmrc.']);
 });
 
