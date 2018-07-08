@@ -55,6 +55,13 @@ test.serial('Skip npm auth verification if "npmPublish" is false', async t => {
   await t.notThrows(t.context.m.verifyConditions({npmPublish: false}, {options: {}, logger: t.context.logger}));
 });
 
+test.serial('Skip npm auth verification if "package.private" is true', async t => {
+  process.env.NPM_TOKEN = 'wrong_token';
+  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
+  await outputJson('./package.json', pkg);
+  await t.notThrows(t.context.m.verifyConditions({}, {options: {}, logger: t.context.logger}));
+});
+
 test.serial('Skip npm token verification if "npmPublish" is false', async t => {
   delete process.env.NPM_TOKEN;
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -64,6 +71,15 @@ test.serial('Skip npm token verification if "npmPublish" is false', async t => {
       {npmPublish: false},
       {options: {publish: ['@semantic-release/npm']}, logger: t.context.logger}
     )
+  );
+});
+
+test.serial('Skip npm token verification if "package.private" is true', async t => {
+  delete process.env.NPM_TOKEN;
+  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
+  await outputJson('./package.json', pkg);
+  await t.notThrows(
+    t.context.m.verifyConditions({}, {options: {publish: ['@semantic-release/npm']}, logger: t.context.logger})
   );
 });
 
@@ -201,7 +217,7 @@ test.serial('Publish the package from a sub-directory', async t => {
   t.is(await execa.stdout('npm', ['view', pkg.name, 'version']), '1.0.0');
 });
 
-test.serial('Create the package and skip publish', async t => {
+test.serial('Create the package and skip publish ("npmPublish" is false)', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   // Delete the authentication to make sure they are not required when skipping publish to registry
   delete process.env.NPM_TOKEN;
@@ -223,13 +239,56 @@ test.serial('Create the package and skip publish', async t => {
   await t.throws(execa('npm', ['view', pkg.name, 'version']));
 });
 
-test.serial('Create the package and skip publish from a sub-directory', async t => {
+test.serial('Create the package and skip publish ("package.private" is true)', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  // Delete the authentication to make sure they are not required when skipping publish to registry
+  delete process.env.NPM_TOKEN;
+  delete process.env.NPM_USERNAME;
+  delete process.env.NPM_PASSWORD;
+  delete process.env.NPM_EMAIL;
+
+  const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
+  await outputJson('./package.json', pkg);
+
+  const result = await t.context.m.publish(
+    {tarballDir: 'tarball'},
+    {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+  );
+
+  t.falsy(result);
+  t.is((await readJson('./package.json')).version, '1.0.0');
+  t.true(await pathExists(`./tarball/${pkg.name}-1.0.0.tgz`));
+  await t.throws(execa('npm', ['view', pkg.name, 'version']));
+});
+
+test.serial('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async t => {
   Object.assign(process.env, npmRegistry.authEnv);
   const pkg = {name: 'skip-publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson('./dist/package.json', pkg);
 
   const result = await t.context.m.publish(
     {npmPublish: false, tarballDir: './tarball', pkgRoot: './dist'},
+    {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+  );
+
+  t.falsy(result);
+  t.is((await readJson('./dist/package.json')).version, '1.0.0');
+  t.true(await pathExists(`./tarball/${pkg.name}-1.0.0.tgz`));
+  await t.throws(execa('npm', ['view', pkg.name, 'version']));
+});
+
+test.serial('Create the package and skip publish from a sub-directory ("package.private" is true)', async t => {
+  Object.assign(process.env, npmRegistry.authEnv);
+  const pkg = {
+    name: 'skip-publish-sub-dir',
+    version: '0.0.0',
+    publishConfig: {registry: npmRegistry.url},
+    private: true,
+  };
+  await outputJson('./dist/package.json', pkg);
+
+  const result = await t.context.m.publish(
+    {tarballDir: './tarball', pkgRoot: './dist'},
     {logger: t.context.logger, nextRelease: {version: '1.0.0'}}
   );
 

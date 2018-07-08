@@ -26,8 +26,8 @@ async function verifyConditions(pluginConfig, context) {
   try {
     const pkg = await getPkg(pluginConfig.pkgRoot);
 
-    // Verify the npm authentication only if `npmPublish` is not false
-    if (pluginConfig.npmPublish !== false) {
+    // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
+    if (pluginConfig.npmPublish !== false && pkg.private !== true) {
       setLegacyToken();
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
@@ -47,7 +47,7 @@ async function prepare(pluginConfig, context) {
   try {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig.pkgRoot);
-    if (!verified && pluginConfig.npmPublish !== false) {
+    if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
       setLegacyToken();
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
@@ -70,7 +70,7 @@ async function publish(pluginConfig, context) {
   try {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig.pkgRoot);
-    if (!verified && pluginConfig.npmPublish !== false) {
+    if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
