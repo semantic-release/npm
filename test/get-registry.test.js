@@ -1,38 +1,35 @@
+import path from 'path';
 import test from 'ava';
 import {appendFile} from 'fs-extra';
 import tempy from 'tempy';
 import getRegistry from '../lib/get-registry';
 
-// Save the current working diretory
-const cwd = process.cwd();
-
-test.beforeEach(() => {
-  // Change current working directory to a temp directory
-  process.chdir(tempy.directory());
+test('Get default registry', t => {
+  const cwd = tempy.directory();
+  t.is(getRegistry({name: 'package-name'}, {cwd}), 'https://registry.npmjs.org/');
+  t.is(getRegistry({name: 'package-name', publishConfig: {}}, {cwd}), 'https://registry.npmjs.org/');
 });
 
-test.afterEach.always(() => {
-  // Restore the current working directory
-  process.chdir(cwd);
+test('Get the registry configured in ".npmrc" and normalize trailing slash', async t => {
+  const cwd = tempy.directory();
+  await appendFile(path.resolve(cwd, '.npmrc'), 'registry = https://custom1.registry.com');
+
+  t.is(getRegistry({name: 'package-name'}, {cwd}), 'https://custom1.registry.com/');
 });
 
-test.serial('Get default registry', async t => {
-  t.is(await getRegistry(undefined, 'package-name'), 'https://registry.npmjs.org/');
-  t.is(await getRegistry({}, 'package-name'), 'https://registry.npmjs.org/');
+test('Get the registry configured from "publishConfig"', async t => {
+  const cwd = tempy.directory();
+  await appendFile(path.resolve(cwd, '.npmrc'), 'registry = https://custom2.registry.com');
+
+  t.is(
+    getRegistry({name: 'package-name', publishConfig: {registry: 'https://custom3.registry.com/'}}, {cwd}),
+    'https://custom3.registry.com/'
+  );
 });
 
-test.serial('Get the registry configured in ".npmrc" and normalize trailing slash', async t => {
-  await appendFile('./.npmrc', 'registry = https://custom1.registry.com');
+test('Get the registry configured in ".npmrc" for scoped package', async t => {
+  const cwd = tempy.directory();
+  await appendFile(path.resolve(cwd, '.npmrc'), '@scope:registry = https://custom3.registry.com');
 
-  t.is(await getRegistry({}, 'package-name'), 'https://custom1.registry.com/');
-});
-
-test.serial('Get the registry configured from "publishConfig"', async t => {
-  t.is(await getRegistry({registry: 'https://custom2.registry.com/'}, 'package-name'), 'https://custom2.registry.com/');
-});
-
-test.serial('Get the registry configured in ".npmrc" for scoped package', async t => {
-  await appendFile('./.npmrc', '@scope:registry = https://custom3.registry.com');
-
-  t.is(await getRegistry({}, '@scope/package-name'), 'https://custom3.registry.com/');
+  t.is(getRegistry({name: '@scope/package-name'}, {cwd}), 'https://custom3.registry.com/');
 });
