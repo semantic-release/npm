@@ -24,11 +24,11 @@ async function verifyConditions(pluginConfig, context) {
   const errors = verifyNpmConfig(pluginConfig);
 
   try {
-    const pkg = await getPkg(pluginConfig.pkgRoot);
+    const pkg = await getPkg(pluginConfig, context);
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (pluginConfig.npmPublish !== false && pkg.private !== true) {
-      setLegacyToken();
+      setLegacyToken(context);
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
@@ -46,9 +46,9 @@ async function prepare(pluginConfig, context) {
 
   try {
     // Reload package.json in case a previous external step updated it
-    pkg = await getPkg(pluginConfig.pkgRoot);
+    pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      setLegacyToken();
+      setLegacyToken(context);
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
   } catch (err) {
@@ -65,11 +65,11 @@ async function publish(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
-  setLegacyToken();
+  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
-    pkg = await getPkg(pluginConfig.pkgRoot);
+    pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
       await verifyNpmAuth(pluginConfig, pkg, context);
     }

@@ -1,59 +1,53 @@
+import path from 'path';
 import test from 'ava';
 import {outputJson, writeFile} from 'fs-extra';
 import tempy from 'tempy';
 import getPkg from '../lib/get-pkg';
 
-// Save the current working diretory
-const cwd = process.cwd();
-
-test.beforeEach(() => {
-  // Change current working directory to a temp directory
-  process.chdir(tempy.directory());
-});
-
-test.afterEach.always(() => {
-  // Restore the current working directory
-  process.chdir(cwd);
-});
-
-test.serial('Verify name and version then return parsed package.json', async t => {
+test('Verify name and version then return parsed package.json', async t => {
+  const cwd = tempy.directory();
   const pkg = {name: 'package', version: '0.0.0'};
-  await outputJson('./package.json', pkg);
+  await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  const result = await getPkg();
+  const result = await getPkg({}, {cwd});
   t.is(pkg.name, result.name);
   t.is(pkg.version, result.version);
 });
 
-test.serial('Verify name and version then return parsed package.json from a sub-directory', async t => {
+test('Verify name and version then return parsed package.json from a sub-directory', async t => {
+  const cwd = tempy.directory();
+  const pkgRoot = 'dist';
   const pkg = {name: 'package', version: '0.0.0'};
-  await outputJson('./dist/package.json', pkg);
+  await outputJson(path.resolve(cwd, pkgRoot, 'package.json'), pkg);
 
-  const result = await getPkg('dist');
+  const result = await getPkg({pkgRoot}, {cwd});
   t.is(pkg.name, result.name);
   t.is(pkg.version, result.version);
 });
 
-test.serial('Throw error if missing package.json', async t => {
-  const [error] = await t.throws(getPkg());
+test('Throw error if missing package.json', async t => {
+  const cwd = tempy.directory();
+  const [error] = await t.throws(getPkg({}, {cwd}));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKG');
 });
 
-test.serial('Throw error if missing package name', async t => {
-  await outputJson('./package.json', {version: '0.0.0'});
+test('Throw error if missing package name', async t => {
+  const cwd = tempy.directory();
+  await outputJson(path.resolve(cwd, 'package.json'), {version: '0.0.0'});
 
-  const [error] = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg({}, {cwd}));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'ENOPKGNAME');
 });
 
-test.serial('Throw error if package.json is malformed', async t => {
-  await writeFile('./package.json', "{name: 'package',}");
+test('Throw error if package.json is malformed', async t => {
+  const cwd = tempy.directory();
+  await writeFile(path.resolve(cwd, 'package.json'), "{name: 'package',}");
 
-  const [error] = await t.throws(getPkg());
+  const [error] = await t.throws(getPkg({}, {cwd}));
 
   t.is(error.name, 'JSONError');
 });
