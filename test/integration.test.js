@@ -7,10 +7,17 @@ import tempy from 'tempy';
 import clearModule from 'clear-module';
 import npmRegistry from './helpers/npm-registry';
 
-const LEGACY_TOKEN = Buffer.from(
-  `${npmRegistry.authEnv.NPM_USERNAME}:${npmRegistry.authEnv.NPM_PASSWORD}`,
-  'utf8'
-).toString('base64');
+/* eslint camelcase: ["error", {properties: "never"}] */
+
+// Environment variables used only for the local npm command used to do verification
+const testEnv = {
+  ...process.env,
+  ...npmRegistry.authEnv,
+  npm_config_registry: npmRegistry.url,
+  LEGACY_TOKEN: Buffer.from(`${npmRegistry.authEnv.NPM_USERNAME}:${npmRegistry.authEnv.NPM_PASSWORD}`, 'utf8').toString(
+    'base64'
+  ),
+};
 
 test.before(async () => {
   // Start the local NPM registry
@@ -189,10 +196,7 @@ test('Publish the package', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(
-    await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}),
-    '1.0.0'
-  );
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
 });
 
 test('Publish the package on a dist-tag', async t => {
@@ -209,10 +213,7 @@ test('Publish the package on a dist-tag', async t => {
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(
-    await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}),
-    '1.0.0'
-  );
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
 });
 
 test('Publish the package from a sub-directory', async t => {
@@ -229,10 +230,7 @@ test('Publish the package from a sub-directory', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(
-    await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}),
-    '1.0.0'
-  );
+  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
 });
 
 test('Create the package and skip publish ("npmPublish" is false)', async t => {
@@ -249,7 +247,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async t => {
   t.falsy(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}));
+  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish ("package.private" is true)', async t => {
@@ -266,7 +264,7 @@ test('Create the package and skip publish ("package.private" is true)', async t 
   t.falsy(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}));
+  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async t => {
@@ -283,7 +281,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
   t.falsy(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}));
+  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish from a sub-directory ("package.private" is true)', async t => {
@@ -305,7 +303,7 @@ test('Create the package and skip publish from a sub-directory ("package.private
   t.falsy(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: {...npmRegistry.authEnv, LEGACY_TOKEN}}));
+  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in publish', async t => {
