@@ -25,6 +25,7 @@
     "lodash": "^4.17.4",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^3.0.0",
+    "npm": "^6.3.0",
     "parse-json": "^4.0.0",
     "rc": "^1.2.8",
     "read-pkg": "^4.0.0",
