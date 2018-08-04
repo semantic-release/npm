@@ -5,6 +5,7 @@ import execa from 'execa';
 import {spy} from 'sinon';
 import tempy from 'tempy';
 import clearModule from 'clear-module';
+import {WritableStreamBuffer} from 'stream-buffers';
 import npmRegistry from './helpers/npm-registry';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
@@ -30,8 +31,9 @@ test.beforeEach(t => {
   t.context.m = require('..');
   // Stub the logger
   t.context.log = spy();
-  t.context.stdout = spy();
-  t.context.logger = {log: t.context.log, stdout: t.context.stdout};
+  t.context.stdout = new WritableStreamBuffer();
+  t.context.stderr = new WritableStreamBuffer();
+  t.context.logger = {log: t.context.log};
 });
 
 test.after.always(async () => {
@@ -46,7 +48,10 @@ test('Skip npm auth verification if "npmPublish" is false', async t => {
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
   await t.notThrows(
-    t.context.m.verifyConditions({npmPublish: false}, {cwd, env, options: {}, logger: t.context.logger})
+    t.context.m.verifyConditions(
+      {npmPublish: false},
+      {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
+    )
   );
 });
 
@@ -58,7 +63,13 @@ test('Skip npm auth verification if "package.private" is true', async t => {
   await t.notThrows(
     t.context.m.verifyConditions(
       {npmPublish: false},
-      {cwd, options: {publish: ['@semantic-release/npm']}, logger: t.context.logger}
+      {
+        cwd,
+        options: {publish: ['@semantic-release/npm']},
+        stdout: t.context.stdout,
+        stderr: t.context.stderr,
+        logger: t.context.logger,
+      }
     )
   );
 });
@@ -68,7 +79,16 @@ test('Skip npm token verification if "package.private" is true', async t => {
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
   await t.notThrows(
-    t.context.m.verifyConditions({}, {cwd, options: {publish: ['@semantic-release/npm']}, logger: t.context.logger})
+    t.context.m.verifyConditions(
+      {},
+      {
+        cwd,
+        options: {publish: ['@semantic-release/npm']},
+        stdout: t.context.stdout,
+        stderr: t.context.stderr,
+        logger: t.context.logger,
+      }
+    )
   );
 });
 
@@ -78,7 +98,12 @@ test('Throws error if NPM token is invalid', async t => {
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  const [error] = await t.throws(t.context.m.verifyConditions({}, {cwd, env, options: {}, logger: t.context.logger}));
+  const [error] = await t.throws(
+    t.context.m.verifyConditions(
+      {},
+      {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
+    )
+  );
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDNPMTOKEN');
@@ -93,7 +118,12 @@ test('Skip Token validation if the registry configured is not the default one', 
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: 'http://custom-registry.com/'}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
-  await t.notThrows(t.context.m.verifyConditions({}, {cwd, env, options: {}, logger: t.context.logger}));
+  await t.notThrows(
+    t.context.m.verifyConditions(
+      {},
+      {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
+    )
+  );
 
   const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
   t.regex(npmrc, /:_authToken/);
@@ -104,7 +134,17 @@ test('Verify npm auth and package', async t => {
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
   await t.notThrows(
-    t.context.m.verifyConditions({}, {cwd, env: npmRegistry.authEnv, options: {}, logger: t.context.logger})
+    t.context.m.verifyConditions(
+      {},
+      {
+        cwd,
+        env: npmRegistry.authEnv,
+        options: {},
+        stdout: t.context.stdout,
+        stderr: t.context.stderr,
+        logger: t.context.logger,
+      }
+    )
   );
 
   const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
@@ -119,7 +159,14 @@ test('Verify npm auth and package from a sub-directory', async t => {
   await t.notThrows(
     t.context.m.verifyConditions(
       {pkgRoot: 'dist'},
-      {cwd, env: npmRegistry.authEnv, options: {}, logger: t.context.logger}
+      {
+        cwd,
+        env: npmRegistry.authEnv,
+        options: {},
+        stdout: t.context.stdout,
+        stderr: t.context.stderr,
+        logger: t.context.logger,
+      }
     )
   );
 
@@ -139,6 +186,8 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
         cwd,
         env: {...npmRegistry.authEnv, npm_config_registry: 'https://registry.yarnpkg.com'}, // eslint-disable-line camelcase
         options: {publish: []},
+        stdout: t.context.stdout,
+        stderr: t.context.stderr,
         logger: t.context.logger,
       }
     )
@@ -166,6 +215,8 @@ test('Throw SemanticReleaseError Array if config option are not valid in verifyC
           options: {
             publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish, tarballDir, pkgRoot}],
           },
+          stdout: t.context.stdout,
+          stderr: t.context.stderr,
           logger: t.context.logger,
         }
       )
@@ -190,7 +241,15 @@ test('Publish the package', async t => {
 
   const result = await t.context.m.publish(
     {},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
@@ -207,7 +266,15 @@ test('Publish the package on a dist-tag', async t => {
 
   const result = await t.context.m.publish(
     {},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
@@ -224,7 +291,15 @@ test('Publish the package from a sub-directory', async t => {
 
   const result = await t.context.m.publish(
     {pkgRoot: 'dist'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
@@ -241,7 +316,15 @@ test('Create the package and skip publish ("npmPublish" is false)', async t => {
 
   const result = await t.context.m.publish(
     {npmPublish: false, tarballDir: 'tarball'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.falsy(result);
@@ -258,7 +341,15 @@ test('Create the package and skip publish ("package.private" is true)', async t 
 
   const result = await t.context.m.publish(
     {tarballDir: 'tarball'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.falsy(result);
@@ -275,7 +366,15 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
 
   const result = await t.context.m.publish(
     {npmPublish: false, tarballDir: './tarball', pkgRoot: './dist'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.falsy(result);
@@ -297,7 +396,15 @@ test('Create the package and skip publish from a sub-directory ("package.private
 
   const result = await t.context.m.publish(
     {tarballDir: './tarball', pkgRoot: './dist'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.falsy(result);
@@ -323,6 +430,8 @@ test('Throw SemanticReleaseError Array if config option are not valid in publish
           env: {},
           options: {publish: ['@semantic-release/github', '@semantic-release/npm']},
           nextRelease: {version: '1.0.0'},
+          stdout: t.context.stdout,
+          stderr: t.context.stderr,
           logger: t.context.logger,
         }
       )
@@ -345,7 +454,18 @@ test('Prepare the package', async t => {
   const pkg = {name: 'prepare', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  await t.context.m.prepare({}, {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  await t.context.m.prepare(
+    {},
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
+  );
 
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
@@ -359,7 +479,15 @@ test('Prepare the package from a sub-directory', async t => {
 
   await t.context.m.prepare(
     {pkgRoot: 'dist'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
@@ -374,7 +502,15 @@ test('Create the package in prepare step', async t => {
 
   await t.context.m.prepare(
     {npmPublish: false, tarballDir: 'tarball'},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
 
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
@@ -398,6 +534,8 @@ test('Throw SemanticReleaseError Array if config option are not valid in prepare
           env: {},
           options: {publish: ['@semantic-release/github', '@semantic-release/npm']},
           nextRelease: {version: '1.0.0'},
+          stdout: t.context.stdout,
+          stderr: t.context.stderr,
           logger: t.context.logger,
         }
       )
@@ -420,12 +558,36 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  await t.notThrows(t.context.m.verifyConditions({}, {cwd, env, options: {}, logger: t.context.logger}));
-  await t.context.m.prepare({}, {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}});
+  await t.notThrows(
+    t.context.m.verifyConditions(
+      {},
+      {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
+    )
+  );
+  await t.context.m.prepare(
+    {},
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
+  );
 
   const result = await t.context.m.publish(
     {},
-    {cwd, env, options: {}, logger: t.context.logger, nextRelease: {version: '1.0.0'}}
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
   );
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
 });
