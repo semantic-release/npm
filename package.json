@@ -47,6 +47,7 @@
     "p-retry": "^2.0.0",
     "semantic-release": "^15.0.0",
     "sinon": "^6.0.0",
+    "stream-buffers": "^3.0.2",
     "tempy": "^0.2.1",
     "xo": "^0.21.0"
   },
@@ -80,7 +81,7 @@
     "all": true
   },
   "peerDependencies": {
-    "semantic-release": ">=15.8.0 <16.0.0"
+    "semantic-release": ">=15.9.0 <16.0.0"
   },
   "prettier": {
     "printWidth": 120,
