@@ -39,7 +39,7 @@ async function start() {
       minTimeout: 1000,
       factor: 2,
     });
-  } catch (err) {
+  } catch (error) {
     throw new Error(`Couldn't start npm-docker-couchdb after 2 min`);
   }
 

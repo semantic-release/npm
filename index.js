@@ -31,8 +31,8 @@ async function verifyConditions(pluginConfig, context) {
       setLegacyToken(context);
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
-  } catch (err) {
-    errors.push(...err);
+  } catch (error) {
+    errors.push(...error);
   }
   if (errors.length > 0) {
     throw new AggregateError(errors);
@@ -51,8 +51,8 @@ async function prepare(pluginConfig, context) {
       setLegacyToken(context);
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
-  } catch (err) {
-    errors.push(...err);
+  } catch (error) {
+    errors.push(...error);
   }
   if (errors.length > 0) {
     throw new AggregateError(errors);
@@ -73,8 +73,8 @@ async function publish(pluginConfig, context) {
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
       await verifyNpmAuth(pluginConfig, pkg, context);
     }
-  } catch (err) {
-    errors.push(...err);
+  } catch (error) {
+    errors.push(...error);
   }
   if (errors.length > 0) {
     throw new AggregateError(errors);
