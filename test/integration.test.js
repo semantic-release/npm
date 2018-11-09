@@ -494,29 +494,6 @@ test('Prepare the package from a sub-directory', async t => {
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
 });
 
-test('Create the package in prepare step', async t => {
-  const cwd = tempy.directory();
-  const env = npmRegistry.authEnv;
-  const pkg = {name: 'prepare-pkg', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
-  await outputJson(path.resolve(cwd, 'package.json'), pkg);
-
-  await t.context.m.prepare(
-    {npmPublish: false, tarballDir: 'tarball'},
-    {
-      cwd,
-      env,
-      options: {},
-      stdout: t.context.stdout,
-      stderr: t.context.stderr,
-      logger: t.context.logger,
-      nextRelease: {version: '1.0.0'},
-    }
-  );
-
-  t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
-  t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-});
-
 test('Throw SemanticReleaseError Array if config option are not valid in prepare', async t => {
   const cwd = tempy.directory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
