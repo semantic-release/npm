@@ -65,6 +65,7 @@ test('Skip npm auth verification if "package.private" is true', async t => {
       {npmPublish: false},
       {
         cwd,
+        env: {},
         options: {publish: ['@semantic-release/npm']},
         stdout: t.context.stdout,
         stderr: t.context.stderr,
@@ -83,6 +84,7 @@ test('Skip npm token verification if "package.private" is true', async t => {
       {},
       {
         cwd,
+        env: {},
         options: {publish: ['@semantic-release/npm']},
         stdout: t.context.stdout,
         stderr: t.context.stderr,
