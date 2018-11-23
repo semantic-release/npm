@@ -242,7 +242,7 @@ test('Publish the package', async t => {
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
   const result = await t.context.m.publish(
-    {},
+    {access: 'public'},
     {
       cwd,
       env,
@@ -267,7 +267,7 @@ test('Publish the package on a dist-tag', async t => {
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
   const result = await t.context.m.publish(
-    {},
+    {access: 'public'},
     {
       cwd,
       env,
@@ -292,7 +292,7 @@ test('Publish the package from a sub-directory', async t => {
   await outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
 
   const result = await t.context.m.publish(
-    {pkgRoot: 'dist'},
+    {pkgRoot: 'dist', access: 'public'},
     {
       cwd,
       env,
@@ -557,7 +557,7 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
   );
 
   const result = await t.context.m.publish(
-    {},
+    {access: 'public'},
     {
       cwd,
       env,

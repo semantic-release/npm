@@ -62,9 +62,12 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 |--------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
 | `pkgRoot`    | Directory path to publish.                                                                                          | `.`                                                                                                                              |
-| `tarballDir` | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
+| `tarballDir` | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                             |
+| `access`     | Tells the registry whether this package should be published as `public` or `restricted`.                            | `'restricted'`                                                                                                                             |
 
 **Note**: The `pkgRoot` directory must contains a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
+
+**Note**: The `access` must be set to `public` if you don’t have a paid account and trying to push to the official registry, see [npm documentation](https://docs.npmjs.com/cli/publish#description).
 
 **Note**: If you use a [shareable configuration](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/shareable-configurations.md#shareable-configurations) that defines one of these options you can set it to `false` in your [**semantic-release** configuration](https://github.com/semantic-release/semantic-release/blob/caribou/docs/usage/configuration.md#configuration) in order to use the default value.
 
@@ -84,6 +87,21 @@ The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://
 
 ### Examples
 
+The `access` value `public` must be set up if you publish a public package to npmjs.com:
+
+```json
+{
+  "plugins": [
+    ["@semantic-release/npm", {
+      "access": "public"
+    }],
+    ["@semantic-release/github", {
+      "assets": "dist/*.tgz"
+    }]
+  ]
+}
+```
+
 The `npmPublish` and `tarballDir` option can be used to skip the publishing to the `npm` registry and instead, release the package tarball with another plugin. For example with the [@semantic-release/github](https://github.com/semantic-release/github) plugin:
 
 ```json
@@ -93,7 +111,7 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
     "@semantic-release/release-notes-generator",
     ["@semantic-release/npm", {
       "npmPublish": false,
-      "tarballDir": "dist",
+      "tarballDir": "dist"
     }],
     ["@semantic-release/github", {
       "assets": "dist/*.tgz"
