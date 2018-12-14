@@ -634,7 +634,7 @@ test('Skip adding the package to a channel ("npmPublish" is false)', async t => 
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
@@ -662,7 +662,7 @@ test('Skip adding the package to a channel ("package.private" is true)', async t
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
