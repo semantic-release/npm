@@ -329,7 +329,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async t => {
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -354,7 +354,7 @@ test('Create the package and skip publish ("package.private" is true)', async t 
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -379,7 +379,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -409,7 +409,7 @@ test('Create the package and skip publish from a sub-directory ("package.private
     }
   );
 
-  t.falsy(result);
+  t.false(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
