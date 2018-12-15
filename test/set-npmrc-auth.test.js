@@ -61,7 +61,9 @@ test('Do not modify ".npmrc" if auth is already configured for a scoped package'
 test('Throw error if "NPM_TOKEN" is missing', async t => {
   const cwd = tempy.directory();
 
-  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', {cwd, env: {}, logger: t.context.logger}));
+  const [error] = await t.throwsAsync(
+    setNpmrcAuth('http://custom.registry.com', {cwd, env: {}, logger: t.context.logger})
+  );
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -72,7 +74,7 @@ test('Throw error if "NPM_USERNAME" is missing', async t => {
   const cwd = tempy.directory();
   const env = {NPM_PASSWORD: 'npm_pasword', NPM_EMAIL: 'npm_email'};
 
-  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
+  const [error] = await t.throwsAsync(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -83,7 +85,7 @@ test('Throw error if "NPM_PASSWORD" is missing', async t => {
   const cwd = tempy.directory();
   const env = {NPM_USERNAME: 'npm_username', NPM_EMAIL: 'npm_email'};
 
-  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
+  const [error] = await t.throwsAsync(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
@@ -94,7 +96,7 @@ test('Throw error if "NPM_EMAIL" is missing', async t => {
   const cwd = tempy.directory();
   const env = {NPM_USERNAME: 'npm_username', NPM_PASSWORD: 'npm_password'};
 
-  const [error] = await t.throws(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
+  const [error] = await t.throwsAsync(setNpmrcAuth('http://custom.registry.com', {cwd, env, logger: t.context.logger}));
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.message, 'No npm token specified.');
