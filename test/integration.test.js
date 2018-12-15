@@ -47,7 +47,7 @@ test('Skip npm auth verification if "npmPublish" is false', async t => {
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {npmPublish: false},
       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
@@ -60,7 +60,7 @@ test('Skip npm auth verification if "package.private" is true', async t => {
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {npmPublish: false},
       {
@@ -79,7 +79,7 @@ test('Skip npm token verification if "package.private" is true', async t => {
   const cwd = tempy.directory();
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {},
       {
@@ -100,7 +100,7 @@ test('Throws error if NPM token is invalid', async t => {
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  const [error] = await t.throws(
+  const [error] = await t.throwsAsync(
     t.context.m.verifyConditions(
       {},
       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
@@ -120,7 +120,7 @@ test('Skip Token validation if the registry configured is not the default one', 
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: 'http://custom-registry.com/'}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {},
       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
@@ -135,7 +135,7 @@ test('Verify npm auth and package', async t => {
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {},
       {
@@ -158,7 +158,7 @@ test('Verify npm auth and package from a sub-directory', async t => {
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {pkgRoot: 'dist'},
       {
@@ -181,7 +181,7 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {},
       {
@@ -208,7 +208,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in verifyC
   const tarballDir = 42;
   const pkgRoot = 42;
   const errors = [
-    ...(await t.throws(
+    ...(await t.throwsAsync(
       t.context.m.verifyConditions(
         {},
         {
@@ -336,7 +336,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async t => {
   t.false(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish ("package.private" is true)', async t => {
@@ -366,7 +366,7 @@ test('Create the package and skip publish ("package.private" is true)', async t 
   t.false(result);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async t => {
@@ -391,7 +391,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
   t.false(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Create the package and skip publish from a sub-directory ("package.private" is true)', async t => {
@@ -421,7 +421,7 @@ test('Create the package and skip publish from a sub-directory ("package.private
   t.false(result);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in publish', async t => {
@@ -433,7 +433,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in publish
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throws(
+    ...(await t.throwsAsync(
       t.context.m.publish(
         {npmPublish, tarballDir, pkgRoot},
         {
@@ -514,7 +514,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in prepare
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throws(
+    ...(await t.throwsAsync(
       t.context.m.prepare(
         {npmPublish, tarballDir, pkgRoot},
         {
@@ -635,7 +635,7 @@ test('Skip adding the package to a channel ("npmPublish" is false)', async t => 
   );
 
   t.false(result);
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
 test('Skip adding the package to a channel ("package.private" is true)', async t => {
@@ -663,7 +663,7 @@ test('Skip adding the package to a channel ("package.private" is true)', async t
   );
 
   t.false(result);
-  await t.throws(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
+  await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
 test('Create the package in addChannel step', async t => {
@@ -699,7 +699,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in addChan
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throws(
+    ...(await t.throwsAsync(
       t.context.m.addChannel(
         {npmPublish, tarballDir, pkgRoot},
         {
@@ -731,7 +731,7 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
 
-  await t.notThrows(
+  await t.notThrowsAsync(
     t.context.m.verifyConditions(
       {},
       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
