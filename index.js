@@ -36,9 +36,11 @@ async function verifyConditions(pluginConfig, context) {
   } catch (error) {
     errors.push(...error);
   }
+
   if (errors.length > 0) {
     throw new AggregateError(errors);
   }
+
   verified = true;
 }
 
@@ -56,9 +58,11 @@ async function prepare(pluginConfig, context) {
   } catch (error) {
     errors.push(...error);
   }
+
   if (errors.length > 0) {
     throw new AggregateError(errors);
   }
+
   await prepareNpm(pluginConfig, context);
   prepared = true;
 }
@@ -78,12 +82,15 @@ async function publish(pluginConfig, context) {
   } catch (error) {
     errors.push(...error);
   }
+
   if (errors.length > 0) {
     throw new AggregateError(errors);
   }
+
   if (!prepared) {
     await prepareNpm(pluginConfig, context);
   }
+
   return publishNpm(pluginConfig, pkg, context);
 }
 
