@@ -186,7 +186,7 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
       {},
       {
         cwd,
-        env: {...npmRegistry.authEnv, npm_config_registry: 'https://registry.yarnpkg.com'}, // eslint-disable-line camelcase
+        env: {...npmRegistry.authEnv, npm_config_registry: 'https://registry.yarnpkg.com'},
         options: {publish: []},
         stdout: t.context.stdout,
         stderr: t.context.stderr,
