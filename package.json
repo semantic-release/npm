@@ -23,7 +23,7 @@
     "lodash": "^4.17.4",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^4.0.0",
-    "npm": "6.5.0",
+    "npm": "6.8.0",
     "rc": "^1.2.8",
     "read-pkg": "^4.0.0",
     "registry-auth-token": "^3.3.1"
