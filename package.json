@@ -42,7 +42,7 @@
     "got": "^9.0.0",
     "nock": "^10.0.0",
     "nyc": "^13.1.0",
-    "p-retry": "^3.0.0",
+    "p-retry": "^4.0.0",
     "semantic-release": "^16.0.0-beta",
     "sinon": "^7.1.1",
     "stream-buffers": "^3.0.2",
