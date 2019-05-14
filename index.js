@@ -19,6 +19,7 @@ async function verifyConditions(pluginConfig, context) {
     pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
     pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
     pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
+    pluginConfig.registry = defaultTo(pluginConfig.registry, publishPlugin.registry);
   }
 
   const errors = verifyNpmConfig(pluginConfig);
