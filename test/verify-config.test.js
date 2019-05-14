@@ -36,11 +36,24 @@ test('Return SemanticReleaseError if "pkgRoot" option is not a String', async t 
   t.is(error.code, 'EINVALIDPKGROOT');
 });
 
+test('Return SemanticReleaseError if "registry" option is not a String', async t => {
+  const registry = 42;
+  const [error] = await verify({registry}, {}, t.context.logger);
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'EINVALIDREGISTRY');
+});
+
 test('Return SemanticReleaseError Array if multiple config are invalid', async t => {
   const npmPublish = 42;
   const tarballDir = 42;
   const pkgRoot = 42;
-  const [error1, error2, error3] = await verify({npmPublish, tarballDir, pkgRoot}, {}, t.context.logger);
+  const registry = 42;
+  const [error1, error2, error3, error4] = await verify(
+    {npmPublish, tarballDir, pkgRoot, registry},
+    {},
+    t.context.logger
+  );
 
   t.is(error1.name, 'SemanticReleaseError');
   t.is(error1.code, 'EINVALIDNPMPUBLISH');
@@ -50,4 +63,7 @@ test('Return SemanticReleaseError Array if multiple config are invalid', async t
 
   t.is(error3.name, 'SemanticReleaseError');
   t.is(error3.code, 'EINVALIDPKGROOT');
+
+  t.is(error4.name, 'SemanticReleaseError');
+  t.is(error4.code, 'EINVALIDREGISTRY');
 });
