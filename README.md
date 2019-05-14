@@ -10,7 +10,7 @@
 [![npm next version](https://img.shields.io/npm/v/@semantic-release/npm/next.svg)](https://www.npmjs.com/package/@semantic-release/npm)
 
 | Step               | Description                                                                                                                                   |
-|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `verifyConditions` | Verify the presence of the `NPM_TOKEN` environment variable, create or update the `.npmrc` file with the token and verify the token is valid. |
 | `prepare`          | Update the `package.json` version and [create](https://docs.npmjs.com/cli/pack) the npm package tarball.                                      |
 | `publish`          | [Publish the npm package](https://docs.npmjs.com/cli/publish) to the registry.                                                                |
@@ -27,11 +27,7 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ```json
 {
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/npm",
-  ]
+  "plugins": ["@semantic-release/commit-analyzer", "@semantic-release/release-notes-generator", "@semantic-release/npm"]
 }
 ```
 
@@ -59,9 +55,10 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 ### Options
 
 | Options      | Description                                                                                                         | Default                                                                                                                          |
-|--------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| ------------ | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
 | `pkgRoot`    | Directory path to publish.                                                                                          | `.`                                                                                                                              |
+| `registry`   | Registry to publish to.                                                                                             | `https://registry.npmjs.org/`                                                                                                    |
 | `tarballDir` | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
 
 **Note**: The `pkgRoot` directory must contains a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
@@ -73,6 +70,7 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 The plugin uses the [`npm` CLI](https://github.com/npm/cli) which will read the configuration from [`.npmrc`](https://docs.npmjs.com/files/npmrc). See [`npm config`](https://docs.npmjs.com/misc/config) for the option list.
 
 The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://docs.npmjs.com/cli/dist-tag) can be configured in the `package.json` and will take precedence over the configuration in `.npmrc`:
+
 ```json
 {
   "publishConfig": {
@@ -91,13 +89,37 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    ["@semantic-release/npm", {
-      "npmPublish": false,
-      "tarballDir": "dist",
-    }],
-    ["@semantic-release/github", {
-      "assets": "dist/*.tgz"
-    }]
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": false,
+        "tarballDir": "dist"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": "dist/*.tgz"
+      }
+    ]
+  ]
+}
+```
+
+Publish to [GitHub’s npm registry](https://help.github.com/en/articles/configuring-npm-for-use-with-github-package-registry).
+
+```json
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/npm",
+      {
+        "registry": "https://npm.pkg.github.com/"
+      }
+    ],
+    "@semantic-release/github"
   ]
 }
 ```
@@ -109,15 +131,22 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    ["@semantic-release/npm", {
-      "pkgRoot": "dist",
-    }],
-    ["@semantic-release/git", {
-      "assets": ["package.json", "npm-shrinkwrap.json"]
-    }]
+    [
+      "@semantic-release/npm",
+      {
+        "pkgRoot": "dist"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["package.json", "npm-shrinkwrap.json"]
+      }
+    ]
   ]
 }
 ```
+
 ```json
 {
   "scripts": {
