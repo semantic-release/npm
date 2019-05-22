@@ -70,6 +70,20 @@ test('Throw error if "NPM_TOKEN" is missing', async t => {
   t.is(error.code, 'ENONPMTOKEN');
 });
 
+test('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', async t => {
+  const cwd = tempy.directory();
+
+  await appendFile(path.resolve(cwd, '.custom-npmrc'), `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
+
+  await setNpmrcAuth('http://custom.registry.com', {
+    cwd,
+    env: {NPM_CONFIG_USERCONFIG: path.resolve(cwd, '.custom-npmrc')},
+    logger: t.context.logger,
+  });
+
+  t.is(t.context.log.callCount, 1);
+});
+
 test('Throw error if "NPM_USERNAME" is missing', async t => {
   const cwd = tempy.directory();
   const env = {NPM_PASSWORD: 'npm_pasword', NPM_EMAIL: 'npm_email'};
