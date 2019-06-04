@@ -124,6 +124,24 @@ Publish to [GitHub’s npm registry](https://help.github.com/en/articles/configu
 }
 ```
 
+Publish to multiple registries
+
+```json
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/npm",
+      {
+        "registry": ["https://npm.pkg.github.com/", "https://registry.npmjs.org/"]
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}
+```
+
 When publishing from a sub-directory with the `pkgRoot` option, the `package.json` and `npm-shrinkwrap.json` updated with the new version can be moved to another directory with a `postpublish` [npm script](https://docs.npmjs.com/misc/scripts). For example with the [@semantic-release/git](https://github.com/semantic-release/git) plugin:
 
 ```json
