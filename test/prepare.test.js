@@ -1,6 +1,6 @@
 import path from 'path';
 import test from 'ava';
-import {outputJson, readJson, outputFile, readFile, pathExists} from 'fs-extra';
+import {outputJson, readJson, outputFile, readFile, pathExists, appendFile} from 'fs-extra';
 import tempy from 'tempy';
 import execa from 'execa';
 import {stub} from 'sinon';
@@ -70,6 +70,7 @@ test('Updade package.json and package-lock.json', async t => {
   const packagePath = path.resolve(cwd, 'package.json');
   const packageLockPath = path.resolve(cwd, 'package-lock.json');
   await outputJson(packagePath, {version: '0.0.0-dev'});
+  await appendFile(path.resolve(cwd, '.npmrc'), 'package-lock = true');
   // Create a package-lock.json file
   await execa('npm', ['install'], {cwd});
 
@@ -126,6 +127,7 @@ test('Updade package.json and package-lock.json in a sub-directory', async t => 
   const packagePath = path.resolve(cwd, pkgRoot, 'package.json');
   const packageLockPath = path.resolve(cwd, pkgRoot, 'package-lock.json');
   await outputJson(packagePath, {version: '0.0.0-dev'});
+  await appendFile(path.resolve(cwd, pkgRoot, '.npmrc'), 'package-lock = true');
   // Create a package-lock.json file
   await execa('npm', ['install'], {cwd: path.resolve(cwd, pkgRoot)});
 
