@@ -257,7 +257,7 @@ test('Publish the package', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Publish the package on a dist-tag', async t => {
@@ -282,7 +282,7 @@ test('Publish the package on a dist-tag', async t => {
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Publish the package from a sub-directory', async t => {
@@ -307,7 +307,7 @@ test('Publish the package from a sub-directory', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Create the package and skip publish ("npmPublish" is false)', async t => {
