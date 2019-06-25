@@ -226,3 +226,29 @@ test('Create the package in the "tarballDir" directory', async t => {
   // Verify the logger has been called with the version updated
   t.deepEqual(t.context.log.args[0], ['Write version %s to package.json in %s', '1.0.0', cwd]);
 });
+
+test('Only move the created tarball if the "tarballDir" directory is not the CWD', async t => {
+  const cwd = tempy.directory();
+  const packagePath = path.resolve(cwd, 'package.json');
+  const pkg = {name: 'my-pkg', version: '0.0.0-dev'};
+  await outputJson(packagePath, pkg);
+
+  await prepare(
+    {tarballDir: '.'},
+    {
+      cwd,
+      env: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      nextRelease: {version: '1.0.0'},
+      logger: t.context.logger,
+    }
+  );
+
+  // Verify package.json has been updated
+  t.is((await readJson(packagePath)).version, '1.0.0');
+
+  t.true(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
+  // Verify the logger has been called with the version updated
+  t.deepEqual(t.context.log.args[0], ['Write version %s to package.json in %s', '1.0.0', cwd]);
+});
