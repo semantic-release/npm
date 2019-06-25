@@ -257,7 +257,7 @@ test('Publish the package', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Publish the package on a dist-tag', async t => {
@@ -286,7 +286,7 @@ test('Publish the package on a dist-tag', async t => {
   });
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Publish the package from a sub-directory', async t => {
@@ -311,7 +311,7 @@ test('Publish the package from a sub-directory', async t => {
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
 test('Create the package and skip publish ("npmPublish" is false)', async t => {
@@ -573,7 +573,7 @@ test('Publish the package and add to default dist-tag', async t => {
   );
 
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env})).stdout, '1.0.0');
 });
 
 test('Publish the package and add to lts dist-tag', async t => {
@@ -610,7 +610,7 @@ test('Publish the package and add to lts dist-tag', async t => {
 
   t.deepEqual(result, {name: 'npm package (@release-1.x dist-tag)', url: undefined, channel: 'release-1.x'});
   t.is(
-    await execa.stdout('npm', ['view', pkg.name, 'dist-tags'], {cwd, env}),
+    (await execa('npm', ['view', pkg.name, 'dist-tags'], {cwd, env})).stdout,
     "{ latest: '1.0.0', 'release-1.x': '1.0.0' }"
   );
 });
@@ -763,7 +763,7 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
     }
   );
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: undefined, channel: 'next'});
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'dist-tags.next'], {cwd, env}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'dist-tags.next'], {cwd, env})).stdout, '1.0.0');
 
   result = await t.context.m.addChannel(
     {},
@@ -779,5 +779,5 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
   );
 
   t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
-  t.is(await execa.stdout('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env}), '1.0.0');
+  t.is((await execa('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env})).stdout, '1.0.0');
 });
