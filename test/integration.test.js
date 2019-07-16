@@ -7,6 +7,7 @@ import tempy from 'tempy';
 import clearModule from 'clear-module';
 import {WritableStreamBuffer} from 'stream-buffers';
 import npmRegistry from './helpers/npm-registry';
+import otpServer from './helpers/otp-server';
 
 /* eslint camelcase: ["error", {properties: "never"}] */
 
@@ -23,6 +24,8 @@ const testEnv = {
 test.before(async () => {
   // Start the local NPM registry
   await npmRegistry.start();
+  // Stop the test OTP server
+  await otpServer.start();
 });
 
 test.beforeEach(t => {
@@ -39,6 +42,8 @@ test.beforeEach(t => {
 test.after.always(async () => {
   // Stop the local NPM registry
   await npmRegistry.stop();
+  // Stop the test OTP server
+  await otpServer.start();
 });
 
 test('Skip npm auth verification if "npmPublish" is false', async t => {
@@ -280,6 +285,34 @@ test('Publish the package on a dist-tag', async t => {
   );
 
   t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
+  t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
+  t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
+});
+
+test('Publish the package with OTP', async t => {
+  const cwd = tempy.directory();
+  const env = npmRegistry.authEnv;
+  const pkg = {name: 'publish-otp', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
+  await outputJson(path.resolve(cwd, 'package.json'), pkg);
+
+  const {port, address} = otpServer.address();
+  const result = await t.context.m.publish(
+    {
+      otpUrl: `http://${address}:${port}/otp`,
+    },
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
+  );
+
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
