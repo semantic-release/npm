@@ -8,8 +8,20 @@ test.beforeEach(t => {
   t.context.logger = {log: t.context.log};
 });
 
-test('Verify "npmPublish", "tarballDir" and "pkgRoot" options', async t => {
-  t.deepEqual(await verify({npmPublish: true, tarballDir: 'release', pkgRoot: 'dist'}, {}, t.context.logger), []);
+test('Verify "npmPublish", "tarballDir", "pkgRoot" and "otpUrl" options', async t => {
+  t.deepEqual(
+    await verify(
+      {
+        npmPublish: true,
+        tarballDir: 'release',
+        pkgRoot: 'dist',
+        otpUrl: 'http://0.0.0.0/my-otp-provider',
+      },
+      {},
+      t.context.logger
+    ),
+    []
+  );
 });
 
 test('Return SemanticReleaseError if "npmPublish" option is not a Boolean', async t => {
@@ -34,6 +46,14 @@ test('Return SemanticReleaseError if "pkgRoot" option is not a String', async t 
 
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDPKGROOT');
+});
+
+test('Return SemanticReleaseError if "otpUrl" option is not a String', async t => {
+  const otpUrl = 42;
+  const [error] = await verify({otpUrl}, {}, t.context.logger);
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.code, 'EINVALIDOTPURL');
 });
 
 test('Return SemanticReleaseError Array if multiple config are invalid', async t => {
