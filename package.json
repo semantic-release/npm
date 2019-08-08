@@ -28,10 +28,10 @@
     "aggregate-error": "^3.0.0",
     "execa": "^2.0.2",
     "fs-extra": "^8.0.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.15",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^4.0.0",
-    "npm": "^6.8.0",
+    "npm": "^6.10.3",
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
     "registry-auth-token": "^4.0.0"
