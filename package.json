@@ -14,11 +14,6 @@
   "bugs": {
     "url": "https://github.com/semantic-release/npm/issues"
   },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
   "contributors": [
     "Stephan Bönnemann <stephan@boennemann.me> (http://boennemann.me)",
     "Gregor Martynus (https://twitter.com/gr2m)"
@@ -41,8 +36,6 @@
     "ava": "^2.0.0",
     "clear-module": "^4.0.0",
     "codecov": "^3.0.0",
-    "commitizen": "^4.0.0",
-    "cz-conventional-changelog": "^2.0.0",
     "delay": "^4.0.0",
     "dockerode": "^2.5.3",
     "get-stream": "^5.0.0",
@@ -99,7 +92,6 @@
     "url": "https://github.com/semantic-release/npm.git"
   },
   "scripts": {
-    "cm": "git-cz",
     "codecov": "codecov -f coverage/coverage-final.json",
     "lint": "xo",
     "pretest": "npm run lint",
