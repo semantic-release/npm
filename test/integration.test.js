@@ -25,6 +25,11 @@ test.before(async () => {
   await npmRegistry.start();
 });
 
+test.after.always(async () => {
+  // Stop the local NPM registry
+  await npmRegistry.stop();
+});
+
 test.beforeEach(t => {
   // Clear npm cache to refresh the module state
   clearModule('..');
@@ -34,11 +39,6 @@ test.beforeEach(t => {
   t.context.stdout = new WritableStreamBuffer();
   t.context.stderr = new WritableStreamBuffer();
   t.context.logger = {log: t.context.log};
-});
-
-test.after.always(async () => {
-  // Stop the local NPM registry
-  await npmRegistry.stop();
 });
 
 test('Skip npm auth verification if "npmPublish" is false', async t => {
