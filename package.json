@@ -30,7 +30,8 @@
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
     "registry-auth-token": "^4.0.0",
-    "semver": "^5.5.0"
+    "semver": "^5.5.0",
+    "tempy": "^0.3.0"
   },
   "devDependencies": {
     "ava": "^2.0.0",
@@ -45,7 +46,6 @@
     "semantic-release": "^16.0.0-beta",
     "sinon": "^7.1.1",
     "stream-buffers": "^3.0.2",
-    "tempy": "^0.3.0",
     "xo": "^0.25.0"
   },
   "engines": {
