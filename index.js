@@ -1,5 +1,6 @@
 const {defaultTo, castArray} = require('lodash');
 const AggregateError = require('aggregate-error');
+const tempy = require('tempy');
 const setLegacyToken = require('./lib/set-legacy-token');
 const getPkg = require('./lib/get-pkg');
 const verifyNpmConfig = require('./lib/verify-config');
@@ -9,6 +10,7 @@ const publishNpm = require('./lib/publish');
 
 let verified;
 let prepared;
+const npmrc = tempy.file({name: '.npmrc'});
 
 async function verifyConditions(pluginConfig, context) {
   // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong
@@ -30,7 +32,7 @@ async function verifyConditions(pluginConfig, context) {
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(pluginConfig, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
     errors.push(...error);
@@ -52,7 +54,7 @@ async function prepare(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     const pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(pluginConfig, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
     errors.push(...error);
@@ -62,7 +64,7 @@ async function prepare(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
-  await prepareNpm(pluginConfig, context);
+  await prepareNpm(npmrc, pluginConfig, context);
   prepared = true;
 }
 
@@ -76,7 +78,7 @@ async function publish(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(pluginConfig, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
     errors.push(...error);
@@ -87,10 +89,10 @@ async function publish(pluginConfig, context) {
   }
 
   if (!prepared) {
-    await prepareNpm(pluginConfig, context);
+    await prepareNpm(npmrc, pluginConfig, context);
   }
 
-  return publishNpm(pluginConfig, pkg, context);
+  return publishNpm(npmrc, pluginConfig, pkg, context);
 }
 
 module.exports = {verifyConditions, prepare, publish};

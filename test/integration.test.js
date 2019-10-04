@@ -1,6 +1,6 @@
 import path from 'path';
 import test from 'ava';
-import {outputJson, readJson, readFile, pathExists} from 'fs-extra';
+import {outputJson, readJson, pathExists} from 'fs-extra';
 import execa from 'execa';
 import {spy} from 'sinon';
 import tempy from 'tempy';
@@ -110,9 +110,6 @@ test('Throws error if NPM token is invalid', async t => {
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDNPMTOKEN');
   t.is(error.message, 'Invalid npm token.');
-
-  const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
-  t.regex(npmrc, /:_authToken/);
 });
 
 test('Skip Token validation if the registry configured is not the default one', async t => {
@@ -126,9 +123,6 @@ test('Skip Token validation if the registry configured is not the default one', 
       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
     )
   );
-
-  const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
-  t.regex(npmrc, /:_authToken/);
 });
 
 test('Verify npm auth and package', async t => {
@@ -148,10 +142,6 @@ test('Verify npm auth and package', async t => {
       }
     )
   );
-
-  const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
-  t.regex(npmrc, /_auth =/);
-  t.regex(npmrc, /email =/);
 });
 
 test('Verify npm auth and package from a sub-directory', async t => {
@@ -171,10 +161,6 @@ test('Verify npm auth and package from a sub-directory', async t => {
       }
     )
   );
-
-  const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
-  t.regex(npmrc, /_auth =/);
-  t.regex(npmrc, /email =/);
 });
 
 test('Verify npm auth and package with "npm_config_registry" env var set by yarn', async t => {
@@ -194,10 +180,6 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
       }
     )
   );
-
-  const npmrc = (await readFile(path.resolve(cwd, '.npmrc'))).toString();
-  t.regex(npmrc, /_auth =/);
-  t.regex(npmrc, /email =/);
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in verifyConditions', async t => {

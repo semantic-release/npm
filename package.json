@@ -29,7 +29,8 @@
     "npm": "^6.10.3",
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
-    "registry-auth-token": "^4.0.0"
+    "registry-auth-token": "^4.0.0",
+    "tempy": "^0.3.0"
   },
   "devDependencies": {
     "ava": "^2.0.0",
@@ -44,7 +45,6 @@
     "semantic-release": "^15.0.0",
     "sinon": "^7.1.1",
     "stream-buffers": "^3.0.2",
-    "tempy": "^0.3.0",
     "xo": "^0.25.0"
   },
   "engines": {

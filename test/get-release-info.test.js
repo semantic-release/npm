@@ -1,4 +1,3 @@
-import path from 'path';
 import test from 'ava';
 import {writeFile} from 'fs-extra';
 import tempy from 'tempy';
@@ -15,8 +14,9 @@ test.beforeEach(() => {
 
 test('Default registry and tag', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
 
-  t.deepEqual(await getReleaseInfo({name: 'module'}, {cwd, env: {}}, 'https://registry.npmjs.org/'), {
+  t.deepEqual(await getReleaseInfo(npmrc, {name: 'module'}, {cwd, env: {}}, 'https://registry.npmjs.org/'), {
     name: 'npm package (@latest dist-tag)',
     url: 'https://www.npmjs.com/package/module',
   });
@@ -24,8 +24,9 @@ test('Default registry and tag', async t => {
 
 test('Default registry, tag and scoped module', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
 
-  t.deepEqual(await getReleaseInfo({name: '@scope/module'}, {cwd, env: {}}, 'https://registry.npmjs.org/'), {
+  t.deepEqual(await getReleaseInfo(npmrc, {name: '@scope/module'}, {cwd, env: {}}, 'https://registry.npmjs.org/'), {
     name: 'npm package (@latest dist-tag)',
     url: 'https://www.npmjs.com/package/@scope/module',
   });
@@ -33,8 +34,9 @@ test('Default registry, tag and scoped module', async t => {
 
 test('Custom registry, tag and scoped module', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
 
-  t.deepEqual(await getReleaseInfo({name: '@scope/module'}, {cwd, env: {}}, 'https://custom.registry.org/'), {
+  t.deepEqual(await getReleaseInfo(npmrc, {name: '@scope/module'}, {cwd, env: {}}, 'https://custom.registry.org/'), {
     name: 'npm package (@latest dist-tag)',
     url: undefined,
   });
@@ -42,10 +44,11 @@ test('Custom registry, tag and scoped module', async t => {
 
 test('Default registry and tag from .npmrc', async t => {
   const cwd = tempy.directory();
-  await writeFile(path.resolve(cwd, '.npmrc'), 'tag=npmrc');
+  const npmrc = tempy.file({name: '.npmrc'});
+  await writeFile(npmrc, 'tag=npmrc');
 
   t.deepEqual(
-    await getReleaseInfo({name: 'module', publishConfig: {}}, {cwd, env: {}}, 'https://registry.npmjs.org/'),
+    await getReleaseInfo(npmrc, {name: 'module', publishConfig: {}}, {cwd, env: {}}, 'https://registry.npmjs.org/'),
     {
       name: 'npm package (@npmrc dist-tag)',
       url: 'https://www.npmjs.com/package/module',
@@ -55,22 +58,29 @@ test('Default registry and tag from .npmrc', async t => {
 
 test('Default registry and tag from package.json', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
 
-  await writeFile(path.resolve(cwd, '.npmrc'), 'tag=npmrc');
+  await writeFile(npmrc, 'tag=npmrc');
 
   t.deepEqual(
-    await getReleaseInfo({name: 'module', publishConfig: {tag: 'pkg'}}, {cwd, env: {}}, 'https://registry.npmjs.org/'),
+    await getReleaseInfo(
+      npmrc,
+      {name: 'module', publishConfig: {tag: 'pkg'}},
+      {cwd, env: {}},
+      'https://registry.npmjs.org/'
+    ),
     {name: 'npm package (@pkg dist-tag)', url: 'https://www.npmjs.com/package/module'}
   );
 });
 
 test('Default tag', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
 
-  await writeFile(path.resolve(cwd, '.npmrc'), 'tag=');
+  await writeFile(npmrc, 'tag=');
 
   t.deepEqual(
-    await getReleaseInfo({name: 'module', publishConfig: {}}, {cwd, env: {}}, 'https://registry.npmjs.org/'),
+    await getReleaseInfo(npmrc, {name: 'module', publishConfig: {}}, {cwd, env: {}}, 'https://registry.npmjs.org/'),
     {
       name: 'npm package (@latest dist-tag)',
       url: 'https://www.npmjs.com/package/module',
