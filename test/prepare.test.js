@@ -16,10 +16,12 @@ test.beforeEach(t => {
 
 test('Updade package.json', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   await outputJson(packagePath, {version: '0.0.0-dev'});
 
   await prepare(
+    npmrc,
     {},
     {
       cwd,
@@ -40,6 +42,7 @@ test('Updade package.json', async t => {
 
 test('Updade package.json and npm-shrinkwrap.json', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const shrinkwrapPath = path.resolve(cwd, 'npm-shrinkwrap.json');
   await outputJson(packagePath, {version: '0.0.0-dev'});
@@ -47,6 +50,7 @@ test('Updade package.json and npm-shrinkwrap.json', async t => {
   await execa('npm', ['shrinkwrap'], {cwd});
 
   await prepare(
+    npmrc,
     {},
     {
       cwd,
@@ -67,6 +71,7 @@ test('Updade package.json and npm-shrinkwrap.json', async t => {
 
 test('Updade package.json and package-lock.json', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const packageLockPath = path.resolve(cwd, 'package-lock.json');
   await outputJson(packagePath, {version: '0.0.0-dev'});
@@ -75,6 +80,7 @@ test('Updade package.json and package-lock.json', async t => {
   await execa('npm', ['install'], {cwd});
 
   await prepare(
+    npmrc,
     {},
     {
       cwd,
@@ -95,6 +101,7 @@ test('Updade package.json and package-lock.json', async t => {
 
 test('Updade package.json and npm-shrinkwrap.json in a sub-directory', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const pkgRoot = 'dist';
   const packagePath = path.resolve(cwd, pkgRoot, 'package.json');
   const shrinkwrapPath = path.resolve(cwd, pkgRoot, 'npm-shrinkwrap.json');
@@ -103,6 +110,7 @@ test('Updade package.json and npm-shrinkwrap.json in a sub-directory', async t =
   await execa('npm', ['shrinkwrap'], {cwd: path.resolve(cwd, pkgRoot)});
 
   await prepare(
+    npmrc,
     {pkgRoot},
     {
       cwd,
@@ -123,6 +131,7 @@ test('Updade package.json and npm-shrinkwrap.json in a sub-directory', async t =
 
 test('Updade package.json and package-lock.json in a sub-directory', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const pkgRoot = 'dist';
   const packagePath = path.resolve(cwd, pkgRoot, 'package.json');
   const packageLockPath = path.resolve(cwd, pkgRoot, 'package-lock.json');
@@ -132,6 +141,7 @@ test('Updade package.json and package-lock.json in a sub-directory', async t => 
   await execa('npm', ['install'], {cwd: path.resolve(cwd, pkgRoot)});
 
   await prepare(
+    npmrc,
     {pkgRoot},
     {
       cwd,
@@ -152,10 +162,12 @@ test('Updade package.json and package-lock.json in a sub-directory', async t => 
 
 test('Preserve indentation and newline', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   await outputFile(packagePath, `{\r\n        "name": "package-name",\r\n        "version": "0.0.0-dev"\r\n}\r\n`);
 
   await prepare(
+    npmrc,
     {},
     {
       cwd,
@@ -179,10 +191,12 @@ test('Preserve indentation and newline', async t => {
 
 test('Use default indentation and newline if it cannot be detected', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   await outputFile(packagePath, `{"name": "package-name","version": "0.0.0-dev"}`);
 
   await prepare(
+    npmrc,
     {},
     {
       cwd,
@@ -203,11 +217,13 @@ test('Use default indentation and newline if it cannot be detected', async t => 
 
 test('Create the package in the "tarballDir" directory', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const pkg = {name: 'my-pkg', version: '0.0.0-dev'};
   await outputJson(packagePath, pkg);
 
   await prepare(
+    npmrc,
     {tarballDir: 'tarball'},
     {
       cwd,
@@ -229,11 +245,13 @@ test('Create the package in the "tarballDir" directory', async t => {
 
 test('Only move the created tarball if the "tarballDir" directory is not the CWD', async t => {
   const cwd = tempy.directory();
+  const npmrc = tempy.file({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const pkg = {name: 'my-pkg', version: '0.0.0-dev'};
   await outputJson(packagePath, pkg);
 
   await prepare(
+    npmrc,
     {tarballDir: '.'},
     {
       cwd,
