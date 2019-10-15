@@ -21,7 +21,7 @@
   "dependencies": {
     "@semantic-release/error": "^2.2.0",
     "aggregate-error": "^3.0.0",
-    "execa": "^2.0.2",
+    "execa": "^3.1.0",
     "fs-extra": "^8.0.0",
     "lodash": "^4.17.15",
     "nerf-dart": "^1.0.0",
