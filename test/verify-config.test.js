@@ -14,24 +14,27 @@ test('Verify "npmPublish", "tarballDir" and "pkgRoot" options', async t => {
 
 test('Return SemanticReleaseError if "npmPublish" option is not a Boolean', async t => {
   const npmPublish = 42;
-  const [error] = await verify({npmPublish}, {}, t.context.logger);
+  const [error, ...errors] = await verify({npmPublish}, {}, t.context.logger);
 
+  t.is(errors.length, 0);
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDNPMPUBLISH');
 });
 
 test('Return SemanticReleaseError if "tarballDir" option is not a String', async t => {
   const tarballDir = 42;
-  const [error] = await verify({tarballDir}, {}, t.context.logger);
+  const [error, ...errors] = await verify({tarballDir}, {}, t.context.logger);
 
+  t.is(errors.length, 0);
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDTARBALLDIR');
 });
 
 test('Return SemanticReleaseError if "pkgRoot" option is not a String', async t => {
   const pkgRoot = 42;
-  const [error] = await verify({pkgRoot}, {}, t.context.logger);
+  const [error, ...errors] = await verify({pkgRoot}, {}, t.context.logger);
 
+  t.is(errors.length, 0);
   t.is(error.name, 'SemanticReleaseError');
   t.is(error.code, 'EINVALIDPKGROOT');
 });
