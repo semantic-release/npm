@@ -44,7 +44,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
 
   await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger});
 
-  t.is((await readFile(npmrc)).toString(), `\n_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
+  t.is((await readFile(npmrc)).toString(), `_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to ${npmrc}`]);
 });
 
@@ -60,7 +60,11 @@ test.serial('Preserve home ".npmrc"', async t => {
   await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger});
 
   t.is((await readFile(npmrc)).toString(), `home_config = test\n//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
-  t.deepEqual(t.context.log.args[1], [`Wrote NPM_TOKEN to ${npmrc}`]);
+  t.deepEqual(t.context.log.args[1], [
+    'Reading npm config from %s',
+    [path.resolve(process.env.HOME, '.npmrc')].join(', '),
+  ]);
+  t.deepEqual(t.context.log.args[2], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
 test.serial('Preserve home and local ".npmrc"', async t => {
@@ -79,7 +83,11 @@ test.serial('Preserve home and local ".npmrc"', async t => {
     (await readFile(npmrc)).toString(),
     `home_config = test\ncwd_config = test\n//custom.registry.com/:_authToken = \${NPM_TOKEN}`
   );
-  t.deepEqual(t.context.log.args[1], [`Wrote NPM_TOKEN to ${npmrc}`]);
+  t.deepEqual(t.context.log.args[1], [
+    'Reading npm config from %s',
+    [path.resolve(process.env.HOME, '.npmrc'), path.resolve(cwd, '.npmrc')].join(', '),
+  ]);
+  t.deepEqual(t.context.log.args[2], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
 test.serial('Preserve all ".npmrc" if auth is already configured', async t => {
@@ -94,7 +102,10 @@ test.serial('Preserve all ".npmrc" if auth is already configured', async t => {
   await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env: {}, logger: t.context.logger});
 
   t.is((await readFile(npmrc)).toString(), `home_config = test\n//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
-  t.is(t.context.log.callCount, 1);
+  t.deepEqual(t.context.log.args[1], [
+    'Reading npm config from %s',
+    [path.resolve(process.env.HOME, '.npmrc'), path.resolve(cwd, '.npmrc')].join(', '),
+  ]);
 });
 
 test.serial('Preserve ".npmrc" if auth is already configured for a scoped package', async t => {
@@ -115,7 +126,10 @@ test.serial('Preserve ".npmrc" if auth is already configured for a scoped packag
     (await readFile(npmrc)).toString(),
     `home_config = test\n@scope:registry=http://custom.registry.com\n//custom.registry.com/:_authToken = \${NPM_TOKEN}`
   );
-  t.is(t.context.log.callCount, 1);
+  t.deepEqual(t.context.log.args[1], [
+    'Reading npm config from %s',
+    [path.resolve(process.env.HOME, '.npmrc'), path.resolve(cwd, '.npmrc')].join(', '),
+  ]);
 });
 
 test.serial('Throw error if "NPM_TOKEN" is missing', async t => {
@@ -148,7 +162,7 @@ test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', a
   });
 
   t.is((await readFile(npmrc)).toString(), `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
-  t.is(t.context.log.callCount, 1);
+  t.deepEqual(t.context.log.args[1], ['Reading npm config from %s', [path.resolve(cwd, '.custom-npmrc')].join(', ')]);
 });
 
 test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
