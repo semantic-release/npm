@@ -30,7 +30,7 @@
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
     "registry-auth-token": "^4.0.0",
-    "semver": "^5.5.0",
+    "semver": "^6.3.0",
     "tempy": "^0.3.0"
   },
   "devDependencies": {
