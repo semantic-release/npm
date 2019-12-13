@@ -267,6 +267,33 @@ test('Publish the package on a dist-tag', async t => {
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
+test('Publish the package with OTP', async t => {
+  const cwd = tempy.directory();
+  const env = npmRegistry.authEnv;
+  const pkg = {name: 'publish-otp', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
+  await outputJson(path.resolve(cwd, 'package.json'), pkg);
+
+  const result = await t.context.m.publish(
+    {
+      otpProvider: path.resolve(__dirname, 'helpers', 'fake-otp-provider.js'),
+    },
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
+  );
+
+  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined});
+  t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
+  t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
+  t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
+});
+
 test('Publish the package from a sub-directory', async t => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;

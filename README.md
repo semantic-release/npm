@@ -43,7 +43,7 @@ The npm authentication configuration is **required** and can be set via [environ
 
 Both the [token](https://docs.npmjs.com/getting-started/working_with_tokens) and the legacy (`username`, `password` and `email`) authentication are supported. It is recommended to use the [token](https://docs.npmjs.com/getting-started/working_with_tokens) authentication. The legacy authentication is supported as the alternative npm registries [Artifactory](https://www.jfrog.com/open-source/#os-arti) and [npm-registry-couchapp](https://github.com/npm/npm-registry-couchapp) only supports that form of authentication.
 
-**Note**: Only the `auth-only` [level of npm two-factor authentication](https://docs.npmjs.com/getting-started/using-two-factor-authentication#levels-of-authentication) is supported, **semantic-release** will not work with the default `auth-and-writes` level.
+**Note**: Only the `auth-only` [level of npm two-factor authentication](https://docs.npmjs.com/getting-started/using-two-factor-authentication#levels-of-authentication) is supported, **semantic-release** will not work with the default `auth-and-writes` level by default.  If you want to use `auth-and-writes` you will need to use the `otpProvider` option to somehow give semantic-release an OTP token to use.
 
 ### Environment variables
 
@@ -58,11 +58,12 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 
 ### Options
 
-| Options      | Description                                                                                                         | Default                                                                                                                          |
-|--------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
-| `pkgRoot`    | Directory path to publish.                                                                                          | `.`                                                                                                                              |
-| `tarballDir` | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
+| Options       | Description                                                                                                         | Default                                                                                                                          |
+|---------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `npmPublish`  | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
+| `pkgRoot`     | Directory path to publish.                                                                                          | `.`                                                                                                                              |
+| `tarballDir`  | Directory path in which to write the the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
+| `otpProvider` | Package name for an npm module that exports a single async function that resolves with an OTP code. | `undefined`                                                                                                                                      |
 
 **Note**: The `pkgRoot` directory must contains a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
