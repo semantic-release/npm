@@ -261,7 +261,7 @@ test('Publish the package on a dist-tag', async t => {
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag'});
+  t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: 'https://www.npmjs.com/package/publish-tag/v/1.0.0'});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
