@@ -41,10 +41,10 @@
     "dockerode": "^3.0.0",
     "get-stream": "^5.0.0",
     "got": "^10.0.1",
-    "nyc": "^14.0.0",
+    "nyc": "^15.0.0",
     "p-retry": "^4.0.0",
     "semantic-release": "^16.0.0-beta",
-    "sinon": "^7.1.1",
+    "sinon": "^8.0.0",
     "stream-buffers": "^3.0.2",
     "xo": "^0.25.0"
   },
