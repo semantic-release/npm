@@ -1,5 +1,5 @@
-import test from 'ava';
-import getChannel from '../lib/get-channel';
+const test = require('ava');
+const getChannel = require('../lib/get-channel');
 
 test.serial('Get default channel', t => {
   t.is(getChannel(undefined), 'latest');

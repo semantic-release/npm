@@ -1,6 +1,6 @@
-import test from 'ava';
-import {stub} from 'sinon';
-import verify from '../lib/verify-config';
+const test = require('ava');
+const {stub} = require('sinon');
+const verify = require('../lib/verify-config');
 
 test.beforeEach(t => {
   // Stub the logger functions

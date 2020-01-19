@@ -1,5 +1,5 @@
-import test from 'ava';
-import getReleaseInfo from '../lib/get-release-info';
+const test = require('ava');
+const getReleaseInfo = require('../lib/get-release-info');
 
 test('Default registry and scoped module', async t => {
   t.deepEqual(

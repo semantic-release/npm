@@ -7,9 +7,7 @@
     "files": [
       "test/**/*.test.js"
     ],
-    "helpers": [
-      "test/helpers/**/*"
-    ]
+    "timeout": "2m"
   },
   "bugs": {
     "url": "https://github.com/semantic-release/npm/issues"
@@ -34,7 +32,7 @@
     "tempy": "^0.3.0"
   },
   "devDependencies": {
-    "ava": "^2.0.0",
+    "ava": "^3.1.0",
     "clear-module": "^4.0.0",
     "codecov": "^3.0.0",
     "delay": "^4.0.0",
