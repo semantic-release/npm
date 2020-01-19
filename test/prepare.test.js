@@ -1,11 +1,11 @@
-import path from 'path';
-import test from 'ava';
-import {outputJson, readJson, outputFile, readFile, pathExists, appendFile} from 'fs-extra';
-import tempy from 'tempy';
-import execa from 'execa';
-import {stub} from 'sinon';
-import {WritableStreamBuffer} from 'stream-buffers';
-import prepare from '../lib/prepare';
+const path = require('path');
+const test = require('ava');
+const {outputJson, readJson, outputFile, readFile, pathExists, appendFile} = require('fs-extra');
+const tempy = require('tempy');
+const execa = require('execa');
+const {stub} = require('sinon');
+const {WritableStreamBuffer} = require('stream-buffers');
+const prepare = require('../lib/prepare');
 
 test.beforeEach(t => {
   t.context.log = stub();

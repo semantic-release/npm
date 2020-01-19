@@ -1,8 +1,8 @@
-import path from 'path';
-import test from 'ava';
-import {outputJson, writeFile} from 'fs-extra';
-import tempy from 'tempy';
-import getPkg from '../lib/get-pkg';
+const path = require('path');
+const test = require('ava');
+const {outputJson, writeFile} = require('fs-extra');
+const tempy = require('tempy');
+const getPkg = require('../lib/get-pkg');
 
 test('Verify name and version then return parsed package.json', async t => {
   const cwd = tempy.directory();

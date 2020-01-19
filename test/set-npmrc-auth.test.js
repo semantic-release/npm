@@ -1,9 +1,9 @@
-import path from 'path';
-import test from 'ava';
-import {readFile, appendFile} from 'fs-extra';
-import {stub} from 'sinon';
-import tempy from 'tempy';
-import clearModule from 'clear-module';
+const path = require('path');
+const test = require('ava');
+const {readFile, appendFile} = require('fs-extra');
+const {stub} = require('sinon');
+const tempy = require('tempy');
+const clearModule = require('clear-module');
 
 const {HOME} = process.env;
 const cwd = process.cwd();

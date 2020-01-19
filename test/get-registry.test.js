@@ -1,8 +1,8 @@
-import path from 'path';
-import test from 'ava';
-import {appendFile} from 'fs-extra';
-import tempy from 'tempy';
-import getRegistry from '../lib/get-registry';
+const path = require('path');
+const test = require('ava');
+const {appendFile} = require('fs-extra');
+const tempy = require('tempy');
+const getRegistry = require('../lib/get-registry');
 
 test('Get default registry', t => {
   const cwd = tempy.directory();
