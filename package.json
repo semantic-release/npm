@@ -42,7 +42,7 @@
     "nyc": "^15.0.0",
     "p-retry": "^4.0.0",
     "semantic-release": "^17.0.0",
-    "sinon": "^8.0.0",
+    "sinon": "^9.0.0",
     "stream-buffers": "^3.0.2",
     "xo": "^0.26.0"
   },
