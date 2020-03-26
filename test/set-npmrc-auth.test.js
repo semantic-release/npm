@@ -31,7 +31,7 @@ test.serial('Set auth with "NPM_TOKEN"', async t => {
 
   await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger});
 
-  t.regex((await readFile(npmrc)).toString(), /\/\/custom.registry.com\/:_authToken = \$\{NPM_TOKEN\}/);
+  t.regex((await readFile(npmrc)).toString(), /\/\/custom.registry.com\/:_authToken = \${NPM_TOKEN}/);
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 

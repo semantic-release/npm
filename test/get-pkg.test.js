@@ -45,7 +45,7 @@ test('Throw error if missing package name', async t => {
 
 test('Throw error if package.json is malformed', async t => {
   const cwd = tempy.directory();
-  await writeFile(path.resolve(cwd, 'package.json'), "{name: 'package',}");
+  await writeFile(path.resolve(cwd, 'package.json'), '{name: ’package’,}');
 
   const [error] = await t.throwsAsync(getPkg({}, {cwd}));
 
