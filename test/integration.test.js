@@ -1,5 +1,4 @@
 const path = require('path');
-const {inspect} = require('util');
 const test = require('ava');
 const {outputJson, readJson, pathExists} = require('fs-extra');
 const execa = require('execa');
@@ -594,7 +593,7 @@ test('Publish the package and add to lts dist-tag', async t => {
   t.deepEqual(result, {name: 'npm package (@release-1.x dist-tag)', url: undefined, channel: 'release-1.x'});
   t.is(
     (await execa('npm', ['view', pkg.name, 'dist-tags'], {cwd, env})).stdout,
-    inspect({latest: '1.0.0', 'release-1.x': '1.0.0'})
+    "{ latest: '1.0.0', 'release-1.x': '1.0.0' }"
   );
 });
 
