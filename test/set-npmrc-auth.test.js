@@ -8,7 +8,7 @@ const clearModule = require('clear-module');
 const {HOME} = process.env;
 const cwd = process.cwd();
 
-test.beforeEach(t => {
+test.beforeEach((t) => {
   // Stub the logger
   t.context.log = stub();
   t.context.logger = {log: t.context.log};
@@ -22,7 +22,7 @@ test.afterEach.always(() => {
   process.chdir(cwd);
 });
 
-test.serial('Set auth with "NPM_TOKEN"', async t => {
+test.serial('Set auth with "NPM_TOKEN"', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -35,7 +35,7 @@ test.serial('Set auth with "NPM_TOKEN"', async t => {
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
-test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async t => {
+test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -48,7 +48,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to ${npmrc}`]);
 });
 
-test.serial('Preserve home ".npmrc"', async t => {
+test.serial('Preserve home ".npmrc"', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -67,7 +67,7 @@ test.serial('Preserve home ".npmrc"', async t => {
   t.deepEqual(t.context.log.args[2], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
-test.serial('Preserve home and local ".npmrc"', async t => {
+test.serial('Preserve home and local ".npmrc"', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -90,7 +90,7 @@ test.serial('Preserve home and local ".npmrc"', async t => {
   t.deepEqual(t.context.log.args[2], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
-test.serial('Preserve all ".npmrc" if auth is already configured', async t => {
+test.serial('Preserve all ".npmrc" if auth is already configured', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -108,7 +108,7 @@ test.serial('Preserve all ".npmrc" if auth is already configured', async t => {
   ]);
 });
 
-test.serial('Preserve ".npmrc" if auth is already configured for a scoped package', async t => {
+test.serial('Preserve ".npmrc" if auth is already configured for a scoped package', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -132,7 +132,7 @@ test.serial('Preserve ".npmrc" if auth is already configured for a scoped packag
   ]);
 });
 
-test.serial('Throw error if "NPM_TOKEN" is missing', async t => {
+test.serial('Throw error if "NPM_TOKEN" is missing', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -147,7 +147,7 @@ test.serial('Throw error if "NPM_TOKEN" is missing', async t => {
   t.is(error.code, 'ENONPMTOKEN');
 });
 
-test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', async t => {
+test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -165,7 +165,7 @@ test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', a
   t.deepEqual(t.context.log.args[1], ['Reading npm config from %s', [path.resolve(cwd, '.custom-npmrc')].join(', ')]);
 });
 
-test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
+test.serial('Throw error if "NPM_USERNAME" is missing', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -181,7 +181,7 @@ test.serial('Throw error if "NPM_USERNAME" is missing', async t => {
   t.is(error.code, 'ENONPMTOKEN');
 });
 
-test.serial('Throw error if "NPM_PASSWORD" is missing', async t => {
+test.serial('Throw error if "NPM_PASSWORD" is missing', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);
@@ -197,7 +197,7 @@ test.serial('Throw error if "NPM_PASSWORD" is missing', async t => {
   t.is(error.code, 'ENONPMTOKEN');
 });
 
-test.serial('Throw error if "NPM_EMAIL" is missing', async t => {
+test.serial('Throw error if "NPM_EMAIL" is missing', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
   process.chdir(cwd);

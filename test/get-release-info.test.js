@@ -1,7 +1,7 @@
 const test = require('ava');
 const getReleaseInfo = require('../lib/get-release-info');
 
-test('Default registry and scoped module', async t => {
+test('Default registry and scoped module', async (t) => {
   t.deepEqual(
     await getReleaseInfo(
       {name: '@scope/module'},
@@ -17,7 +17,7 @@ test('Default registry and scoped module', async t => {
   );
 });
 
-test('Custom registry and scoped module', async t => {
+test('Custom registry and scoped module', async (t) => {
   t.deepEqual(
     await getReleaseInfo(
       {name: '@scope/module'},

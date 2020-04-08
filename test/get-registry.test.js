@@ -4,20 +4,20 @@ const {appendFile} = require('fs-extra');
 const tempy = require('tempy');
 const getRegistry = require('../lib/get-registry');
 
-test('Get default registry', t => {
+test('Get default registry', (t) => {
   const cwd = tempy.directory();
   t.is(getRegistry({name: 'package-name'}, {cwd, env: {}}), 'https://registry.npmjs.org/');
   t.is(getRegistry({name: 'package-name', publishConfig: {}}, {cwd, env: {}}), 'https://registry.npmjs.org/');
 });
 
-test('Get the registry configured in ".npmrc" and normalize trailing slash', async t => {
+test('Get the registry configured in ".npmrc" and normalize trailing slash', async (t) => {
   const cwd = tempy.directory();
   await appendFile(path.resolve(cwd, '.npmrc'), 'registry = https://custom1.registry.com');
 
   t.is(getRegistry({name: 'package-name'}, {cwd, env: {}}), 'https://custom1.registry.com/');
 });
 
-test('Get the registry configured from "publishConfig"', async t => {
+test('Get the registry configured from "publishConfig"', async (t) => {
   const cwd = tempy.directory();
   await appendFile(path.resolve(cwd, '.npmrc'), 'registry = https://custom2.registry.com');
 
@@ -27,7 +27,7 @@ test('Get the registry configured from "publishConfig"', async t => {
   );
 });
 
-test('Get the registry configured in "NPM_CONFIG_REGISTRY"', t => {
+test('Get the registry configured in "NPM_CONFIG_REGISTRY"', (t) => {
   const cwd = tempy.directory();
 
   t.is(
@@ -36,7 +36,7 @@ test('Get the registry configured in "NPM_CONFIG_REGISTRY"', t => {
   );
 });
 
-test('Get the registry configured in ".npmrc" for scoped package', async t => {
+test('Get the registry configured in ".npmrc" for scoped package', async (t) => {
   const cwd = tempy.directory();
   await appendFile(path.resolve(cwd, '.npmrc'), '@scope:registry = https://custom3.registry.com');
 
