@@ -44,7 +44,7 @@
     "semantic-release": "^17.0.0",
     "sinon": "^9.0.0",
     "stream-buffers": "^3.0.2",
-    "xo": "^0.29.0"
+    "xo": "^0.30.0"
   },
   "engines": {
     "node": ">=10.18"
