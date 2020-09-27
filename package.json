@@ -41,6 +41,7 @@
     "got": "^11.0.0",
     "nyc": "^15.0.0",
     "p-retry": "^4.0.0",
+    "prettier": "^2.1.2",
     "semantic-release": "^17.0.0",
     "sinon": "^9.0.0",
     "stream-buffers": "^3.0.2",
@@ -100,7 +101,8 @@
     "prettier": true,
     "space": true,
     "rules": {
-      "unicorn/string-content": "off"
+      "unicorn/string-content": "off",
+      "unicorn/no-reduce": "off"
     }
   }
 }
