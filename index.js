@@ -22,6 +22,7 @@ async function verifyConditions(pluginConfig, context) {
     pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
     pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
     pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
+    pluginConfig.usesAutomationToken = defaultTo(pluginConfig.usesAutomationToken, publishPlugin.usesAutomationToken);
   }
 
   const errors = verifyNpmConfig(pluginConfig);
@@ -33,7 +34,7 @@ async function verifyConditions(pluginConfig, context) {
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context, pluginConfig.usesAutomationToken);
     }
   } catch (error) {
     errors.push(...error);
@@ -55,7 +56,7 @@ async function prepare(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     const pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context, pluginConfig.usesAutomationToken);
     }
   } catch (error) {
     errors.push(...error);
@@ -79,7 +80,7 @@ async function publish(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context, pluginConfig.usesAutomationToken);
     }
   } catch (error) {
     errors.push(...error);
@@ -106,7 +107,7 @@ async function addChannel(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context, pluginConfig.usesAutomationToken);
     }
   } catch (error) {
     errors.push(...error);
