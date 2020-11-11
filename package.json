@@ -24,7 +24,7 @@
     "lodash": "^4.17.15",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^5.0.0",
-    "npm": "^6.13.0",
+    "npm": "^6.14.8",
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
     "registry-auth-token": "^4.0.0",
@@ -44,7 +44,7 @@
     "semantic-release": "^17.0.0",
     "sinon": "^9.0.0",
     "stream-buffers": "^3.0.2",
-    "xo": "^0.29.0"
+    "xo": "^0.33.1"
   },
   "engines": {
     "node": ">=10.19"
@@ -100,7 +100,8 @@
     "prettier": true,
     "space": true,
     "rules": {
-      "unicorn/string-content": "off"
+      "unicorn/string-content": "off",
+      "unicorn/no-reduce": "off"
     }
   }
 }
