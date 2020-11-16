@@ -20,8 +20,9 @@ jobs:
           - 14
         os:
           - ubuntu-latest
+          # only ubuntu has the "docker" binary available
           # - macos-latest
-          - windows-latest
+          # - windows-latest
 
     runs-on: ${{ matrix.os }}
 
