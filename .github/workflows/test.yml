@@ -20,7 +20,7 @@ jobs:
           - 14
         os:
           - ubuntu-latest
-          - macos-latest
+          # - macos-latest
           - windows-latest
 
     runs-on: ${{ matrix.os }}
