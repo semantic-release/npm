@@ -37,7 +37,7 @@
     "codecov": "3.8.1",
     "delay": "4.4.0",
     "dockerode": "3.2.1",
-    "get-stream": "5.2.0",
+    "get-stream": "6.0.0",
     "got": "11.8.0",
     "nyc": "15.1.0",
     "p-retry": "4.2.0",
