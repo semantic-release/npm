@@ -32,19 +32,19 @@
     "tempy": "^1.0.0"
   },
   "devDependencies": {
-    "ava": "^3.1.0",
-    "clear-module": "^4.0.0",
-    "codecov": "^3.0.0",
-    "delay": "^4.0.0",
-    "dockerode": "^3.0.0",
-    "get-stream": "^5.0.0",
-    "got": "^11.0.0",
-    "nyc": "^15.0.0",
-    "p-retry": "^4.0.0",
-    "semantic-release": "^17.0.0",
-    "sinon": "^9.0.0",
-    "stream-buffers": "^3.0.2",
-    "xo": "^0.33.1"
+    "ava": "3.13.0",
+    "clear-module": "4.1.1",
+    "codecov": "3.8.1",
+    "delay": "4.4.0",
+    "dockerode": "3.2.1",
+    "get-stream": "5.2.0",
+    "got": "11.8.0",
+    "nyc": "15.1.0",
+    "p-retry": "4.2.0",
+    "semantic-release": "17.2.3",
+    "sinon": "9.2.1",
+    "stream-buffers": "3.0.2",
+    "xo": "0.33.1"
   },
   "engines": {
     "node": ">=10.19"
