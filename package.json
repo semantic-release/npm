@@ -40,7 +40,7 @@
     "get-stream": "6.0.0",
     "got": "11.8.1",
     "nyc": "15.1.0",
-    "p-retry": "4.3.0",
+    "p-retry": "4.4.0",
     "semantic-release": "17.3.9",
     "sinon": "9.2.4",
     "stream-buffers": "3.0.2",
