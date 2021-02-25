@@ -121,7 +121,7 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
 ```json
 {
   "scripts": {
-    "postpublish": "cp -r package.json .. && cp -r npm-shrinkwrap.json .."
+    "postversion": "cp -r package.json .. && cp -r npm-shrinkwrap.json .."
   }
 }
 ```
