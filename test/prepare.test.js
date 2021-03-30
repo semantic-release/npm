@@ -189,32 +189,6 @@ test('Preserve indentation and newline', async (t) => {
   t.deepEqual(t.context.log.args[0], ['Write version %s to package.json in %s', '1.0.0', cwd]);
 });
 
-test('Use default indentation and newline if it cannot be detected', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
-  const packagePath = path.resolve(cwd, 'package.json');
-  await outputFile(packagePath, `{"name": "package-name","version": "0.0.0-dev"}`);
-
-  await prepare(
-    npmrc,
-    {},
-    {
-      cwd,
-      env: {},
-      stdout: t.context.stdout,
-      stderr: t.context.stderr,
-      nextRelease: {version: '1.0.0'},
-      logger: t.context.logger,
-    }
-  );
-
-  // Verify package.json has been updated
-  t.is(await readFile(packagePath, 'utf-8'), `{\n  "name": "package-name",\n  "version": "1.0.0"\n}\n`);
-
-  // Verify the logger has been called with the version updated
-  t.deepEqual(t.context.log.args[0], ['Write version %s to package.json in %s', '1.0.0', cwd]);
-});
-
 test('Create the package in the "tarballDir" directory', async (t) => {
   const cwd = tempy.directory();
   const npmrc = tempy.file({name: '.npmrc'});
