@@ -38,7 +38,7 @@
     "delay": "5.0.0",
     "dockerode": "3.2.1",
     "get-stream": "6.0.0",
-    "got": "11.8.1",
+    "got": "11.8.2",
     "nyc": "15.1.0",
     "p-retry": "4.4.0",
     "semantic-release": "17.3.9",
