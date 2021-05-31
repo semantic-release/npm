@@ -103,7 +103,7 @@ The `npmPublish` and `tarballDir` option can be used to skip the publishing to t
 }
 ```
 
-When publishing from a sub-directory with the `pkgRoot` option, the `package.json` and `npm-shrinkwrap.json` updated with the new version can be moved to another directory with a `postpublish` [npm script](https://docs.npmjs.com/misc/scripts). For example with the [@semantic-release/git](https://github.com/semantic-release/git) plugin:
+When publishing from a sub-directory with the `pkgRoot` option, the `package.json` and `npm-shrinkwrap.json` updated with the new version can be moved to another directory with a `postversion`. For example with the [@semantic-release/git](https://github.com/semantic-release/git) plugin:
 
 ```json
 {
