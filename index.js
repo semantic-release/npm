@@ -24,7 +24,7 @@ async function verifyConditions(pluginConfig, context) {
     pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
   }
 
-  const errors = verifyNpmConfig(pluginConfig);
+  let errors = verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -36,7 +36,7 @@ async function verifyConditions(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors = errors.concat(error);
   }
 
   if (errors.length > 0) {
@@ -47,7 +47,7 @@ async function verifyConditions(pluginConfig, context) {
 }
 
 async function prepare(pluginConfig, context) {
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -58,7 +58,7 @@ async function prepare(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors = errors.concat(error);
   }
 
   if (errors.length > 0) {
@@ -71,7 +71,7 @@ async function prepare(pluginConfig, context) {
 
 async function publish(pluginConfig, context) {
   let pkg;
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -82,7 +82,7 @@ async function publish(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors = errors.concat(error);
   }
 
   if (errors.length > 0) {
@@ -98,7 +98,7 @@ async function publish(pluginConfig, context) {
 
 async function addChannel(pluginConfig, context) {
   let pkg;
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -109,7 +109,7 @@ async function addChannel(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors = errors.concat(error);
   }
 
   if (errors.length > 0) {
