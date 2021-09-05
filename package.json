@@ -42,7 +42,7 @@
     "nyc": "15.1.0",
     "p-retry": "4.6.1",
     "semantic-release": "17.4.7",
-    "sinon": "9.2.4",
+    "sinon": "11.1.2",
     "stream-buffers": "3.0.2",
     "xo": "0.36.1"
   },
