@@ -8,6 +8,7 @@ const verifyNpmAuth = require('./lib/verify-auth');
 const addChannelNpm = require('./lib/add-channel');
 const prepareNpm = require('./lib/prepare');
 const publishNpm = require('./lib/publish');
+const {mergeErrors} = require('./lib/merge-errors');
 
 let verified;
 let prepared;
@@ -24,7 +25,7 @@ async function verifyConditions(pluginConfig, context) {
     pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
   }
 
-  let errors = verifyNpmConfig(pluginConfig);
+  const errors = verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -36,7 +37,7 @@ async function verifyConditions(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors = errors.concat(error);
+    mergeErrors(errors, error);
   }
 
   if (errors.length > 0) {
@@ -47,7 +48,7 @@ async function verifyConditions(pluginConfig, context) {
 }
 
 async function prepare(pluginConfig, context) {
-  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -58,7 +59,7 @@ async function prepare(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors = errors.concat(error);
+    mergeErrors(errors, error);
   }
 
   if (errors.length > 0) {
@@ -71,7 +72,7 @@ async function prepare(pluginConfig, context) {
 
 async function publish(pluginConfig, context) {
   let pkg;
-  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -82,7 +83,7 @@ async function publish(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors = errors.concat(error);
+    mergeErrors(errors, error);
   }
 
   if (errors.length > 0) {
@@ -98,7 +99,7 @@ async function publish(pluginConfig, context) {
 
 async function addChannel(pluginConfig, context) {
   let pkg;
-  let errors = verified ? [] : verifyNpmConfig(pluginConfig);
+  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
 
   setLegacyToken(context);
 
@@ -109,7 +110,7 @@ async function addChannel(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors = errors.concat(error);
+    mergeErrors(errors, error);
   }
 
   if (errors.length > 0) {
