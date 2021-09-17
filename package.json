@@ -41,13 +41,13 @@
     "got": "11.8.2",
     "nyc": "15.1.0",
     "p-retry": "4.6.1",
-    "semantic-release": "17.4.7",
+    "semantic-release": "^18.0.0-beta.3",
     "sinon": "11.1.2",
     "stream-buffers": "3.0.2",
     "xo": "0.36.1"
   },
   "engines": {
-    "node": ">=10.19"
+    "node": ">=14.17"
   },
   "files": [
     "lib",
@@ -76,7 +76,7 @@
     "all": true
   },
   "peerDependencies": {
-    "semantic-release": ">=16.0.0 <18.0.0"
+    "semantic-release": ">=18.0.0-beta.1"
   },
   "prettier": {
     "printWidth": 120,
