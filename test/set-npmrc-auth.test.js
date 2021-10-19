@@ -212,3 +212,30 @@ test.serial('Throw error if "NPM_EMAIL" is missing', async (t) => {
   t.is(error.message, 'No npm token specified.');
   t.is(error.code, 'ENONPMTOKEN');
 });
+
+test.serial('Prefer .npmrc over environment variables', async (t) => {
+  process.env.HOME = tempy.directory();
+  const cwd = tempy.directory();
+  process.chdir(cwd);
+  const npmrc = tempy.file({name: '.npmrc'});
+  // Specify an NPM token environment variable
+  const env = {NPM_TOKEN: 'env_npm_token'};
+
+  await appendFile(path.resolve(cwd, '.npmrc'), '//registry.npmjs.org/:_authToken=npmrc_npm_token');
+
+  await require('../lib/set-npmrc-auth')(npmrc, 'http://registry.npmjs.org', {cwd, env, logger: t.context.logger});
+
+  t.is(
+    (await readFile(npmrc)).toString(),
+    // Assert did not write the token from environment variable
+    `//registry.npmjs.org/:_authToken=npmrc_npm_token`
+  );
+
+  // Assert reads from config
+  t.deepEqual(t.context.log.args[1], ['Reading npm config from %s', path.resolve(cwd, '.npmrc')]);
+
+  // Assert does not write NPM_TOKEN
+  for (const log of t.context.log.args) {
+    t.false(log.includes('Wrote NPM_TOKEN'));
+  }
+});
