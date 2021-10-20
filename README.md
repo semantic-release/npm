@@ -8,7 +8,7 @@
 
 | Step               | Description |
 |--------------------|-------------|
-| `verifyConditions` | Verify the presence of the `NPM_TOKEN` environment variable, create or update the `.npmrc` file with the token and verify the token is valid. |
+| `verifyConditions` | Verify the presence of the `NPM_TOKEN` environment variable, or an `.npmrc` file, and verify the authentication method is valid. |
 | `prepare`          | Update the `package.json` version and [create](https://docs.npmjs.com/cli/pack) the npm package tarball. |
 | `addChannel`       | [Add a release to a dist-tag](https://docs.npmjs.com/cli/dist-tag). |
 | `publish`          | [Publish the npm package](https://docs.npmjs.com/cli/publish) to the registry. |
@@ -41,7 +41,9 @@ The npm authentication configuration is **required** and can be set via [environ
 
 Both the [token](https://docs.npmjs.com/getting-started/working_with_tokens) and the legacy (`username`, `password` and `email`) authentication are supported. It is recommended to use the [token](https://docs.npmjs.com/getting-started/working_with_tokens) authentication. The legacy authentication is supported as the alternative npm registries [Artifactory](https://www.jfrog.com/open-source/#os-arti) and [npm-registry-couchapp](https://github.com/npm/npm-registry-couchapp) only supports that form of authentication.
 
-**Note**: Only the `auth-only` [level of npm two-factor authentication](https://docs.npmjs.com/getting-started/using-two-factor-authentication#levels-of-authentication) is supported, **semantic-release** will not work with the default `auth-and-writes` level.
+**Notes**:
+- Only the `auth-only` [level of npm two-factor authentication](https://docs.npmjs.com/getting-started/using-two-factor-authentication#levels-of-authentication) is supported, **semantic-release** will not work with the default `auth-and-writes` level.
+- The presence of an `.npmrc` file will override any specified environment variables.
 
 ### Environment variables
 
