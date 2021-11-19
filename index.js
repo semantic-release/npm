@@ -32,7 +32,7 @@ async function verifyConditions(pluginConfig, context) {
     const pkg = await getPkg(pluginConfig, context);
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
-    if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
+    if (pluginConfig.npmPublish !== false && pkg.private !== true) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
