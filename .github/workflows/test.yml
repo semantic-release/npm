@@ -15,7 +15,7 @@ jobs:
         node-version:
           - 14.17
           - 16.0.0
-          - 17
+          - 18
         os:
           - ubuntu-latest
     runs-on: "${{ matrix.os }}"
