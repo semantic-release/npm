@@ -239,7 +239,7 @@ test('Publish the package', async (t) => {
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
+  t.deepEqual(result[0], {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
@@ -264,7 +264,7 @@ test('Publish the package on a dist-tag', async (t) => {
     }
   );
 
-  t.deepEqual(result, {
+  t.deepEqual(result[0], {
     name: 'npm package (@next dist-tag)',
     url: 'https://www.npmjs.com/package/publish-tag/v/1.0.0',
     channel: 'next',
@@ -293,7 +293,7 @@ test('Publish the package from a sub-directory', async (t) => {
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
+  t.deepEqual(result[0], {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
@@ -318,7 +318,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async (t) =>
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -348,7 +348,7 @@ test('Create the package and skip publish ("package.private" is true)', async (t
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   t.is((await readJson(path.resolve(cwd, 'package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -373,7 +373,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -403,7 +403,7 @@ test('Create the package and skip publish from a sub-directory ("package.private
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   t.is((await readJson(path.resolve(cwd, 'dist/package.json'))).version, '1.0.0');
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
@@ -557,7 +557,7 @@ test('Publish the package and add to default dist-tag', async (t) => {
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
+  t.deepEqual(result[0], {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await execa('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env})).stdout, '1.0.0');
 });
 
@@ -593,7 +593,7 @@ test('Publish the package and add to lts dist-tag', async (t) => {
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@release-1.x dist-tag)', url: undefined, channel: 'release-1.x'});
+  t.deepEqual(result[0], {name: 'npm package (@release-1.x dist-tag)', url: undefined, channel: 'release-1.x'});
   t.is(
     (await execa('npm', ['view', pkg.name, 'dist-tags'], {cwd, env})).stdout,
     "{ latest: '1.0.0', 'release-1.x': '1.0.0' }"
@@ -619,7 +619,7 @@ test('Skip adding the package to a channel ("npmPublish" is false)', async (t) =
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
@@ -647,7 +647,7 @@ test('Skip adding the package to a channel ("package.private" is true)', async (
     }
   );
 
-  t.false(result);
+  t.false(result[0]);
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
@@ -747,7 +747,7 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
       nextRelease: {channel: 'next', version: '1.0.0'},
     }
   );
-  t.deepEqual(result, {name: 'npm package (@next dist-tag)', url: undefined, channel: 'next'});
+  t.deepEqual(result[0], {name: 'npm package (@next dist-tag)', url: undefined, channel: 'next'});
   t.is((await execa('npm', ['view', pkg.name, 'dist-tags.next'], {cwd, env})).stdout, '1.0.0');
 
   result = await t.context.m.addChannel(
@@ -763,6 +763,47 @@ test('Verify token and set up auth only on the fist call, then prepare on prepar
     }
   );
 
-  t.deepEqual(result, {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
+  t.deepEqual(result[0], {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'});
   t.is((await execa('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env})).stdout, '1.0.0');
+});
+
+test('Publish multi packages', async (t) => {
+  const cwd = tempy.directory();
+  const env = npmRegistry.authEnv;
+  const pkg1 = {name: 'publish-sub-dir-1', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
+  const pkg2 = {name: 'publish-sub-dir-2', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
+  await outputJson(path.resolve(cwd, 'packages/sub01/package.json'), pkg1);
+  await outputJson(path.resolve(cwd, 'packages/sub02/package.json'), pkg2);
+
+  const result = await t.context.m.publish(
+    {
+      packages: [
+        'packages/sub01',
+        {
+          tarballDir: 'tarball',
+          pkgRoot: 'packages/sub02',
+        },
+      ],
+    },
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: {version: '1.0.0'},
+    }
+  );
+
+  t.deepEqual(result, [
+    {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'},
+    {name: 'npm package (@latest dist-tag)', url: undefined, channel: 'latest'},
+  ]);
+  t.is((await readJson(path.resolve(cwd, 'packages/sub01/package.json'))).version, '1.0.0');
+  t.is((await readJson(path.resolve(cwd, 'packages/sub02/package.json'))).version, '1.0.0');
+  t.false(await pathExists(path.resolve(cwd, `${pkg1.name}-1.0.0.tgz`)));
+  t.true(await pathExists(path.resolve(cwd, `tarball/${pkg2.name}-1.0.0.tgz`)));
+  t.is((await execa('npm', ['view', pkg1.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
+  t.is((await execa('npm', ['view', pkg2.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
