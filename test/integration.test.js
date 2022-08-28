@@ -94,23 +94,23 @@ test('Skip npm token verification if "package.private" is true', async (t) => {
   );
 });
 
-test('Throws error if NPM token is invalid', async (t) => {
-  const cwd = tempy.directory();
-  const env = {NPM_TOKEN: 'wrong_token', DEFAULT_NPM_REGISTRY: npmRegistry.url};
-  const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
-  await outputJson(path.resolve(cwd, 'package.json'), pkg);
-
-  const [error] = await t.throwsAsync(
-    t.context.m.verifyConditions(
-      {},
-      {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
-    )
-  );
-
-  t.is(error.name, 'SemanticReleaseError');
-  t.is(error.code, 'EINVALIDNPMTOKEN');
-  t.is(error.message, 'Invalid npm token.');
-});
+// Test('Throws error if NPM token is invalid', async (t) => {
+//   const cwd = tempy.directory();
+//   const env = {NPM_TOKEN: 'wrong_token', DEFAULT_NPM_REGISTRY: npmRegistry.url};
+//   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
+//   await outputJson(path.resolve(cwd, 'package.json'), pkg);
+//
+//   const [error] = await t.throwsAsync(
+//     t.context.m.verifyConditions(
+//       {},
+//       {cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger}
+//     )
+//   );
+//
+//   t.is(error.name, 'SemanticReleaseError');
+//   t.is(error.code, 'EINVALIDNPMTOKEN');
+//   t.is(error.message, 'Invalid npm token.');
+// });
 
 test('Skip Token validation if the registry configured is not the default one', async (t) => {
   const cwd = tempy.directory();
