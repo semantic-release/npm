@@ -59,11 +59,12 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 
 ### Options
 
-| Options      | Description                                                                                                         | Default                                                                                                                          |
-|--------------|---------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
-| `pkgRoot`    | Directory path to publish.                                                                                          | `.`                                                                                                                              |
+| Options      | Description                                                                                 | Default                                                                                                                          |
+|--------------|---------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated. | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
+| `pkgRoot`    | Directory path to publish.                                                                  | `.`                                                                                                                              |
 | `tarballDir` | Directory path in which to write the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
+| `packages`   | Array of packages path to publish.                                                          | `[]`                                                                                                                              |
 
 **Note**: The `pkgRoot` directory must contain a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
@@ -113,7 +114,7 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
     ["@semantic-release/npm", {
-      "pkgRoot": "dist",
+      "pkgRoot": "dist"
     }],
     ["@semantic-release/git", {
       "assets": ["package.json", "npm-shrinkwrap.json"]
@@ -126,5 +127,50 @@ When publishing from a sub-directory with the `pkgRoot` option, the `package.jso
   "scripts": {
     "postversion": "cp -r package.json .. && cp -r npm-shrinkwrap.json .."
   }
+}
+```
+
+When publishing from multi sub package with the `packages` options:
+
+```json
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/npm", {
+      "packages": ["packages/package-1", "packages/package-2"]
+    }],
+    ["@semantic-release/git", {
+      "assets": ["packages/package-1/package.json", "packages/package-2/package.json"]
+    }]
+  ]
+}
+```
+
+Also can config every package:
+
+```json
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/npm", {
+      "packages": [
+        {
+          "pkgRoot": "packages/package-1",
+          "npmPublish": true,
+          "tarballDir": "latest"
+        },
+        {
+          "pkgRoot": "packages/package-2",
+          "npmPublish": false,
+          "tarballDir": "next"
+        }
+      ]
+    }],
+    ["@semantic-release/git", {
+      "assets": ["packages/package-1/package.json", "packages/package-2/package.json"]
+    }]
+  ]
 }
 ```
