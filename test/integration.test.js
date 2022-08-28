@@ -94,7 +94,7 @@ test('Skip npm token verification if "package.private" is true', async (t) => {
   );
 });
 
-// test('Throws error if NPM token is invalid', async (t) => {
+// Test('Throws error if NPM token is invalid', async (t) => {
 //   const cwd = tempy.directory();
 //   const env = {NPM_TOKEN: 'wrong_token', DEFAULT_NPM_REGISTRY: npmRegistry.url};
 //   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
