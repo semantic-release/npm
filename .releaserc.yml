@@ -1,0 +1,9 @@
+branches:
+  - master
+  - R1
+  - name: dev
+    prerelease: alpha
+    channel: alpha
+  - name: beta
+    prerelease: beta
+    channel: beta

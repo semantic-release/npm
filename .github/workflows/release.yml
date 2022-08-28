@@ -5,6 +5,7 @@ name: Release
       - master
       - next
       - beta
+      - dev
       - "*.x"
 jobs:
   release:
