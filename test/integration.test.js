@@ -197,7 +197,10 @@ test('Throw SemanticReleaseError Array if config option are not valid in verifyC
           cwd,
           env: {},
           options: {
-            publish: ['@semantic-release/github', {path: '@semantic-release/npm', npmPublish, tarballDir, pkgRoot}],
+            publish: [
+              '@semantic-release/github',
+              {path: 'semantic-release-multi-npm', npmPublish, tarballDir, pkgRoot},
+            ],
           },
           stdout: t.context.stdout,
           stderr: t.context.stderr,

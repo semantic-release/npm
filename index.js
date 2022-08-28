@@ -118,7 +118,7 @@ async function publish(pluginConfig, context) {
   return Promise.all(
     publishPackages.map(async (config) => {
       const pkg = await getPkg(config, context);
-      await publishNpm(npmrc, config, pkg, context);
+      return publishNpm(npmrc, config, pkg, context);
     })
   );
 }
@@ -145,7 +145,7 @@ async function addChannel(pluginConfig, context) {
     publishPackages.map(async (config) => {
       const pkg = await getPkg(config, context);
 
-      await addChannelNpm(npmrc, config, pkg, context);
+      return addChannelNpm(npmrc, config, pkg, context);
     })
   );
 }
