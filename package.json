@@ -54,7 +54,7 @@
     "lib",
     "index.js"
   ],
-  "homepage": "https://github.com/semantic-release/npm#readme",
+  "homepage": "https://github.com/oussstn/semantic-release-multi-npm#readme",
   "keywords": [
     "npm",
     "publish",
@@ -88,7 +88,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/semantic-release/npm.git"
+    "url": "https://github.com/oussstn/semantic-release-multi-npm.git"
   },
   "scripts": {
     "codecov": "codecov -f coverage/coverage-final.json",
