@@ -141,13 +141,21 @@ async function addChannel(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
-  return Promise.all(
+  const info = await Promise.all(
     publishPackages.map(async (config) => {
       const pkg = await getPkg(config, context);
 
       return addChannelNpm(npmrc, config, pkg, context);
     })
   );
+
+  if (info.length === 1) {
+    return info[0]
+  }
+
+  return {
+    packages: info,
+  }
 }
 
 module.exports = {verifyConditions, prepare, publish, addChannel};
