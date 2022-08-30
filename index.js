@@ -115,12 +115,20 @@ async function publish(pluginConfig, context) {
     );
   }
 
-  return Promise.all(
+  const result = await Promise.all(
     publishPackages.map(async (config) => {
       const pkg = await getPkg(config, context);
       return publishNpm(npmrc, config, pkg, context);
     })
   );
+
+  if (result.length === 1) {
+    return result;
+  }
+
+  return {
+    packages: result,
+  };
 }
 
 async function addChannel(pluginConfig, context) {
@@ -141,21 +149,13 @@ async function addChannel(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
-  const info = await Promise.all(
+  return Promise.all(
     publishPackages.map(async (config) => {
       const pkg = await getPkg(config, context);
 
       return addChannelNpm(npmrc, config, pkg, context);
     })
   );
-
-  if (info.length === 1) {
-    return info[0];
-  }
-
-  return {
-    packages: info,
-  };
 }
 
 module.exports = {verifyConditions, prepare, publish, addChannel};
