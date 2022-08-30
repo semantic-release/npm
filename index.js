@@ -150,12 +150,12 @@ async function addChannel(pluginConfig, context) {
   );
 
   if (info.length === 1) {
-    return info[0]
+    return info[0];
   }
 
   return {
     packages: info,
-  }
+  };
 }
 
 module.exports = {verifyConditions, prepare, publish, addChannel};
