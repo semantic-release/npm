@@ -1,7 +1,7 @@
 {
   "name": "semantic-release-multi-npm",
   "description": "semantic-release plugin to publish multi npm packages",
-  "version": "0.0.0-development",
+  "version": "1.0.1",
   "author": "Pierre Vanduynslager (https://twitter.com/@pvdlg_)",
   "ava": {
     "files": [
