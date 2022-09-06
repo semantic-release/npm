@@ -14,7 +14,7 @@ let prepared;
 const npmrc = tempy.file({name: '.npmrc'});
 
 async function verifyConditions(pluginConfig, context) {
-  // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong
+  // If the npm publish plugin is used and has `npmPublish`, `tarballDir`, `pkgRoot` or `noWorkspacesUpdate` configured, validate them now in order to prevent any release if the configuration is wrong
   if (context.options.publish) {
     const publishPlugin =
       castArray(context.options.publish).find((config) => config.path && config.path === '@semantic-release/npm') || {};
@@ -22,6 +22,7 @@ async function verifyConditions(pluginConfig, context) {
     pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
     pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
     pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
+    pluginConfig.noWorkspacesUpdate = defaultTo(pluginConfig.noWorkspacesUpdate, publishPlugin.noWorkspacesUpdate);
   }
 
   const errors = verifyNpmConfig(pluginConfig);
