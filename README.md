@@ -64,6 +64,8 @@ Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD
 | `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.  | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
 | `pkgRoot`    | Directory path to publish.                                                                                          | `.`                                                                                                                              |
 | `tarballDir` | Directory path in which to write the package tarball. If `false` the tarball is not be kept on the file system. | `false`                                                                                                                          |
+| `publishArgs` | Additional arguments for executing the `npm publish` command. For example, to specify a workspace `['--workspace', 'packages']` | `[]`                                                                                                                          |
+| `versionArgs` | Additional arguments for executing the `npm version` command. For example, to specify a workspace `['--workspace', 'packages']` | `[]`                                                                                                                          |
 
 **Note**: The `pkgRoot` directory must contain a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
