@@ -41,7 +41,7 @@ test.beforeEach((t) => {
   t.context.logger = {log: t.context.log};
 });
 
-test.serial('Skip npm auth verification if "npmPublish" is false', async (t) => {
+test('Skip npm auth verification if "npmPublish" is false', async (t) => {
   const cwd = tempy.directory();
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -55,7 +55,7 @@ test.serial('Skip npm auth verification if "npmPublish" is false', async (t) => 
   );
 });
 
-test.serial('Skip npm auth verification if "package.private" is true', async (t) => {
+test('Skip npm auth verification if "package.private" is true', async (t) => {
   const cwd = tempy.directory();
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -75,7 +75,7 @@ test.serial('Skip npm auth verification if "package.private" is true', async (t)
   );
 });
 
-test.serial('Skip npm token verification if "package.private" is true', async (t) => {
+test('Skip npm token verification if "package.private" is true', async (t) => {
   const cwd = tempy.directory();
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -94,7 +94,7 @@ test.serial('Skip npm token verification if "package.private" is true', async (t
   );
 });
 
-test.serial('Throws error if NPM token is invalid', async (t) => {
+test('Throws error if NPM token is invalid', async (t) => {
   const cwd = tempy.directory();
   const env = {NPM_TOKEN: 'wrong_token', DEFAULT_NPM_REGISTRY: npmRegistry.url};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -112,7 +112,7 @@ test.serial('Throws error if NPM token is invalid', async (t) => {
   t.is(error.message, 'Invalid npm token.');
 });
 
-test.serial('Skip Token validation if the registry configured is not the default one', async (t) => {
+test('Skip Token validation if the registry configured is not the default one', async (t) => {
   const cwd = tempy.directory();
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: 'http://custom-registry.com/'}};
@@ -125,7 +125,7 @@ test.serial('Skip Token validation if the registry configured is not the default
   );
 });
 
-test.serial('Verify npm auth and package', async (t) => {
+test('Verify npm auth and package', async (t) => {
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -144,7 +144,7 @@ test.serial('Verify npm auth and package', async (t) => {
   );
 });
 
-test.serial('Verify npm auth and package from a sub-directory', async (t) => {
+test('Verify npm auth and package from a sub-directory', async (t) => {
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
@@ -163,7 +163,7 @@ test.serial('Verify npm auth and package from a sub-directory', async (t) => {
   );
 });
 
-test.serial('Verify npm auth and package with "npm_config_registry" env var set by yarn', async (t) => {
+test('Verify npm auth and package with "npm_config_registry" env var set by yarn', async (t) => {
   const cwd = tempy.directory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -182,7 +182,7 @@ test.serial('Verify npm auth and package with "npm_config_registry" env var set 
   );
 });
 
-test.serial('Throw SemanticReleaseError Array if config option are not valid in verifyConditions', async (t) => {
+test('Throw SemanticReleaseError Array if config option are not valid in verifyConditions', async (t) => {
   const cwd = tempy.directory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -217,7 +217,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[3].code, 'ENOPKG');
 });
 
-test.serial('Publish the package', async (t) => {
+test('Publish the package', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -242,7 +242,7 @@ test.serial('Publish the package', async (t) => {
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
-test.serial('Publish the package on a dist-tag', async (t) => {
+test('Publish the package on a dist-tag', async (t) => {
   const cwd = tempy.directory();
   const env = {...npmRegistry.authEnv, DEFAULT_NPM_REGISTRY: npmRegistry.url};
   const pkg = {name: 'publish-tag', version: '0.0.0', publishConfig: {registry: npmRegistry.url, tag: 'next'}};
@@ -271,7 +271,7 @@ test.serial('Publish the package on a dist-tag', async (t) => {
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
-test.serial('Publish the package from a sub-directory', async (t) => {
+test('Publish the package from a sub-directory', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -296,7 +296,7 @@ test.serial('Publish the package from a sub-directory', async (t) => {
   t.is((await execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv})).stdout, '1.0.0');
 });
 
-test.serial('Create the package and skip publish ("npmPublish" is false)', async (t) => {
+test('Create the package and skip publish ("npmPublish" is false)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -321,7 +321,7 @@ test.serial('Create the package and skip publish ("npmPublish" is false)', async
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
-test.serial('Create the package and skip publish ("package.private" is true)', async (t) => {
+test('Create the package and skip publish ("package.private" is true)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {
@@ -351,7 +351,7 @@ test.serial('Create the package and skip publish ("package.private" is true)', a
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
-test.serial('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async (t) => {
+test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -376,7 +376,7 @@ test.serial('Create the package and skip publish from a sub-directory ("npmPubli
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
-test.serial('Create the package and skip publish from a sub-directory ("package.private" is true)', async (t) => {
+test('Create the package and skip publish from a sub-directory ("package.private" is true)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {
@@ -406,7 +406,7 @@ test.serial('Create the package and skip publish from a sub-directory ("package.
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env: testEnv}));
 });
 
-test.serial('Throw SemanticReleaseError Array if config option are not valid in publish', async (t) => {
+test('Throw SemanticReleaseError Array if config option are not valid in publish', async (t) => {
   const cwd = tempy.directory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -441,7 +441,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[3].code, 'ENOPKG');
 });
 
-test.serial('Prepare the package', async (t) => {
+test('Prepare the package', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'prepare', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -464,7 +464,7 @@ test.serial('Prepare the package', async (t) => {
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
 });
 
-test.serial('Prepare the package from a sub-directory', async (t) => {
+test('Prepare the package from a sub-directory', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'prepare-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -487,7 +487,7 @@ test.serial('Prepare the package from a sub-directory', async (t) => {
   t.false(await pathExists(path.resolve(cwd, `${pkg.name}-1.0.0.tgz`)));
 });
 
-test.serial('Throw SemanticReleaseError Array if config option are not valid in prepare', async (t) => {
+test('Throw SemanticReleaseError Array if config option are not valid in prepare', async (t) => {
   const cwd = tempy.directory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -522,7 +522,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[3].code, 'ENOPKG');
 });
 
-test.serial('Publish the package and add to default dist-tag', async (t) => {
+test('Publish the package and add to default dist-tag', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -558,7 +558,7 @@ test.serial('Publish the package and add to default dist-tag', async (t) => {
   t.is((await execa('npm', ['view', pkg.name, 'dist-tags.latest'], {cwd, env})).stdout, '1.0.0');
 });
 
-test.serial('Publish the package and add to lts dist-tag', async (t) => {
+test('Publish the package and add to lts dist-tag', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel-legacy', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -597,7 +597,7 @@ test.serial('Publish the package and add to lts dist-tag', async (t) => {
   );
 });
 
-test.serial('Skip adding the package to a channel ("npmPublish" is false)', async (t) => {
+test('Skip adding the package to a channel ("npmPublish" is false)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-add-channel', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -620,7 +620,7 @@ test.serial('Skip adding the package to a channel ("npmPublish" is false)', asyn
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
-test.serial('Skip adding the package to a channel ("package.private" is true)', async (t) => {
+test('Skip adding the package to a channel ("package.private" is true)', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {
@@ -648,7 +648,7 @@ test.serial('Skip adding the package to a channel ("package.private" is true)', 
   await t.throwsAsync(execa('npm', ['view', pkg.name, 'version'], {cwd, env}));
 });
 
-test.serial('Create the package in addChannel step', async (t) => {
+test('Create the package in addChannel step', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel-pkg', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
@@ -671,7 +671,7 @@ test.serial('Create the package in addChannel step', async (t) => {
   t.true(await pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
 });
 
-test.serial('Throw SemanticReleaseError Array if config option are not valid in addChannel', async (t) => {
+test('Throw SemanticReleaseError Array if config option are not valid in addChannel', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {publishConfig: {registry: npmRegistry.url}};
@@ -707,7 +707,7 @@ test.serial('Throw SemanticReleaseError Array if config option are not valid in 
   t.is(errors[3].code, 'ENOPKG');
 });
 
-test.serial('Verify token and set up auth only on the fist call, then prepare on prepare call only', async (t) => {
+test('Verify token and set up auth only on the fist call, then prepare on prepare call only', async (t) => {
   const cwd = tempy.directory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
