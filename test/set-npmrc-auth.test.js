@@ -44,7 +44,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
 
   await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger});
 
-  t.is((await readFile(npmrc)).toString(), `_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
+  t.is((await readFile(npmrc)).toString(), `//custom.registry.com/:_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to ${npmrc}`]);
 });
 
