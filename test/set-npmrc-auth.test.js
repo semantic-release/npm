@@ -5,17 +5,28 @@ import { stub } from 'sinon';
 import {temporaryFile, temporaryDirectory} from 'tempy';
 
 const {HOME} = process.env;
-const cwd = process.cwd();
+const oldCwd = process.cwd();
+let cwd;
 
-test.beforeEach((t) => {
+test.before((t) => {
+  process.env.HOME = temporaryDirectory();
+  cwd = temporaryDirectory();
+  process.chdir(cwd);
+});
+
+test.beforeEach(async (t) => {
+  // Clear files
+  await fs.remove(resolve(process.env.HOME, ".npmrc"));
+  await fs.remove(resolve(cwd, ".npmrc"));
+
   // Stub the logger
   t.context.log = stub();
   t.context.logger = {log: t.context.log};
 });
 
-test.afterEach.always(() => {
+test.after.always(() => {
   process.env.HOME = HOME;
-  process.chdir(cwd);
+  process.chdir(oldCwd);
 });
 
 test.serial('Set auth with "NPM_TOKEN"', async (t) => {
