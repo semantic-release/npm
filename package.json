@@ -30,7 +30,7 @@
     "read-pkg": "^7.0.0",
     "registry-auth-token": "^5.0.0",
     "semver": "^7.1.2",
-    "tempy": "^2.0.0"
+    "tempy": "^3.0.0"
   },
   "devDependencies": {
     "ava": "5.1.0",

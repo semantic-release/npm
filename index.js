@@ -1,6 +1,6 @@
 import { castArray, defaultTo } from 'lodash-es';
 import AggregateError from 'aggregate-error';
-import tempy from 'tempy';
+import {temporaryFile} from 'tempy';
 import setLegacyToken from './lib/set-legacy-token.js';
 import getPkg from './lib/get-pkg.js';
 import verifyNpmConfig from './lib/verify-config.js';
@@ -11,7 +11,7 @@ import publishNpm from './lib/publish.js';
 
 let verified;
 let prepared;
-const npmrc = tempy.file({name: '.npmrc'});
+const npmrc = temporaryFile({name: '.npmrc'});
 
 export async function verifyConditions(pluginConfig, context) {
   // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong

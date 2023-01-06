@@ -3,7 +3,7 @@ import test from 'ava';
 import fs from 'fs-extra';
 import execa from 'execa';
 import { spy } from 'sinon';
-import tempy from 'tempy';
+import {temporaryDirectory} from 'tempy';
 import { WritableStreamBuffer } from 'stream-buffers';
 import * as npmRegistry from './helpers/npm-registry.js';
 
@@ -39,7 +39,7 @@ test.beforeEach(async (t) => {
 });
 
 test('Skip npm auth verification if "npmPublish" is false', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -53,7 +53,7 @@ test('Skip npm auth verification if "npmPublish" is false', async (t) => {
 });
 
 test('Skip npm auth verification if "package.private" is true', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
 
@@ -73,7 +73,7 @@ test('Skip npm auth verification if "package.private" is true', async (t) => {
 });
 
 test('Skip npm token verification if "package.private" is true', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}, private: true};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   await t.notThrowsAsync(
@@ -92,7 +92,7 @@ test('Skip npm token verification if "package.private" is true', async (t) => {
 });
 
 test('Throws error if NPM token is invalid', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = {NPM_TOKEN: 'wrong_token', DEFAULT_NPM_REGISTRY: npmRegistry.url};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -110,7 +110,7 @@ test('Throws error if NPM token is invalid', async (t) => {
 });
 
 test('Skip Token validation if the registry configured is not the default one', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = {NPM_TOKEN: 'wrong_token'};
   const pkg = {name: 'published', version: '1.0.0', publishConfig: {registry: 'http://custom-registry.com/'}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -123,7 +123,7 @@ test('Skip Token validation if the registry configured is not the default one', 
 });
 
 test('Verify npm auth and package', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   await t.notThrowsAsync(
@@ -142,7 +142,7 @@ test('Verify npm auth and package', async (t) => {
 });
 
 test('Verify npm auth and package from a sub-directory', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
   await t.notThrowsAsync(
@@ -161,7 +161,7 @@ test('Verify npm auth and package from a sub-directory', async (t) => {
 });
 
 test('Verify npm auth and package with "npm_config_registry" env var set by yarn', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {name: 'valid-token', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   await t.notThrowsAsync(
@@ -180,7 +180,7 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in verifyConditions', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   const npmPublish = 42;
@@ -215,7 +215,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in verifyC
 });
 
 test('Publish the package', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -240,7 +240,7 @@ test('Publish the package', async (t) => {
 });
 
 test('Publish the package on a dist-tag', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = {...npmRegistry.authEnv, DEFAULT_NPM_REGISTRY: npmRegistry.url};
   const pkg = {name: 'publish-tag', version: '0.0.0', publishConfig: {registry: npmRegistry.url, tag: 'next'}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -269,7 +269,7 @@ test('Publish the package on a dist-tag', async (t) => {
 });
 
 test('Publish the package from a sub-directory', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
@@ -294,7 +294,7 @@ test('Publish the package from a sub-directory', async (t) => {
 });
 
 test('Create the package and skip publish ("npmPublish" is false)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-publish', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -319,7 +319,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async (t) =>
 });
 
 test('Create the package and skip publish ("package.private" is true)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {
     name: 'skip-publish-private',
@@ -349,7 +349,7 @@ test('Create the package and skip publish ("package.private" is true)', async (t
 });
 
 test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-publish-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
@@ -374,7 +374,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
 });
 
 test('Create the package and skip publish from a sub-directory ("package.private" is true)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {
     name: 'skip-publish-sub-dir-private',
@@ -404,7 +404,7 @@ test('Create the package and skip publish from a sub-directory ("package.private
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in publish', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   const npmPublish = 42;
@@ -439,7 +439,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in publish
 });
 
 test('Prepare the package', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'prepare', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -462,7 +462,7 @@ test('Prepare the package', async (t) => {
 });
 
 test('Prepare the package from a sub-directory', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'prepare-sub-dir', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'dist/package.json'), pkg);
@@ -485,7 +485,7 @@ test('Prepare the package from a sub-directory', async (t) => {
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in prepare', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
   const npmPublish = 42;
@@ -520,7 +520,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in prepare
 });
 
 test('Publish the package and add to default dist-tag', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -556,7 +556,7 @@ test('Publish the package and add to default dist-tag', async (t) => {
 });
 
 test('Publish the package and add to lts dist-tag', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel-legacy', version: '1.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -595,7 +595,7 @@ test('Publish the package and add to lts dist-tag', async (t) => {
 });
 
 test('Skip adding the package to a channel ("npmPublish" is false)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'skip-add-channel', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -618,7 +618,7 @@ test('Skip adding the package to a channel ("npmPublish" is false)', async (t) =
 });
 
 test('Skip adding the package to a channel ("package.private" is true)', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {
     name: 'skip-add-channel-private',
@@ -646,7 +646,7 @@ test('Skip adding the package to a channel ("package.private" is true)', async (
 });
 
 test('Create the package in addChannel step', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'add-channel-pkg', version: '0.0.0', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -669,7 +669,7 @@ test('Create the package in addChannel step', async (t) => {
 });
 
 test('Throw SemanticReleaseError Array if config option are not valid in addChannel', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);
@@ -705,7 +705,7 @@ test('Throw SemanticReleaseError Array if config option are not valid in addChan
 });
 
 test('Verify token and set up auth only on the fist call, then prepare on prepare call only', async (t) => {
-  const cwd = tempy.directory();
+  const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv;
   const pkg = {name: 'test-module', version: '0.0.0-dev', publishConfig: {registry: npmRegistry.url}};
   await fs.outputJson(path.resolve(cwd, 'package.json'), pkg);

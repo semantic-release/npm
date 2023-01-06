@@ -2,7 +2,7 @@ import path from 'path';
 import test from 'ava';
 import fs from 'fs-extra';
 import { stub } from 'sinon';
-import tempy from 'tempy';
+import {temporaryFile, temporaryDirectory} from 'tempy';
 
 const {HOME} = process.env;
 const cwd = process.cwd();
@@ -19,10 +19,7 @@ test.afterEach.always(() => {
 });
 
 test.serial('Set auth with "NPM_TOKEN"', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_TOKEN: 'npm_token'};
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
@@ -33,10 +30,7 @@ test.serial('Set auth with "NPM_TOKEN"', async (t) => {
 });
 
 test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_USERNAME: 'npm_username', NPM_PASSWORD: 'npm_pasword', NPM_EMAIL: 'npm_email'};
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
@@ -47,10 +41,7 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
 });
 
 test.serial('Preserve home ".npmrc"', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_TOKEN: 'npm_token'};
 
   await fs.appendFile(path.resolve(process.env.HOME, '.npmrc'), 'home_config = test');
@@ -67,10 +58,7 @@ test.serial('Preserve home ".npmrc"', async (t) => {
 });
 
 test.serial('Preserve home and local ".npmrc"', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_TOKEN: 'npm_token'};
 
   await fs.appendFile(path.resolve(cwd, '.npmrc'), 'cwd_config = test');
@@ -91,10 +79,7 @@ test.serial('Preserve home and local ".npmrc"', async (t) => {
 });
 
 test.serial('Preserve all ".npmrc" if auth is already configured', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
 
   await fs.appendFile(path.resolve(cwd, '.npmrc'), `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
   await fs.appendFile(path.resolve(process.env.HOME, '.npmrc'), 'home_config = test');
@@ -110,10 +95,7 @@ test.serial('Preserve all ".npmrc" if auth is already configured', async (t) => 
 });
 
 test.serial('Preserve ".npmrc" if auth is already configured for a scoped package', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
 
   await fs.appendFile(
     path.resolve(cwd, '.npmrc'),
@@ -135,10 +117,7 @@ test.serial('Preserve ".npmrc" if auth is already configured for a scoped packag
 });
 
 test.serial('Throw error if "NPM_TOKEN" is missing', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
   const [error] = await t.throwsAsync(
@@ -151,10 +130,7 @@ test.serial('Throw error if "NPM_TOKEN" is missing', async (t) => {
 });
 
 test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
 
   await fs.appendFile(path.resolve(cwd, '.custom-npmrc'), `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
 
@@ -170,10 +146,7 @@ test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', a
 });
 
 test.serial('Throw error if "NPM_USERNAME" is missing', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_PASSWORD: 'npm_pasword', NPM_EMAIL: 'npm_email'};
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
@@ -187,10 +160,7 @@ test.serial('Throw error if "NPM_USERNAME" is missing', async (t) => {
 });
 
 test.serial('Throw error if "NPM_PASSWORD" is missing', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_USERNAME: 'npm_username', NPM_EMAIL: 'npm_email'};
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
@@ -204,10 +174,7 @@ test.serial('Throw error if "NPM_PASSWORD" is missing', async (t) => {
 });
 
 test.serial('Throw error if "NPM_EMAIL" is missing', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   const env = {NPM_USERNAME: 'npm_username', NPM_PASSWORD: 'npm_password'};
 
   const setNpmrcAuth = (await import('../lib/set-npmrc-auth.js')).default;
@@ -221,10 +188,7 @@ test.serial('Throw error if "NPM_EMAIL" is missing', async (t) => {
 });
 
 test.serial('Prefer .npmrc over environment variables', async (t) => {
-  process.env.HOME = tempy.directory();
-  const cwd = tempy.directory();
-  process.chdir(cwd);
-  const npmrc = tempy.file({name: '.npmrc'});
+  const npmrc = temporaryFile({name: '.npmrc'});
   // Specify an NPM token environment variable
   const env = {NPM_TOKEN: 'env_npm_token'};
 

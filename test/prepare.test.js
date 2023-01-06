@@ -1,7 +1,7 @@
 import path from 'path';
 import test from 'ava';
 import fs from 'fs-extra';
-import tempy from 'tempy';
+import {temporaryDirectory, temporaryFile} from 'tempy';
 import execa from 'execa';
 import { stub } from 'sinon';
 import { WritableStreamBuffer } from 'stream-buffers';
@@ -14,9 +14,9 @@ test.beforeEach((t) => {
   t.context.stderr = new WritableStreamBuffer();
 });
 
-test('Updade package.json', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+test('Update package.json', async (t) => {
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   await fs.outputJson(packagePath, {version: '0.0.0-dev'});
 
@@ -41,8 +41,8 @@ test('Updade package.json', async (t) => {
 });
 
 test('Updade package.json and npm-shrinkwrap.json', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const shrinkwrapPath = path.resolve(cwd, 'npm-shrinkwrap.json');
   await fs.outputJson(packagePath, {version: '0.0.0-dev'});
@@ -70,8 +70,8 @@ test('Updade package.json and npm-shrinkwrap.json', async (t) => {
 });
 
 test('Updade package.json and package-lock.json', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const packageLockPath = path.resolve(cwd, 'package-lock.json');
   await fs.outputJson(packagePath, {version: '0.0.0-dev'});
@@ -100,8 +100,8 @@ test('Updade package.json and package-lock.json', async (t) => {
 });
 
 test('Updade package.json and npm-shrinkwrap.json in a sub-directory', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const pkgRoot = 'dist';
   const packagePath = path.resolve(cwd, pkgRoot, 'package.json');
   const shrinkwrapPath = path.resolve(cwd, pkgRoot, 'npm-shrinkwrap.json');
@@ -130,8 +130,8 @@ test('Updade package.json and npm-shrinkwrap.json in a sub-directory', async (t)
 });
 
 test('Updade package.json and package-lock.json in a sub-directory', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const pkgRoot = 'dist';
   const packagePath = path.resolve(cwd, pkgRoot, 'package.json');
   const packageLockPath = path.resolve(cwd, pkgRoot, 'package-lock.json');
@@ -161,8 +161,8 @@ test('Updade package.json and package-lock.json in a sub-directory', async (t) =
 });
 
 test('Preserve indentation and newline', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   await fs.outputFile(packagePath, `{\r\n        "name": "package-name",\r\n        "version": "0.0.0-dev"\r\n}\r\n`);
 
@@ -190,8 +190,8 @@ test('Preserve indentation and newline', async (t) => {
 });
 
 test('Create the package in the "tarballDir" directory', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const pkg = {name: 'my-pkg', version: '0.0.0-dev'};
   await fs.outputJson(packagePath, pkg);
@@ -218,8 +218,8 @@ test('Create the package in the "tarballDir" directory', async (t) => {
 });
 
 test('Only move the created tarball if the "tarballDir" directory is not the CWD', async (t) => {
-  const cwd = tempy.directory();
-  const npmrc = tempy.file({name: '.npmrc'});
+  const cwd = temporaryDirectory();
+  const npmrc = temporaryFile({name: '.npmrc'});
   const packagePath = path.resolve(cwd, 'package.json');
   const pkg = {name: 'my-pkg', version: '0.0.0-dev'};
   await fs.outputJson(packagePath, pkg);
