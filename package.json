@@ -28,7 +28,7 @@
     "npm": "^9.0.0",
     "rc": "^1.2.8",
     "read-pkg": "^5.0.0",
-    "registry-auth-token": "^4.0.0",
+    "registry-auth-token": "^5.0.0",
     "semver": "^7.1.2",
     "tempy": "^1.0.0"
   },
