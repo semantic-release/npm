@@ -22,33 +22,32 @@
     "aggregate-error": "^3.0.0",
     "execa": "^5.0.0",
     "fs-extra": "^11.0.0",
-    "lodash": "^4.17.15",
+    "lodash-es": "^4.17.21",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^6.0.0",
     "npm": "^8.3.0",
     "rc": "^1.2.8",
-    "read-pkg": "^5.0.0",
+    "read-pkg": "^7.0.0",
     "registry-auth-token": "^5.0.0",
     "semver": "^7.1.2",
-    "tempy": "^1.0.0"
+    "tempy": "^3.0.0"
   },
   "devDependencies": {
     "ava": "5.1.0",
-    "clear-module": "4.1.2",
+    "c8": "7.10.0",
     "codecov": "3.8.3",
     "delay": "5.0.0",
     "dockerode": "3.3.4",
     "get-stream": "6.0.1",
     "got": "11.8.6",
-    "nyc": "15.1.0",
     "p-retry": "4.6.2",
-    "semantic-release": "20.0.2",
-    "sinon": "15.0.1",
-    "stream-buffers": "3.0.2",
-    "xo": "0.36.1"
+    "prettier": "^2.8.2",
+    "semantic-release": "19.0.5",
+    "sinon": "14.0.2",
+    "stream-buffers": "3.0.2"
   },
   "engines": {
-    "node": ">=16 || ^14.17"
+    "node": ">=18"
   },
   "files": [
     "lib",
@@ -64,7 +63,7 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "nyc": {
+  "c8": {
     "include": [
       "lib/**/*.js",
       "index.js"
@@ -92,20 +91,13 @@
   },
   "scripts": {
     "codecov": "codecov -f coverage/coverage-final.json",
-    "lint": "xo",
+    "lint": "prettier --check \"{lib,test}/**/*.{js,json,ts}\" \"*.{md,json,js}\" \".github/**/*.yml\"",
+    "lint:fix": "prettier --write \"{lib,test}/**/*.{js,json,ts}\" \"*.{md,json,js}\" \".github/**/*.yml\"",
     "pretest": "npm run lint",
-    "semantic-release": "semantic-release",
-    "test": "nyc ava -v",
-    "test:ci": "nyc ava -v"
+    "test": "c8 ava -v",
+    "test:ci": "c8 ava -v"
   },
-  "xo": {
-    "prettier": true,
-    "space": true,
-    "rules": {
-      "unicorn/string-content": "off",
-      "unicorn/no-reduce": "off"
-    }
-  },
+  "type": "module",
   "renovate": {
     "extends": [
       "github>semantic-release/.github"
