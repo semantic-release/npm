@@ -10,18 +10,17 @@ import * as npmRegistry from "./helpers/npm-registry.js";
 /* eslint camelcase: ["error", {properties: "never"}] */
 
 // Environment variables used only for the local npm command used to do verification
-const testEnv = {
-  ...process.env,
-  ...npmRegistry.authEnv,
-  npm_config_registry: npmRegistry.url,
-  LEGACY_TOKEN: Buffer.from(`${npmRegistry.authEnv.NPM_USERNAME}:${npmRegistry.authEnv.NPM_PASSWORD}`, "utf8").toString(
-    "base64"
-  ),
-};
+let testEnv;
 
 test.before(async () => {
   // Start the local NPM registry
   await npmRegistry.start();
+
+  testEnv = {
+    ...process.env,
+    ...npmRegistry.authEnv(),
+    npm_config_registry: npmRegistry.url,
+  };
 });
 
 test.after.always(async () => {
@@ -131,7 +130,7 @@ test("Verify npm auth and package", async (t) => {
       {},
       {
         cwd,
-        env: npmRegistry.authEnv,
+        env: npmRegistry.authEnv(),
         options: {},
         stdout: t.context.stdout,
         stderr: t.context.stderr,
@@ -150,7 +149,7 @@ test("Verify npm auth and package from a sub-directory", async (t) => {
       { pkgRoot: "dist" },
       {
         cwd,
-        env: npmRegistry.authEnv,
+        env: npmRegistry.authEnv(),
         options: {},
         stdout: t.context.stdout,
         stderr: t.context.stderr,
@@ -169,7 +168,7 @@ test('Verify npm auth and package with "npm_config_registry" env var set by yarn
       {},
       {
         cwd,
-        env: { ...npmRegistry.authEnv, npm_config_registry: "https://registry.yarnpkg.com" },
+        env: { ...npmRegistry.authEnv(), npm_config_registry: "https://registry.yarnpkg.com" },
         options: { publish: [] },
         stdout: t.context.stdout,
         stderr: t.context.stderr,
@@ -216,7 +215,7 @@ test("Throw SemanticReleaseError Array if config option are not valid in verifyC
 
 test("Publish the package", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "publish", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -241,7 +240,7 @@ test("Publish the package", async (t) => {
 
 test("Publish the package on a dist-tag", async (t) => {
   const cwd = temporaryDirectory();
-  const env = { ...npmRegistry.authEnv, DEFAULT_NPM_REGISTRY: npmRegistry.url };
+  const env = { ...npmRegistry.authEnv(), DEFAULT_NPM_REGISTRY: npmRegistry.url };
   const pkg = { name: "publish-tag", version: "0.0.0", publishConfig: { registry: npmRegistry.url, tag: "next" } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -270,7 +269,7 @@ test("Publish the package on a dist-tag", async (t) => {
 
 test("Publish the package from a sub-directory", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "publish-sub-dir", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "dist/package.json"), pkg);
 
@@ -295,7 +294,7 @@ test("Publish the package from a sub-directory", async (t) => {
 
 test('Create the package and skip publish ("npmPublish" is false)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "skip-publish", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -320,7 +319,7 @@ test('Create the package and skip publish ("npmPublish" is false)', async (t) =>
 
 test('Create the package and skip publish ("package.private" is true)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = {
     name: "skip-publish-private",
     version: "0.0.0",
@@ -350,7 +349,7 @@ test('Create the package and skip publish ("package.private" is true)', async (t
 
 test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "skip-publish-sub-dir", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "dist/package.json"), pkg);
 
@@ -375,7 +374,7 @@ test('Create the package and skip publish from a sub-directory ("npmPublish" is 
 
 test('Create the package and skip publish from a sub-directory ("package.private" is true)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = {
     name: "skip-publish-sub-dir-private",
     version: "0.0.0",
@@ -440,7 +439,7 @@ test("Throw SemanticReleaseError Array if config option are not valid in publish
 
 test("Prepare the package", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "prepare", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -463,7 +462,7 @@ test("Prepare the package", async (t) => {
 
 test("Prepare the package from a sub-directory", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "prepare-sub-dir", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "dist/package.json"), pkg);
 
@@ -521,7 +520,7 @@ test("Throw SemanticReleaseError Array if config option are not valid in prepare
 
 test("Publish the package and add to default dist-tag", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "add-channel", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -557,7 +556,7 @@ test("Publish the package and add to default dist-tag", async (t) => {
 
 test("Publish the package and add to lts dist-tag", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "add-channel-legacy", version: "1.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -596,7 +595,7 @@ test("Publish the package and add to lts dist-tag", async (t) => {
 
 test('Skip adding the package to a channel ("npmPublish" is false)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "skip-add-channel", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -619,7 +618,7 @@ test('Skip adding the package to a channel ("npmPublish" is false)', async (t) =
 
 test('Skip adding the package to a channel ("package.private" is true)', async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = {
     name: "skip-add-channel-private",
     version: "0.0.0",
@@ -647,7 +646,7 @@ test('Skip adding the package to a channel ("package.private" is true)', async (
 
 test("Create the package in addChannel step", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "add-channel-pkg", version: "0.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
@@ -670,7 +669,7 @@ test("Create the package in addChannel step", async (t) => {
 
 test("Throw SemanticReleaseError Array if config option are not valid in addChannel", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
   const npmPublish = 42;
@@ -706,7 +705,7 @@ test("Throw SemanticReleaseError Array if config option are not valid in addChan
 
 test("Verify token and set up auth only on the fist call, then prepare on prepare call only", async (t) => {
   const cwd = temporaryDirectory();
-  const env = npmRegistry.authEnv;
+  const env = npmRegistry.authEnv();
   const pkg = { name: "test-module", version: "0.0.0-dev", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 

@@ -1,7 +1,6 @@
 import { castArray, defaultTo } from "lodash-es";
 import AggregateError from "aggregate-error";
 import { temporaryFile } from "tempy";
-import setLegacyToken from "./lib/set-legacy-token.js";
 import getPkg from "./lib/get-pkg.js";
 import verifyNpmConfig from "./lib/verify-config.js";
 import verifyNpmAuth from "./lib/verify-auth.js";
@@ -26,8 +25,6 @@ export async function verifyConditions(pluginConfig, context) {
 
   const errors = verifyNpmConfig(pluginConfig);
 
-  setLegacyToken(context);
-
   try {
     const pkg = await getPkg(pluginConfig, context);
 
@@ -48,8 +45,6 @@ export async function verifyConditions(pluginConfig, context) {
 
 export async function prepare(pluginConfig, context) {
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
@@ -72,8 +67,6 @@ export async function prepare(pluginConfig, context) {
 export async function publish(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
@@ -99,8 +92,6 @@ export async function publish(pluginConfig, context) {
 export async function addChannel(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it

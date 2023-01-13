@@ -40,17 +40,6 @@ test.serial('Set auth with "NPM_TOKEN"', async (t) => {
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_TOKEN to ${npmrc}`]);
 });
 
-test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', async (t) => {
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const env = { NPM_USERNAME: "npm_username", NPM_PASSWORD: "npm_pasword", NPM_EMAIL: "npm_email" };
-
-  const setNpmrcAuth = (await import("../lib/set-npmrc-auth.js")).default;
-  await setNpmrcAuth(npmrc, "http://custom.registry.com", { cwd, env, logger: t.context.logger });
-
-  t.is((await fs.readFile(npmrc)).toString(), `_auth = \${LEGACY_TOKEN}\nemail = \${NPM_EMAIL}`);
-  t.deepEqual(t.context.log.args[1], [`Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to ${npmrc}`]);
-});
-
 test.serial('Preserve home ".npmrc"', async (t) => {
   const npmrc = temporaryFile({ name: ".npmrc" });
   const env = { NPM_TOKEN: "npm_token" };
@@ -151,48 +140,6 @@ test.serial('Emulate npm config resolution if "NPM_CONFIG_USERCONFIG" is set', a
 
   t.is((await fs.readFile(npmrc)).toString(), `//custom.registry.com/:_authToken = \${NPM_TOKEN}`);
   t.deepEqual(t.context.log.args[1], ["Reading npm config from %s", [resolve(cwd, ".custom-npmrc")].join(", ")]);
-});
-
-test.serial('Throw error if "NPM_USERNAME" is missing', async (t) => {
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const env = { NPM_PASSWORD: "npm_pasword", NPM_EMAIL: "npm_email" };
-
-  const setNpmrcAuth = (await import("../lib/set-npmrc-auth.js")).default;
-  const [error] = await t.throwsAsync(
-    setNpmrcAuth(npmrc, "http://custom.registry.com", { cwd, env, logger: t.context.logger })
-  );
-
-  t.is(error.name, "SemanticReleaseError");
-  t.is(error.message, "No npm token specified.");
-  t.is(error.code, "ENONPMTOKEN");
-});
-
-test.serial('Throw error if "NPM_PASSWORD" is missing', async (t) => {
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const env = { NPM_USERNAME: "npm_username", NPM_EMAIL: "npm_email" };
-
-  const setNpmrcAuth = (await import("../lib/set-npmrc-auth.js")).default;
-  const [error] = await t.throwsAsync(
-    setNpmrcAuth(npmrc, "http://custom.registry.com", { cwd, env, logger: t.context.logger })
-  );
-
-  t.is(error.name, "SemanticReleaseError");
-  t.is(error.message, "No npm token specified.");
-  t.is(error.code, "ENONPMTOKEN");
-});
-
-test.serial('Throw error if "NPM_EMAIL" is missing', async (t) => {
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const env = { NPM_USERNAME: "npm_username", NPM_PASSWORD: "npm_password" };
-
-  const setNpmrcAuth = (await import("../lib/set-npmrc-auth.js")).default;
-  const [error] = await t.throwsAsync(
-    setNpmrcAuth(npmrc, "http://custom.registry.com", { cwd, env, logger: t.context.logger })
-  );
-
-  t.is(error.name, "SemanticReleaseError");
-  t.is(error.message, "No npm token specified.");
-  t.is(error.code, "ENONPMTOKEN");
 });
 
 test.serial("Prefer .npmrc over environment variables", async (t) => {
