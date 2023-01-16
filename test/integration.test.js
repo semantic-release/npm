@@ -1,7 +1,7 @@
 import path from "path";
 import test from "ava";
 import fs from "fs-extra";
-import execa from "execa";
+import { execa } from "execa";
 import { spy } from "sinon";
 import { temporaryDirectory } from "tempy";
 import { WritableStreamBuffer } from "stream-buffers";
