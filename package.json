@@ -39,11 +39,11 @@
     "delay": "5.0.0",
     "dockerode": "3.3.4",
     "get-stream": "6.0.1",
-    "got": "11.8.6",
-    "p-retry": "4.6.2",
+    "got": "12.5.3",
+    "p-retry": "5.1.2",
     "prettier": "^2.8.2",
     "semantic-release": "19.0.5",
-    "sinon": "14.0.2",
+    "sinon": "15.0.1",
     "stream-buffers": "3.0.2"
   },
   "engines": {
