@@ -27,7 +27,9 @@ test("Verify name and version then return parsed package.json from a sub-directo
 
 test("Throw error if missing package.json", async (t) => {
   const cwd = temporaryDirectory();
-  const [error] = await t.throwsAsync(getPkg({}, { cwd }));
+  const {
+    errors: [error],
+  } = await t.throwsAsync(getPkg({}, { cwd }));
 
   t.is(error.name, "SemanticReleaseError");
   t.is(error.code, "ENOPKG");
@@ -37,7 +39,9 @@ test("Throw error if missing package name", async (t) => {
   const cwd = temporaryDirectory();
   await fs.outputJson(path.resolve(cwd, "package.json"), { version: "0.0.0" });
 
-  const [error] = await t.throwsAsync(getPkg({}, { cwd }));
+  const {
+    errors: [error],
+  } = await t.throwsAsync(getPkg({}, { cwd }));
 
   t.is(error.name, "SemanticReleaseError");
   t.is(error.code, "ENOPKGNAME");
@@ -47,7 +51,9 @@ test("Throw error if package.json is malformed", async (t) => {
   const cwd = temporaryDirectory();
   await fs.writeFile(path.resolve(cwd, "package.json"), "{name: 'package',}");
 
-  const [error] = await t.throwsAsync(getPkg({}, { cwd }));
+  const {
+    errors: [error],
+  } = await t.throwsAsync(getPkg({}, { cwd }));
 
   t.is(error.name, "JSONError");
 });

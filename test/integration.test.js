@@ -96,7 +96,9 @@ test("Throws error if NPM token is invalid", async (t) => {
   const pkg = { name: "published", version: "1.0.0", publishConfig: { registry: npmRegistry.url } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
-  const [error] = await t.throwsAsync(
+  const {
+    errors: [error],
+  } = await t.throwsAsync(
     t.context.m.verifyConditions(
       {},
       { cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger }
@@ -186,21 +188,23 @@ test("Throw SemanticReleaseError Array if config option are not valid in verifyC
   const tarballDir = 42;
   const pkgRoot = 42;
   const errors = [
-    ...(await t.throwsAsync(
-      t.context.m.verifyConditions(
-        {},
-        {
-          cwd,
-          env: {},
-          options: {
-            publish: ["@semantic-release/github", { path: "@semantic-release/npm", npmPublish, tarballDir, pkgRoot }],
-          },
-          stdout: t.context.stdout,
-          stderr: t.context.stderr,
-          logger: t.context.logger,
-        }
+    ...(
+      await t.throwsAsync(
+        t.context.m.verifyConditions(
+          {},
+          {
+            cwd,
+            env: {},
+            options: {
+              publish: ["@semantic-release/github", { path: "@semantic-release/npm", npmPublish, tarballDir, pkgRoot }],
+            },
+            stdout: t.context.stdout,
+            stderr: t.context.stderr,
+            logger: t.context.logger,
+          }
+        )
       )
-    )),
+    ).errors,
   ];
 
   t.is(errors[0].name, "SemanticReleaseError");
@@ -411,20 +415,22 @@ test("Throw SemanticReleaseError Array if config option are not valid in publish
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throwsAsync(
-      t.context.m.publish(
-        { npmPublish, tarballDir, pkgRoot },
-        {
-          cwd,
-          env: {},
-          options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
-          nextRelease: { version: "1.0.0" },
-          stdout: t.context.stdout,
-          stderr: t.context.stderr,
-          logger: t.context.logger,
-        }
+    ...(
+      await t.throwsAsync(
+        t.context.m.publish(
+          { npmPublish, tarballDir, pkgRoot },
+          {
+            cwd,
+            env: {},
+            options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
+            nextRelease: { version: "1.0.0" },
+            stdout: t.context.stdout,
+            stderr: t.context.stderr,
+            logger: t.context.logger,
+          }
+        )
       )
-    )),
+    ).errors,
   ];
 
   t.is(errors[0].name, "SemanticReleaseError");
@@ -492,20 +498,22 @@ test("Throw SemanticReleaseError Array if config option are not valid in prepare
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throwsAsync(
-      t.context.m.prepare(
-        { npmPublish, tarballDir, pkgRoot },
-        {
-          cwd,
-          env: {},
-          options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
-          nextRelease: { version: "1.0.0" },
-          stdout: t.context.stdout,
-          stderr: t.context.stderr,
-          logger: t.context.logger,
-        }
+    ...(
+      await t.throwsAsync(
+        t.context.m.prepare(
+          { npmPublish, tarballDir, pkgRoot },
+          {
+            cwd,
+            env: {},
+            options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
+            nextRelease: { version: "1.0.0" },
+            stdout: t.context.stdout,
+            stderr: t.context.stderr,
+            logger: t.context.logger,
+          }
+        )
       )
-    )),
+    ).errors,
   ];
 
   t.is(errors[0].name, "SemanticReleaseError");
@@ -677,20 +685,22 @@ test("Throw SemanticReleaseError Array if config option are not valid in addChan
   const pkgRoot = 42;
 
   const errors = [
-    ...(await t.throwsAsync(
-      t.context.m.addChannel(
-        { npmPublish, tarballDir, pkgRoot },
-        {
-          cwd,
-          env,
-          options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
-          nextRelease: { version: "1.0.0" },
-          stdout: t.context.stdout,
-          stderr: t.context.stderr,
-          logger: t.context.logger,
-        }
+    ...(
+      await t.throwsAsync(
+        t.context.m.addChannel(
+          { npmPublish, tarballDir, pkgRoot },
+          {
+            cwd,
+            env,
+            options: { publish: ["@semantic-release/github", "@semantic-release/npm"] },
+            nextRelease: { version: "1.0.0" },
+            stdout: t.context.stdout,
+            stderr: t.context.stderr,
+            logger: t.context.logger,
+          }
+        )
       )
-    )),
+    ).errors,
   ];
 
   t.is(errors[0].name, "SemanticReleaseError");
