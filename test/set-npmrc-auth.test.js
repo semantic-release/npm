@@ -117,7 +117,9 @@ test.serial('Throw error if "NPM_TOKEN" is missing', async (t) => {
   const npmrc = temporaryFile({ name: ".npmrc" });
 
   const setNpmrcAuth = (await import("../lib/set-npmrc-auth.js")).default;
-  const [error] = await t.throwsAsync(
+  const {
+    errors: [error],
+  } = await t.throwsAsync(
     setNpmrcAuth(npmrc, "http://custom.registry.com", { cwd, env: {}, logger: t.context.logger })
   );
 

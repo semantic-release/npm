@@ -33,7 +33,7 @@ export async function verifyConditions(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -53,7 +53,7 @@ export async function prepare(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -75,7 +75,7 @@ export async function publish(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -100,7 +100,7 @@ export async function addChannel(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {

@@ -2,7 +2,7 @@ import path from "path";
 import test from "ava";
 import fs from "fs-extra";
 import { temporaryDirectory, temporaryFile } from "tempy";
-import execa from "execa";
+import { execa } from "execa";
 import { stub } from "sinon";
 import { WritableStreamBuffer } from "stream-buffers";
 import prepare from "../lib/prepare.js";
