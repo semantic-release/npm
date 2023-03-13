@@ -37,7 +37,7 @@
     "clear-module": "4.1.2",
     "codecov": "3.8.3",
     "delay": "5.0.0",
-    "dockerode": "3.3.4",
+    "dockerode": "3.3.5",
     "get-stream": "6.0.1",
     "got": "11.8.6",
     "nyc": "15.1.0",
