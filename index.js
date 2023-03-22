@@ -1,23 +1,22 @@
-const {defaultTo, castArray} = require('lodash');
-const AggregateError = require('aggregate-error');
-const tempy = require('tempy');
-const setLegacyToken = require('./lib/set-legacy-token');
-const getPkg = require('./lib/get-pkg');
-const verifyNpmConfig = require('./lib/verify-config');
-const verifyNpmAuth = require('./lib/verify-auth');
-const addChannelNpm = require('./lib/add-channel');
-const prepareNpm = require('./lib/prepare');
-const publishNpm = require('./lib/publish');
+import { castArray, defaultTo } from "lodash-es";
+import AggregateError from "aggregate-error";
+import { temporaryFile } from "tempy";
+import getPkg from "./lib/get-pkg.js";
+import verifyNpmConfig from "./lib/verify-config.js";
+import verifyNpmAuth from "./lib/verify-auth.js";
+import addChannelNpm from "./lib/add-channel.js";
+import prepareNpm from "./lib/prepare.js";
+import publishNpm from "./lib/publish.js";
 
 let verified;
 let prepared;
-const npmrc = tempy.file({name: '.npmrc'});
+const npmrc = temporaryFile({ name: ".npmrc" });
 
-async function verifyConditions(pluginConfig, context) {
+export async function verifyConditions(pluginConfig, context) {
   // If the npm publish plugin is used and has `npmPublish`, `tarballDir` or `pkgRoot` configured, validate them now in order to prevent any release if the configuration is wrong
   if (context.options.publish) {
     const publishPlugin =
-      castArray(context.options.publish).find((config) => config.path && config.path === '@semantic-release/npm') || {};
+      castArray(context.options.publish).find((config) => config.path && config.path === "@semantic-release/npm") || {};
 
     pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
     pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
@@ -25,8 +24,6 @@ async function verifyConditions(pluginConfig, context) {
   }
 
   const errors = verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     const pkg = await getPkg(pluginConfig, context);
@@ -36,7 +33,7 @@ async function verifyConditions(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -46,10 +43,8 @@ async function verifyConditions(pluginConfig, context) {
   verified = true;
 }
 
-async function prepare(pluginConfig, context) {
+export async function prepare(pluginConfig, context) {
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
@@ -58,7 +53,7 @@ async function prepare(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -69,11 +64,9 @@ async function prepare(pluginConfig, context) {
   prepared = true;
 }
 
-async function publish(pluginConfig, context) {
+export async function publish(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
@@ -82,7 +75,7 @@ async function publish(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -96,11 +89,9 @@ async function publish(pluginConfig, context) {
   return publishNpm(npmrc, pluginConfig, pkg, context);
 }
 
-async function addChannel(pluginConfig, context) {
+export async function addChannel(pluginConfig, context) {
   let pkg;
   const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  setLegacyToken(context);
 
   try {
     // Reload package.json in case a previous external step updated it
@@ -109,7 +100,7 @@ async function addChannel(pluginConfig, context) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
   } catch (error) {
-    errors.push(...error);
+    errors.push(...error.errors);
   }
 
   if (errors.length > 0) {
@@ -118,5 +109,3 @@ async function addChannel(pluginConfig, context) {
 
   return addChannelNpm(npmrc, pluginConfig, pkg, context);
 }
-
-module.exports = {verifyConditions, prepare, publish, addChannel};
