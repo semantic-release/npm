@@ -48,6 +48,19 @@ test.serial('Set auth with "NPM_USERNAME", "NPM_PASSWORD" and "NPM_EMAIL"', asyn
   t.deepEqual(t.context.log.args[1], [`Wrote NPM_USERNAME, NPM_PASSWORD and NPM_EMAIL to ${npmrc}`]);
 });
 
+test.serial('Set auth with "NPM_CONFIG__AUTH" and "NPM_EMAIL"', async (t) => {
+  process.env.HOME = tempy.directory();
+  const cwd = tempy.directory();
+  process.chdir(cwd);
+  const npmrc = tempy.file({name: '.npmrc'});
+  const env = {NPM_CONFIG__AUTH: 'npm_config__auth', NPM_EMAIL: 'npm_email'};
+
+  await require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger});
+
+  t.is((await readFile(npmrc)).toString(), `_auth = \${NPM_CONFIG__AUTH}\nemail = \${NPM_EMAIL}`);
+  t.deepEqual(t.context.log.args[1], [`Wrote NPM_CONFIG__AUTH and NPM_EMAIL to ${npmrc}`]);
+});
+
 test.serial('Preserve home ".npmrc"', async (t) => {
   process.env.HOME = tempy.directory();
   const cwd = tempy.directory();
@@ -140,6 +153,22 @@ test.serial('Throw error if "NPM_TOKEN" is missing', async (t) => {
 
   const [error] = await t.throwsAsync(
     require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env: {}, logger: t.context.logger})
+  );
+
+  t.is(error.name, 'SemanticReleaseError');
+  t.is(error.message, 'No npm token specified.');
+  t.is(error.code, 'ENONPMTOKEN');
+});
+
+test.serial('Throw error if "NPM_EMAIL" is missing when used with "NPM_CONFIG__AUTH"', async (t) => {
+  process.env.HOME = tempy.directory();
+  const cwd = tempy.directory();
+  process.chdir(cwd);
+  const npmrc = tempy.file({name: '.npmrc'});
+  const env = {NPM_CONFIG__AUTH: 'npm_config__auth'};
+
+  const [error] = await t.throwsAsync(
+    require('../lib/set-npmrc-auth')(npmrc, 'http://custom.registry.com', {cwd, env, logger: t.context.logger})
   );
 
   t.is(error.name, 'SemanticReleaseError');

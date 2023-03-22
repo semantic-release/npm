@@ -53,9 +53,10 @@ Both the [token](https://docs.npmjs.com/getting-started/working_with_tokens) and
 | `NPM_USERNAME`          | Npm username created via [npm adduser](https://docs.npmjs.com/cli/adduser) or on [npmjs.com](https://www.npmjs.com)           |
 | `NPM_PASSWORD`          | Password of the npm user.                                                                                                     |
 | `NPM_EMAIL`             | Email address associated with the npm user                                                                                    |
-| `NPM_CONFIG_USERCONFIG` | Path to non-default .npmrc file                                                                                                 |
+| `NPM_CONFIG_USERCONFIG` | Path to non-default .npmrc file                                                                                               |
+| `NPM_CONFIG__AUTH`      | Npm `_auth` configuration parameter set as an [environment variable](https://docs.npmjs.com/cli/v7/using-npm/config)          |
 
-Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD` and `NPM_EMAIL` for legacy authentication
+Use either `NPM_TOKEN` for token authentication or `NPM_USERNAME`, `NPM_PASSWORD` and `NPM_EMAIL` (or alternatively `NPM_CONFIG__AUTH` and `NPM_EMAIL`) for legacy authentication
 
 ### Options
 
