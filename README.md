@@ -25,7 +25,11 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ```json
 {
-  "plugins": ["@semantic-release/commit-analyzer", "@semantic-release/release-notes-generator", "@semantic-release/npm"]
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/npm"
+  ]
 }
 ```
 
@@ -33,21 +37,15 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ### Npm registry authentication
 
-The npm authentication configuration is **required** and can be set via [environment variables](#environment-variables).
+The npm [token](https://docs.npmjs.com/about-access-tokens) authentication configuration is **required** and can be set via [environment variables](#environment-variables).
 
-Both the [token](https://docs.npmjs.com/getting-started/working_with_tokens) and the legacy (`username`, `password` and `email`) authentication are supported. It is recommended to use the [token](https://docs.npmjs.com/getting-started/working_with_tokens) authentication. The legacy authentication is supported as the alternative npm registries [Artifactory](https://www.jfrog.com/open-source/#os-arti) and [npm-registry-couchapp](https://github.com/npm/npm-registry-couchapp) only supports that form of authentication.
-
-**Notes**:
-
-- Only the `auth-only` [level of npm two-factor authentication](https://docs.npmjs.com/getting-started/using-two-factor-authentication#levels-of-authentication) is supported, **semantic-release** will not work with the default `auth-and-writes` level.
-- The presence of an `.npmrc` file will override any specified environment variables.
+Automation tokens are recommended since they can be used for an automated workflow, even when your account is configured to use the [`auth-and-writes` level of 2FA](https://docs.npmjs.com/about-two-factor-authentication#authorization-and-writes).
 
 ### Environment variables
 
 | Variable                | Description                                                                                                                   |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `NPM_TOKEN`             | Npm token created via [npm token create](https://docs.npmjs.com/getting-started/working_with_tokens#how-to-create-new-tokens) |
-| `NPM_CONFIG_USERCONFIG` | Path to non-default .npmrc file                                                                                               |
 
 ### Options
 
@@ -67,7 +65,7 @@ The plugin uses the [`npm` CLI](https://github.com/npm/cli) which will read the 
 
 The [`registry`](https://docs.npmjs.com/misc/registry) can be configured via the npm environment variable `NPM_CONFIG_REGISTRY` and will take precedence over the configuration in `.npmrc`.
 
-The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://docs.npmjs.com/cli/dist-tag) can be configured in the `package.json` and will take precedence over the configuration in `.npmrc` and `NPM_CONFIG_REGISTRY`:
+The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://docs.npmjs.com/cli/dist-tag) can be configured under `publishConfig` in the `package.json`:
 
 ```json
 {
@@ -77,6 +75,11 @@ The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://
   }
 }
 ```
+
+**Notes**:
+
+- The presence of an `.npmrc` file will override any specified environment variables.
+- The presence of `registry` or `dist-tag` under `publishConfig` in the `package.json` will take precedence over the configuration in `.npmrc` and `NPM_CONFIG_REGISTRY`
 
 ### Examples
 
