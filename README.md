@@ -25,27 +25,31 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ```json
 {
-  "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
-    "@semantic-release/npm"
-  ]
+  "plugins": ["@semantic-release/commit-analyzer", "@semantic-release/release-notes-generator", "@semantic-release/npm"]
 }
 ```
 
 ## Configuration
 
-### Npm registry authentication
+### npm registry authentication
 
 The npm [token](https://docs.npmjs.com/about-access-tokens) authentication configuration is **required** and can be set via [environment variables](#environment-variables).
 
 Automation tokens are recommended since they can be used for an automated workflow, even when your account is configured to use the [`auth-and-writes` level of 2FA](https://docs.npmjs.com/about-two-factor-authentication#authorization-and-writes).
 
+### npm provenance
+
+If you are publishing to the official registry and your pipeline is on a [provider that is supported by npm for provenance](https://docs.npmjs.com/generating-provenance-statements#provenance-limitations), npm can be configured to [publish with provenance](https://docs.npmjs.com/generating-provenance-statements).
+
+Since semantic-release wraps the npm publish command, configuring provenance is not exposed directly.
+Instead, provenance can be configured through the [other configuration options exposed by npm](https://docs.npmjs.com/generating-provenance-statements#using-third-party-package-publishing-tools).
+Provenance applies specifically to publishing, so our recommendation is to configure under `publishConfig` within the `package.json`.
+
 ### Environment variables
 
-| Variable                | Description                                                                                                                   |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `NPM_TOKEN`             | Npm token created via [npm token create](https://docs.npmjs.com/getting-started/working_with_tokens#how-to-create-new-tokens) |
+| Variable    | Description                                                                                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `NPM_TOKEN` | Npm token created via [npm token create](https://docs.npmjs.com/getting-started/working_with_tokens#how-to-create-new-tokens) |
 
 ### Options
 
@@ -59,7 +63,7 @@ Automation tokens are recommended since they can be used for an automated workfl
 
 **Note**: If you use a [shareable configuration](https://github.com/semantic-release/semantic-release/blob/master/docs/usage/shareable-configurations.md#shareable-configurations) that defines one of these options you can set it to `false` in your [**semantic-release** configuration](https://github.com/semantic-release/semantic-release/blob/master/docs/usage/configuration.md#configuration) in order to use the default value.
 
-### Npm configuration
+### npm configuration
 
 The plugin uses the [`npm` CLI](https://github.com/npm/cli) which will read the configuration from [`.npmrc`](https://docs.npmjs.com/files/npmrc). See [`npm config`](https://docs.npmjs.com/misc/config) for the option list.
 
