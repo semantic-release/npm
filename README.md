@@ -45,6 +45,30 @@ Since semantic-release wraps the npm publish command, configuring provenance is 
 Instead, provenance can be configured through the [other configuration options exposed by npm](https://docs.npmjs.com/generating-provenance-statements#using-third-party-package-publishing-tools).
 Provenance applies specifically to publishing, so our recommendation is to configure under `publishConfig` within the `package.json`.
 
+#### npm provenance on GitHub Actions
+
+For package provenance to be signed on the GitHub Actions CI the following permission is required
+to be enabled on the job:
+
+```yaml
+    permissions:
+      id-token: write # to enable use of OIDC for npm provenance
+```
+
+It's worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments
+and other features then more permissions are required to be enabled on this job:
+
+```yaml
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write # to enable use of OIDC for npm provenance
+```
+
+Refer to the [GitHub Actions recipe for npm package provenance(https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
+
+
 ### Environment variables
 
 | Variable    | Description                                                                                                                   |
