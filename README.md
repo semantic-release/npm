@@ -51,23 +51,22 @@ For package provenance to be signed on the GitHub Actions CI the following permi
 to be enabled on the job:
 
 ```yaml
-    permissions:
-      id-token: write # to enable use of OIDC for npm provenance
+permissions:
+  id-token: write # to enable use of OIDC for npm provenance
 ```
 
 It's worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments,
 and other features, then [more permissions are required](https://github.com/semantic-release/github#github-authentication) to be enabled on this job:
 
 ```yaml
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      issues: write # to be able to comment on released issues
-      pull-requests: write # to be able to comment on released pull requests
-      id-token: write # to enable use of OIDC for npm provenance
+permissions:
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+  id-token: write # to enable use of OIDC for npm provenance
 ```
 
 Refer to the [GitHub Actions recipe for npm package provenance(https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
-
 
 ### Environment variables
 
