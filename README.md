@@ -66,7 +66,7 @@ permissions:
   id-token: write # to enable use of OIDC for npm provenance
 ```
 
-Refer to the [GitHub Actions recipe for npm package provenance(https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
+Refer to the [GitHub Actions recipe for npm package provenance](https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
 
 ### Environment variables
 
