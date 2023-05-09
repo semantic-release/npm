@@ -55,8 +55,8 @@ to be enabled on the job:
       id-token: write # to enable use of OIDC for npm provenance
 ```
 
-It's worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments
-and other features then more permissions are required to be enabled on this job:
+It's worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments,
+and other features, then [more permissions are required](https://github.com/semantic-release/github#github-authentication) to be enabled on this job:
 
 ```yaml
     permissions:
