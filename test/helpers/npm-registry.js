@@ -1,10 +1,10 @@
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { setTimeout } from "node:timers/promises";
 import Docker from "dockerode";
 import getStream from "get-stream";
 import got from "got";
 import path from "path";
-import delay from "delay";
 import pRetry from "p-retry";
 
 const IMAGE = "verdaccio/verdaccio:5";
@@ -32,7 +32,7 @@ export async function start() {
   });
 
   await container.start();
-  await delay(4000);
+  await setTimeout(4000);
 
   try {
     // Wait for the registry to be ready
