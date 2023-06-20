@@ -2,7 +2,6 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { setTimeout } from "node:timers/promises";
 import Docker from "dockerode";
-import getStream from "get-stream";
 import got from "got";
 import path from "path";
 import pRetry from "p-retry";
@@ -22,7 +21,10 @@ let container, npmToken;
  * Download the `npm-registry-docker` Docker image, create a new container and start it.
  */
 export async function start() {
-  await getStream(await docker.pull(IMAGE));
+  const stream = await docker.pull(IMAGE);
+  await new Promise((resolve, reject) => {
+    docker.modem.followProgress(stream, (err, res) => (err ? reject(err) : resolve(res)));
+  });
 
   container = await docker.createContainer({
     Tty: true,
