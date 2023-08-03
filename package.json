@@ -39,7 +39,7 @@
     "dockerode": "3.3.5",
     "got": "13.0.0",
     "p-retry": "5.1.2",
-    "prettier": "3.0.0",
+    "prettier": "3.0.1",
     "semantic-release": "21.0.7",
     "sinon": "15.2.0",
     "stream-buffers": "3.0.2"
