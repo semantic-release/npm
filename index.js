@@ -81,11 +81,11 @@ async function prepare(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
-  await Promise.all(
-    publishPackages.map(async (config) => {
-      await prepareNpm(npmrc, config, context);
-    })
-  );
+  await publishPackages.reduce(async (acc, config) => {
+    await acc;
+    await prepareNpm(npmrc, config, context);
+  }, Promise.resolve())
+
   prepared = true;
 }
 
@@ -108,11 +108,10 @@ async function publish(pluginConfig, context) {
   }
 
   if (!prepared) {
-    await Promise.all(
-      publishPackages.map(async (config) => {
-        await prepareNpm(npmrc, config, context);
-      })
-    );
+    await publishPackages.reduce(async (acc, config) => {
+      await acc;
+      await prepareNpm(npmrc, config, context);
+    }, Promise.resolve())
   }
 
   const result = await Promise.all(
