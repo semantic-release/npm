@@ -81,10 +81,7 @@ async function prepare(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
-  await publishPackages.reduce(async (acc, config) => {
-    await acc;
-    await prepareNpm(npmrc, config, context);
-  }, Promise.resolve())
+  await prepareNpm(npmrc, publishPackages, context)
 
   prepared = true;
 }
@@ -108,10 +105,7 @@ async function publish(pluginConfig, context) {
   }
 
   if (!prepared) {
-    await publishPackages.reduce(async (acc, config) => {
-      await acc;
-      await prepareNpm(npmrc, config, context);
-    }, Promise.resolve())
+    await prepareNpm(npmrc, publishPackages, context)
   }
 
   const result = await Promise.all(
