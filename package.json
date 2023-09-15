@@ -25,7 +25,7 @@
     "lodash-es": "^4.17.21",
     "nerf-dart": "^1.0.0",
     "normalize-url": "^8.0.0",
-    "npm": "^9.5.0",
+    "npm": "^10.0.0",
     "rc": "^1.2.8",
     "read-pkg": "^8.0.0",
     "registry-auth-token": "^5.0.0",
@@ -45,7 +45,7 @@
     "stream-buffers": "3.0.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": "^18.17 || >=20"
   },
   "files": [
     "lib",
