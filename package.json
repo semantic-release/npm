@@ -38,7 +38,7 @@
     "codecov": "3.8.3",
     "dockerode": "3.3.5",
     "got": "13.0.0",
-    "p-retry": "6.0.0",
+    "p-retry": "6.1.0",
     "prettier": "3.0.3",
     "semantic-release": "22.0.5",
     "sinon": "16.0.0",
