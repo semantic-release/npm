@@ -37,7 +37,7 @@
     "c8": "9.1.0",
     "codecov": "3.8.3",
     "dockerode": "4.0.2",
-    "got": "14.0.0",
+    "got": "14.1.0",
     "p-retry": "6.2.0",
     "prettier": "3.2.4",
     "semantic-release": "23.0.0",
