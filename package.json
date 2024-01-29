@@ -33,7 +33,7 @@
     "tempy": "^3.0.0"
   },
   "devDependencies": {
-    "ava": "6.1.0",
+    "ava": "6.1.1",
     "c8": "9.1.0",
     "codecov": "3.8.3",
     "dockerode": "4.0.2",
