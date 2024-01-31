@@ -27,7 +27,7 @@
     "normalize-url": "^8.0.0",
     "npm": "^10.0.0",
     "rc": "^1.2.8",
-    "read-pkg": "^9.0.0",
+    "read-package-json-fast": "^3.0.2",
     "registry-auth-token": "^5.0.0",
     "semver": "^7.1.2",
     "tempy": "^3.0.0"
