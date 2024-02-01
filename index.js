@@ -18,9 +18,10 @@ export async function verifyConditions(pluginConfig, context) {
     const publishPlugin =
       castArray(context.options.publish).find((config) => config.path && config.path === "@semantic-release/npm") || {};
 
-    pluginConfig.npmPublish = defaultTo(pluginConfig.npmPublish, publishPlugin.npmPublish);
-    pluginConfig.tarballDir = defaultTo(pluginConfig.tarballDir, publishPlugin.tarballDir);
-    pluginConfig.pkgRoot = defaultTo(pluginConfig.pkgRoot, publishPlugin.pkgRoot);
+    pluginConfig.npmPublish = pluginConfig.npmPublish ?? publishPlugin.npmPublish;
+    pluginConfig.tarballDir = pluginConfig.tarballDir ?? publishPlugin.tarballDir;
+    pluginConfig.pkgRoot = pluginConfig.pkgRoot ?? publishPlugin.pkgRoot;
+    pluginConfig.packageManager = pluginConfig.packageManager ?? publishPlugin.packageManager ?? 'npm';
   }
 
   const errors = verifyNpmConfig(pluginConfig);
@@ -30,7 +31,7 @@ export async function verifyConditions(pluginConfig, context) {
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, context, pluginConfig.packageManager);
     }
   } catch (error) {
     errors.push(...error.errors);
