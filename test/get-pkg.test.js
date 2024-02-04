@@ -55,5 +55,5 @@ test("Throw error if package.json is malformed", async (t) => {
     errors: [error],
   } = await t.throwsAsync(getPkg({}, { cwd }));
 
-  t.is(error.name, "JSONError");
+  t.is(error.name, "JSONParseError");
 });
