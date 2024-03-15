@@ -13,9 +13,9 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 18.17.0
-          - 20.0.0
+          - 20.8.1
           - 20
+          - 21
         os:
           - ubuntu-latest
     runs-on: "${{ matrix.os }}"
