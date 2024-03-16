@@ -8,14 +8,22 @@ name: Test
     types:
       - opened
       - synchronize
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
+  NPM_CONFIG_COLOR: always
+
 jobs:
   test_matrix:
     strategy:
       matrix:
         node-version:
-          - 18.17.0
-          - 20.0.0
+          - 20.8.1
           - 20
+          - 21
         os:
           - ubuntu-latest
     runs-on: "${{ matrix.os }}"
@@ -27,18 +35,30 @@ jobs:
           node-version: "${{ matrix.node-version }}"
           cache: npm
       - run: npm clean-install
-      - run: "npm run test:ci"
-  test:
+      - run: npm test
+
+  test_dev:
     runs-on: ubuntu-latest
-    needs: test_matrix
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
-          node-version: "lts/*"
+          node-version-file: .nvmrc
           cache: npm
       - run: npm clean-install
       - run: npm audit signatures
-      - name: Ensure dependencies are compatible with the version of node
-        run: npx ls-engines
-      - run: npm run lint
+      - run: npm test
+
+  test:
+    runs-on: ubuntu-latest
+    needs:
+      - test_dev
+      - test_matrix
+    if: ${{ !cancelled() }}
+    steps:
+      - name: All matrix versions passed
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Some matrix version failed
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

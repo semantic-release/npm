@@ -1,6 +1,7 @@
 import path from "path";
 import test from "ava";
 import fs from "fs-extra";
+import stripAnsi from "strip-ansi";
 import { execa } from "execa";
 import { spy } from "sinon";
 import { temporaryDirectory } from "tempy";
@@ -596,7 +597,7 @@ test("Publish the package and add to lts dist-tag", async (t) => {
 
   t.deepEqual(result, { name: "npm package (@release-1.x dist-tag)", url: undefined, channel: "release-1.x" });
   t.is(
-    (await execa("npm", ["view", pkg.name, "dist-tags"], { cwd, env })).stdout,
+    stripAnsi((await execa("npm", ["view", pkg.name, "dist-tags"], { cwd, env })).stdout),
     "{ latest: '1.0.0', 'release-1.x': '1.0.0' }"
   );
 });
