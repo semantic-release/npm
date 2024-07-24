@@ -38,7 +38,7 @@
     "c8": "10.1.2",
     "codecov": "3.8.3",
     "dockerode": "4.0.2",
-    "got": "14.4.1",
+    "got": "14.4.2",
     "lockfile-lint": "4.14.0",
     "ls-engines": "0.9.2",
     "npm-run-all2": "6.2.2",
