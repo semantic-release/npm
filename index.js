@@ -1,5 +1,4 @@
 import { castArray, defaultTo } from "lodash-es";
-import AggregateError from "aggregate-error";
 import { temporaryFile } from "tempy";
 import getPkg from "./lib/get-pkg.js";
 import verifyNpmConfig from "./lib/verify-config.js";
