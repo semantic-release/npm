@@ -4,11 +4,13 @@ import { temporaryFile } from "tempy";
 import getPkg from "./lib/get-pkg.js";
 import verifyNpmConfig from "./lib/verify-config.js";
 import verifyNpmAuth from "./lib/verify-auth.js";
+import verifyNpmRelease from "./lib/verify-release.js";
 import addChannelNpm from "./lib/add-channel.js";
 import prepareNpm from "./lib/prepare.js";
 import publishNpm from "./lib/publish.js";
 
 let verified;
+let releaseVerified;
 let prepared;
 const npmrc = temporaryFile({ name: ".npmrc" });
 
@@ -43,12 +45,13 @@ export async function verifyConditions(pluginConfig, context) {
   verified = true;
 }
 
-export async function prepare(pluginConfig, context) {
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
+export async function verifyRelease(pluginConfig, context) {
+  const errors = verifyNpmConfig(pluginConfig);
 
   try {
-    // Reload package.json in case a previous external step updated it
     const pkg = await getPkg(pluginConfig, context);
+
+    // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
       await verifyNpmAuth(npmrc, pkg, context);
     }
@@ -60,27 +63,40 @@ export async function prepare(pluginConfig, context) {
     throw new AggregateError(errors);
   }
 
+  await verifyNpmRelease(npmrc, pkg, context);
+  releaseVerified = true;
+}
+
+async function verifyIfNecessary(pluginConfig, context) {
+  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
+
+  let pkg;
+  try {
+    // Reload package.json in case a previous external step updated it
+    pkg = await getPkg(pluginConfig, context);
+    if (pluginConfig.npmPublish !== false && pkg.private !== true) {
+      if (!verified) await verifyNpmAuth(npmrc, pkg, context);
+      if (!releaseVerified) await verifyNpmRelease(npmrc, pkg, context);
+    }
+  } catch (error) {
+    errors.push(...error.errors);
+  }
+
+  if (errors.length > 0) {
+    throw new AggregateError(errors);
+  }
+
+  return pkg;
+}
+
+export async function prepare(pluginConfig, context) {
+  await verifyIfNecessary(pluginConfig, context);
   await prepareNpm(npmrc, pluginConfig, context);
   prepared = true;
 }
 
 export async function publish(pluginConfig, context) {
-  let pkg;
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  try {
-    // Reload package.json in case a previous external step updated it
-    pkg = await getPkg(pluginConfig, context);
-    if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
-    }
-  } catch (error) {
-    errors.push(...error.errors);
-  }
-
-  if (errors.length > 0) {
-    throw new AggregateError(errors);
-  }
+  const pkg = await verifyIfNecessary(pluginConfig, context);
 
   if (!prepared) {
     await prepareNpm(npmrc, pluginConfig, context);
@@ -90,22 +106,6 @@ export async function publish(pluginConfig, context) {
 }
 
 export async function addChannel(pluginConfig, context) {
-  let pkg;
-  const errors = verified ? [] : verifyNpmConfig(pluginConfig);
-
-  try {
-    // Reload package.json in case a previous external step updated it
-    pkg = await getPkg(pluginConfig, context);
-    if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
-    }
-  } catch (error) {
-    errors.push(...error.errors);
-  }
-
-  if (errors.length > 0) {
-    throw new AggregateError(errors);
-  }
-
+  const pkg = await verifyIfNecessary(pluginConfig, context);
   return addChannelNpm(npmrc, pluginConfig, pkg, context);
 }

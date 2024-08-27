@@ -258,6 +258,7 @@ test("Publish the package on a dist-tag", async (t) => {
       stdout: t.context.stdout,
       stderr: t.context.stderr,
       logger: t.context.logger,
+      lastRelease: {},
       nextRelease: { channel: "next", version: "1.0.0" },
     }
   );
