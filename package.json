@@ -40,7 +40,7 @@
     "got": "14.4.7",
     "lockfile-lint": "4.14.1",
     "ls-engines": "0.9.3",
-    "npm-run-all2": "8.0.2",
+    "npm-run-all2": "8.0.3",
     "p-retry": "6.2.1",
     "prettier": "3.5.3",
     "publint": "0.3.12",
