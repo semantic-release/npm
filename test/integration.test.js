@@ -107,8 +107,8 @@ test("Throws error if NPM token is invalid", async (t) => {
   );
 
   t.is(error.name, "SemanticReleaseError");
-  t.is(error.code, "EINVALIDNPMTOKEN");
-  t.is(error.message, "Invalid npm token.");
+  t.is(error.code, "EINVALIDNPMAUTH");
+  t.is(error.message, "Invalid npm authentication.");
 });
 
 test("Skip Token validation if the registry configured is not the default one", async (t) => {
