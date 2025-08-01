@@ -37,9 +37,17 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ### npm registry authentication
 
-The npm [token](https://docs.npmjs.com/about-access-tokens) authentication configuration is **required** and can be set via [environment variables](#environment-variables).
+### Official Registry
 
-Automation tokens are recommended since they can be used for an automated workflow, even when your account is configured to use the [`auth-and-writes` level of 2FA](https://docs.npmjs.com/about-two-factor-authentication#authorization-and-writes).
+When publishing to the [official registry](https://registry.npmjs.org/), it is recommended to publish with authentication that is intended for automation:
+
+* [OIDC publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a CI provider
+* [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for OIDC publishing, and can be set via [environment variables](#environment-variables)
+
+### Alternative Registries
+
+The npm token authentication configuration is **required** and can be set via [environment variables](#environment-variables).
+See the documentation for your registry for details on how to create a token for automation.
 
 ### npm provenance
 
@@ -48,6 +56,9 @@ If you are publishing to the official registry and your pipeline is on a [provid
 Since semantic-release wraps the npm publish command, configuring provenance is not exposed directly.
 Instead, provenance can be configured through the [other configuration options exposed by npm](https://docs.npmjs.com/generating-provenance-statements#using-third-party-package-publishing-tools).
 Provenance applies specifically to publishing, so our recommendation is to configure under `publishConfig` within the `package.json`.
+
+> [!NOTE]
+> When publishing a public package to the official registry with OIDC, [npm provenance is automatically enabled](https://docs.npmjs.com/trusted-publishers#automatic-provenance-generation) and does not require any additional configuration.
 
 #### npm provenance on GitHub Actions
 
