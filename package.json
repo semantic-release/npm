@@ -47,7 +47,8 @@
     "semantic-release": "24.2.9",
     "sinon": "21.0.0",
     "stream-buffers": "3.0.3",
-    "strip-ansi": "7.1.2"
+    "strip-ansi": "7.1.2",
+    "testdouble": "3.20.2"
   },
   "engines": {
     "node": ">=20.8.1"
