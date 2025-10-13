@@ -111,6 +111,27 @@ test("Throws error if NPM token is invalid", async (t) => {
   t.is(error.message, "Invalid npm token.");
 });
 
+test("Throws error if NPM token is not provided", async (t) => {
+  const cwd = temporaryDirectory();
+  const env = { DEFAULT_NPM_REGISTRY: npmRegistry.url };
+  const pkg = { name: "published", version: "1.0.0", publishConfig: { registry: npmRegistry.url } };
+  await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
+
+  const {
+    errors: [error],
+  } = await t.throwsAsync(
+    t.context.m.verifyConditions(
+      {},
+      { cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger }
+    )
+  );
+
+  t.is(error.name, "SemanticReleaseError");
+  t.is(error.code, "ENONPMTOKEN");
+  t.is(error.message, "No npm token specified.");
+});
+
+
 test("Skip Token validation if the registry configured is not the default one", async (t) => {
   const cwd = temporaryDirectory();
   const env = { NPM_TOKEN: "wrong_token" };
