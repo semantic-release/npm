@@ -3,12 +3,12 @@ import * as td from "testdouble";
 
 let execa, verifyAuth, getRegistry, setNpmrcAuth;
 const DEFAULT_NPM_REGISTRY = "https://registry.npmjs.org/";
-const npmrc = 'npmrc contents';
+const npmrc = "npmrc contents";
 const pkg = {};
-const otherEnvVars = {foo: 'bar'}
-const   env = {DEFAULT_NPM_REGISTRY, ...otherEnvVars};
+const otherEnvVars = { foo: "bar" };
+const env = { DEFAULT_NPM_REGISTRY, ...otherEnvVars };
 const cwd = "./path/to/current/working/directory";
-const context = {env, cwd};
+const context = { env, cwd };
 
 test.beforeEach(async (t) => {
   ({ execa } = await td.replaceEsm("execa"));
@@ -22,36 +22,46 @@ test.afterEach.always((t) => {
   td.reset();
 });
 
-test.serial("that the provided token is verified with `npm whoami` when trusted publishing is not established for the official registry", async (t) => {
-  td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
-  td.when(execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
-    cwd,
-    env: otherEnvVars,
-    preferLocal: true,
-  })).thenReturn({
-    stdout: { pipe: () => undefined },
-    stderr: { pipe: () => undefined }
-  });
+test.serial(
+  "that the provided token is verified with `npm whoami` when trusted publishing is not established for the official registry",
+  async (t) => {
+    td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
+    td.when(
+      execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
+        cwd,
+        env: otherEnvVars,
+        preferLocal: true,
+      })
+    ).thenReturn({
+      stdout: { pipe: () => undefined },
+      stderr: { pipe: () => undefined },
+    });
 
-  await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
-});
+    await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
+  }
+);
 
-test.serial("that the auth context for the official registry is considered invalid when no token is provided and trusted publishing is not established", async (t) => {
-  td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
-  td.when(execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
-    cwd,
-    env: otherEnvVars,
-    preferLocal: true,
-  })).thenThrow(new Error());
+test.serial(
+  "that the auth context for the official registry is considered invalid when no token is provided and trusted publishing is not established",
+  async (t) => {
+    td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
+    td.when(
+      execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
+        cwd,
+        env: otherEnvVars,
+        preferLocal: true,
+      })
+    ).thenThrow(new Error());
 
-  const {
-    errors: [error],
-  } = await t.throwsAsync(verifyAuth(npmrc, pkg, context));
+    const {
+      errors: [error],
+    } = await t.throwsAsync(verifyAuth(npmrc, pkg, context));
 
-  t.is(error.name, "SemanticReleaseError");
-  t.is(error.code, "EINVALIDNPMTOKEN");
-  t.is(error.message, "Invalid npm token.");
-});
+    t.is(error.name, "SemanticReleaseError");
+    t.is(error.code, "EINVALIDNPMTOKEN");
+    t.is(error.message, "Invalid npm token.");
+  }
+);
 
 // since alternative registries are not consistent in implementing `npm whoami`,
 // we do not attempt to verify the provided token when publishing to them

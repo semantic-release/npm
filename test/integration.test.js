@@ -131,7 +131,6 @@ test("Throws error if NPM token is not provided", async (t) => {
   t.is(error.message, "No npm token specified.");
 });
 
-
 test("Skip Token validation if the registry configured is not the default one", async (t) => {
   const cwd = temporaryDirectory();
   const env = { NPM_TOKEN: "wrong_token" };
