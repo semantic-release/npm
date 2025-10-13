@@ -2,7 +2,8 @@
 
 [**semantic-release**](https://github.com/semantic-release/semantic-release) plugin to publish a [npm](https://www.npmjs.com) package.
 
-[![Build Status](https://github.com/semantic-release/npm/workflows/Test/badge.svg)](https://github.com/semantic-release/npm/actions?query=workflow%3ATest+branch%3Amaster) [![npm latest version](https://img.shields.io/npm/v/@semantic-release/npm/latest.svg)](https://www.npmjs.com/package/@semantic-release/npm)
+[![Build Status](https://github.com/semantic-release/npm/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/semantic-release/npm/actions/workflows/test.yml?query=branch%3Amaster)
+[![npm latest version](https://img.shields.io/npm/v/@semantic-release/npm/latest.svg)](https://www.npmjs.com/package/@semantic-release/npm)
 [![npm next version](https://img.shields.io/npm/v/@semantic-release/npm/next.svg)](https://www.npmjs.com/package/@semantic-release/npm)
 [![npm beta version](https://img.shields.io/npm/v/@semantic-release/npm/beta.svg)](https://www.npmjs.com/package/@semantic-release/npm)
 
@@ -41,8 +42,8 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 When publishing to the [official registry](https://registry.npmjs.org/), it is recommended to publish with authentication that is intended for automation:
 
-* [OIDC publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a CI provider
-* [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for OIDC publishing, and can be set via [environment variables](#environment-variables)
+- [OIDC publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a CI provider
+- [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for OIDC publishing, and can be set via [environment variables](#environment-variables)
 
 ### Alternative Registries
 
