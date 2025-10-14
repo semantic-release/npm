@@ -1,8 +1,9 @@
 import test from "ava";
 import * as td from "testdouble";
+import { OFFICIAL_REGISTRY } from "../lib/definitions/constants.js";
 
 let execa, verifyAuth, getRegistry, setNpmrcAuth;
-const DEFAULT_NPM_REGISTRY = "https://registry.npmjs.org/";
+const DEFAULT_NPM_REGISTRY = OFFICIAL_REGISTRY;
 const npmrc = "npmrc contents";
 const pkg = {};
 const otherEnvVars = { foo: "bar" };
