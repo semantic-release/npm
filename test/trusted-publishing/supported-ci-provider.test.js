@@ -27,7 +27,7 @@ test("that `true` is returned when GitLab Pipelines is detected", async (t) => {
   t.true(await trustedCiProvider());
 });
 
-test("that `false` is returned no supported CI provider is detected", async (t) => {
+test("that `false` is returned when no supported CI provider is detected", async (t) => {
   td.when(envCi()).thenReturn({ name: "Other Service" });
 
   t.false(await trustedCiProvider());
