@@ -47,33 +47,19 @@ When publishing to the [official registry](https://registry.npmjs.org/), it is r
 - [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for trusted publishing, and can be set via [environment variables](#environment-variables).
   Because these access tokens expire, rotation will need to be accounted for in this scenario.
 
-### Alternative Registries
+#### Trusted publishing from GitHub Actions
 
-The npm token authentication configuration is **required** and can be set via [environment variables](#environment-variables).
-See the documentation for your registry for details on how to create a token for automation.
-
-### npm provenance
-
-If you are publishing to the official registry and your pipeline is on a [provider that is supported by npm for provenance](https://docs.npmjs.com/generating-provenance-statements#provenance-limitations), npm can be configured to [publish with provenance](https://docs.npmjs.com/generating-provenance-statements).
-
-Since semantic-release wraps the npm publish command, configuring provenance is not exposed directly.
-Instead, provenance can be configured through the [other configuration options exposed by npm](https://docs.npmjs.com/generating-provenance-statements#using-third-party-package-publishing-tools).
-Provenance applies specifically to publishing, so our recommendation is to configure under `publishConfig` within the `package.json`.
-
-> [!NOTE]
-> When publishing a public package to the official registry with OIDC, [npm provenance is automatically enabled](https://docs.npmjs.com/trusted-publishers#automatic-provenance-generation) and does not require any additional configuration.
-
-#### npm provenance on GitHub Actions
-
-For package provenance to be signed on the GitHub Actions CI the following permission is required
-to be enabled on the job:
+To publish with OIDC from GitHub Actions, the `id-token: write` permission is required to be enabled on the job:
 
 ```yaml
 permissions:
-  id-token: write # to enable use of OIDC for npm provenance
+  id-token: write # to enable use of OIDC for trusted publishing and npm provenance
 ```
 
-It's worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments,
+> [!NOTE]
+> When using trusted publishing, provenance attestations are automatically generated for your packages without requiring provenance to be explicitly enabled.
+
+It's also worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments,
 and other features, then [more permissions are required](https://github.com/semantic-release/github#github-authentication) to be enabled on this job:
 
 ```yaml
@@ -81,10 +67,15 @@ permissions:
   contents: write # to be able to publish a GitHub release
   issues: write # to be able to comment on released issues
   pull-requests: write # to be able to comment on released pull requests
-  id-token: write # to enable use of OIDC for npm provenance
+  id-token: write # to enable use of OIDC for trusted publishing and npm provenance
 ```
 
 Refer to the [GitHub Actions recipe for npm package provenance](https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
+
+### Alternative Registries
+
+The npm token authentication configuration is **required** and can be set via [environment variables](#environment-variables).
+See the documentation for your registry for details on how to create a token for automation.
 
 ### Environment variables
 
@@ -110,13 +101,14 @@ The plugin uses the [`npm` CLI](https://github.com/npm/cli) which will read the 
 
 The [`registry`](https://docs.npmjs.com/misc/registry) can be configured via the npm environment variable `NPM_CONFIG_REGISTRY` and will take precedence over the configuration in `.npmrc`.
 
-The [`registry`](https://docs.npmjs.com/misc/registry) and [`dist-tag`](https://docs.npmjs.com/cli/dist-tag) can be configured under `publishConfig` in the `package.json`:
+The [`registry`](https://docs.npmjs.com/misc/registry), [`dist-tag`](https://docs.npmjs.com/cli/dist-tag), and [`provenance`](https://docs.npmjs.com/generating-provenance-statements#using-third-party-package-publishing-tools) can be configured under `publishConfig` in the `package.json`:
 
 ```json
 {
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
-    "tag": "latest"
+    "tag": "latest",
+    "provenance": true
   }
 }
 ```
