@@ -47,17 +47,17 @@ When publishing to the [official registry](https://registry.npmjs.org/), it is r
 - [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for trusted publishing, and can be set via [environment variables](#environment-variables).
   Because these access tokens expire, rotation will need to be accounted for in this scenario.
 
+> [!NOTE]
+> When using trusted publishing, provenance attestations are automatically generated for your packages without requiring provenance to be explicitly enabled.
+
 #### Trusted publishing from GitHub Actions
 
-To publish with OIDC from GitHub Actions, the `id-token: write` permission is required to be enabled on the job:
+To leverage trusted publishing and publish with provenance from GitHub Actions, the `id-token: write` permission is required to be enabled on the job:
 
 ```yaml
 permissions:
   id-token: write # to enable use of OIDC for trusted publishing and npm provenance
 ```
-
-> [!NOTE]
-> When using trusted publishing, provenance attestations are automatically generated for your packages without requiring provenance to be explicitly enabled.
 
 It's also worth noting that if you are using semantic-release to its fullest with a GitHub release, GitHub comments,
 and other features, then [more permissions are required](https://github.com/semantic-release/github#github-authentication) to be enabled on this job:
@@ -71,6 +71,18 @@ permissions:
 ```
 
 Refer to the [GitHub Actions recipe for npm package provenance](https://semantic-release.gitbook.io/semantic-release/recipes/ci-configurations/github-actions#.github-workflows-release.yml-configuration-for-node-projects) for the full CI job's YAML code example.
+
+#### Trusted publishing for GitLab Pipelines
+
+To leverage trusted publishing and publish with provenance from GitLab Pipelines, `NPM_ID_TOKEN` needs to be added as an entry under `id_tokens` in the job definition with an audience of `npm:registry.npmjs.org`:
+
+```yaml
+id_tokens:
+  NPM_ID_TOKEN:
+    aud: "npm:registry.npmjs.org"
+```
+
+See the [npm documentation for more detail about configuring pipeline details](https://docs.npmjs.com/trusted-publishers#gitlab-cicd-configuration)
 
 ### Alternative Registries
 
