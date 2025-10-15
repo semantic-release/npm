@@ -36,6 +36,12 @@ test.serial("that an access token is returned when token exchange succeeds", asy
   t.is(await exchangeToken(pkg), token);
 });
 
+test.serial("that `undefined` is returned when ID token retrieval fails", async (t) => {
+  td.when(getIDToken("npm:registry.npmjs.org")).thenThrow(new Error("Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable"));
+
+  t.is(await exchangeToken(pkg), undefined);
+});
+
 test.serial("that `undefined` is returned when token exchange fails", async (t) => {
   td.when(getIDToken("npm:registry.npmjs.org")).thenResolve(idToken);
   td.when(
