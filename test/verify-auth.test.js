@@ -30,7 +30,7 @@ test.serial(
   "that the auth context for the official registry is considered valid when trusted publishing is established",
   async (t) => {
     td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
-    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY)).thenReturn(true);
+    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY, pkg)).thenReturn(true);
 
     await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
   }
@@ -40,7 +40,7 @@ test.serial(
   "that the provided token is verified with `npm whoami` when trusted publishing is not established for the official registry",
   async (t) => {
     td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
-    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY)).thenReturn(false);
+    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY, pkg)).thenReturn(false);
     td.when(
       execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
         cwd,
@@ -60,7 +60,7 @@ test.serial(
   "that the auth context for the official registry is considered invalid when no token is provided and trusted publishing is not established",
   async (t) => {
     td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
-    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY)).thenReturn(false);
+    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY, pkg)).thenReturn(false);
     td.when(
       execa("npm", ["whoami", "--userconfig", npmrc, "--registry", DEFAULT_NPM_REGISTRY], {
         cwd,
@@ -84,7 +84,7 @@ test.serial(
   async (t) => {
     const otherRegistry = "https://other.registry.org";
     td.when(getRegistry(pkg, context)).thenReturn(otherRegistry);
-    td.when(oidcContextEstablished(otherRegistry)).thenReturn(false);
+    td.when(oidcContextEstablished(otherRegistry, pkg)).thenReturn(false);
     td.when(
       execa(
         "npm",
@@ -119,7 +119,7 @@ test.serial(
   async (t) => {
     const otherRegistry = "https://other.registry.org";
     td.when(getRegistry(pkg, context)).thenReturn(otherRegistry);
-    td.when(oidcContextEstablished(otherRegistry)).thenReturn(false);
+    td.when(oidcContextEstablished(otherRegistry, pkg)).thenReturn(false);
     td.when(
       execa(
         "npm",
