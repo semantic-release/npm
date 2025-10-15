@@ -42,7 +42,7 @@ test.serial("that an access token is returned when token exchange succeeds on Gi
     new Response(JSON.stringify({ token }), { status: 201, headers: { "Content-Type": "application/json" } })
   );
 
-  t.is(await exchangeToken(pkg, {logger}), token);
+  t.is(await exchangeToken(pkg, { logger }), token);
 });
 
 test.serial("that `undefined` is returned when ID token retrieval fails on GitHub Actions", async (t) => {
@@ -51,7 +51,7 @@ test.serial("that `undefined` is returned when ID token retrieval fails on GitHu
     new Error("Unable to get ACTIONS_ID_TOKEN_REQUEST_URL env variable")
   );
 
-  t.is(await exchangeToken(pkg, {logger}), undefined);
+  t.is(await exchangeToken(pkg, { logger }), undefined);
 });
 
 test.serial("that `undefined` is returned when token exchange fails on GitHub Actions", async (t) => {
@@ -66,7 +66,7 @@ test.serial("that `undefined` is returned when token exchange fails on GitHub Ac
     new Response(JSON.stringify({ message: "foo" }), { status: 401, headers: { "Content-Type": "application/json" } })
   );
 
-  t.is(await exchangeToken(pkg, {logger}), undefined);
+  t.is(await exchangeToken(pkg, { logger }), undefined);
 });
 
 test.serial("that an access token is returned when token exchange succeeds on GitLab Pipelines", async (t) => {
@@ -81,13 +81,13 @@ test.serial("that an access token is returned when token exchange succeeds on Gi
     new Response(JSON.stringify({ token }), { status: 201, headers: { "Content-Type": "application/json" } })
   );
 
-  t.is(await exchangeToken(pkg, {logger}), token);
+  t.is(await exchangeToken(pkg, { logger }), token);
 });
 
 test.serial("that `undefined` is returned when ID token is not available on GitLab Pipelines", async (t) => {
   td.when(envCi()).thenReturn({ name: GITLAB_PIPELINES_PROVIDER_NAME });
 
-  t.is(await exchangeToken(pkg, {logger}), undefined);
+  t.is(await exchangeToken(pkg, { logger }), undefined);
 });
 
 test.serial("that `undefined` is returned when token exchange fails on GitLab Pipelines", async (t) => {
@@ -102,11 +102,11 @@ test.serial("that `undefined` is returned when token exchange fails on GitLab Pi
     new Response(JSON.stringify({ message: "foo" }), { status: 401, headers: { "Content-Type": "application/json" } })
   );
 
-  t.is(await exchangeToken(pkg, {logger}), undefined);
+  t.is(await exchangeToken(pkg, { logger }), undefined);
 });
 
 test.serial("that `undefined` is returned when no supported CI provider is detected", async (t) => {
   td.when(envCi()).thenReturn({ name: "Other Service" });
 
-  t.is(await exchangeToken(pkg, {logger}), undefined);
+  t.is(await exchangeToken(pkg, { logger }), undefined);
 });
