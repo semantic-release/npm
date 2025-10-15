@@ -46,7 +46,7 @@
     "p-retry": "7.1.0",
     "prettier": "3.6.2",
     "publint": "0.3.14",
-    "semantic-release": "24.2.9",
+    "semantic-release": "25.0.0",
     "sinon": "21.0.0",
     "stream-buffers": "3.0.3",
     "strip-ansi": "7.1.2",
@@ -122,5 +122,5 @@
       "github>semantic-release/.github:renovate-config"
     ]
   },
-  "packageManager": "npm@11.4.2"
+  "packageManager": "npm@11.6.2"
 }
