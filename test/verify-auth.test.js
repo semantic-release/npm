@@ -83,6 +83,11 @@ test.serial(
   "that a publish dry run is performed to validate token presence when publishing to a custom registry",
   async (t) => {
     const otherRegistry = "https://other.registry.org";
+    const execaResult = Promise.resolve({
+      stderr: ["foo", "bar", "baz"],
+    });
+    execaResult.stderr = { pipe: () => undefined };
+    execaResult.stdout = { pipe: () => undefined };
     td.when(getRegistry(pkg, context)).thenReturn(otherRegistry);
     td.when(oidcContextEstablished(otherRegistry, pkg)).thenReturn(false);
     td.when(
@@ -104,9 +109,7 @@ test.serial(
           lines: true,
         }
       )
-    ).thenResolve({
-      stderr: ["foo", "bar", "baz"],
-    });
+    ).thenReturn(execaResult);
 
     await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
   }
@@ -118,6 +121,11 @@ test.serial(
   "that the token is considered invalid when the publish dry run fails when publishing to a custom registry",
   async (t) => {
     const otherRegistry = "https://other.registry.org";
+    const execaResult = Promise.resolve({
+      stderr: ["foo", "bar", "baz", `This command requires you to be logged in to ${otherRegistry}`, "qux"],
+    });
+    execaResult.stderr = { pipe: () => undefined };
+    execaResult.stdout = { pipe: () => undefined };
     td.when(getRegistry(pkg, context)).thenReturn(otherRegistry);
     td.when(oidcContextEstablished(otherRegistry, pkg)).thenReturn(false);
     td.when(
@@ -139,9 +147,7 @@ test.serial(
           lines: true,
         }
       )
-    ).thenResolve({
-      stderr: ["foo", "bar", "baz", `This command requires you to be logged in to ${otherRegistry}`, "qux"],
-    });
+    ).thenReturn(execaResult);
 
     const {
       errors: [error],
