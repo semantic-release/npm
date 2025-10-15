@@ -19,19 +19,25 @@ test.afterEach.always((t) => {
   td.reset();
 });
 
-test.serial("that `true` is returned when a trusted-publishing context has been established with the official registry", async (t) => {
-  td.when(trustedCiProvider()).thenResolve(true);
-  td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
-  td.when(tokenExchange(pkg)).thenResolve('token-value');
+test.serial(
+  "that `true` is returned when a trusted-publishing context has been established with the official registry",
+  async (t) => {
+    td.when(trustedCiProvider()).thenResolve(true);
+    td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
+    td.when(tokenExchange(pkg)).thenResolve("token-value");
 
-  t.true(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
-});
+    t.true(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
+  }
+);
 
-test.serial("that `false` is returned when the official registry is targeted, but outside the context of a supported CI provider", async (t) => {
-  td.when(trustedCiProvider()).thenResolve(false);
+test.serial(
+  "that `false` is returned when the official registry is targeted, but outside the context of a supported CI provider",
+  async (t) => {
+    td.when(trustedCiProvider()).thenResolve(false);
 
-  t.false(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
-});
+    t.false(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
+  }
+);
 
 test.serial("that `false` is returned when OIDC token exchange fails in a supported CI provider", async (t) => {
   td.when(trustedCiProvider()).thenResolve(true);
