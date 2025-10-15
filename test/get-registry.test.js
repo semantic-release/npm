@@ -39,6 +39,26 @@ test('Get the registry configured in "NPM_CONFIG_REGISTRY"', (t) => {
   );
 });
 
+test('Get the registry configured in "publishConfig" for scoped package', async (t) => {
+  const cwd = temporaryDirectory();
+  await fs.appendFile(path.resolve(cwd, ".npmrc"), "@scope:registry = https://custom3.registry.com");
+  await fs.appendFile(path.resolve(cwd, ".npmrc"), "registry = https://custom4.registry.com");
+
+  t.is(
+    getRegistry(
+      {
+        name: "@scope/package-name",
+        publishConfig: {
+          registry: "https://custom6.registry.com",
+          "@scope:registry": "https://custom5.registry.com",
+        },
+      },
+      { cwd, env: { NPM_CONFIG_REGISTRY: "https://custom1.registry.com/" } }
+    ),
+    "https://custom5.registry.com"
+  );
+});
+
 test('Get the registry configured in ".npmrc" for scoped package', async (t) => {
   const cwd = temporaryDirectory();
   await fs.appendFile(path.resolve(cwd, ".npmrc"), "@scope:registry = https://custom3.registry.com");
