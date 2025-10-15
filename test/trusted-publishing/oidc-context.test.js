@@ -8,7 +8,6 @@ const pkg = {};
 
 test.beforeEach(async (t) => {
   await td.replace(globalThis, "fetch");
-  ({ default: trustedCiProvider } = await td.replaceEsm("../../lib/trusted-publishing/supported-ci-provider.js"));
   ({ default: exchangeToken } = await td.replaceEsm("../../lib/trusted-publishing/token-exchange.js"));
   td.when(exchangeToken(pkg)).thenResolve(undefined);
 
@@ -22,7 +21,6 @@ test.afterEach.always((t) => {
 test.serial(
   "that `true` is returned when a trusted-publishing context has been established with the official registry",
   async (t) => {
-    td.when(trustedCiProvider()).thenResolve(true);
     td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
     td.when(exchangeToken(pkg)).thenResolve("token-value");
 
@@ -30,17 +28,7 @@ test.serial(
   }
 );
 
-test.serial(
-  "that `false` is returned when the official registry is targeted, but outside the context of a supported CI provider",
-  async (t) => {
-    td.when(trustedCiProvider()).thenResolve(false);
-
-    t.false(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
-  }
-);
-
 test.serial("that `false` is returned when OIDC token exchange fails in a supported CI provider", async (t) => {
-  td.when(trustedCiProvider()).thenResolve(true);
   td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
   td.when(exchangeToken(pkg)).thenResolve(undefined);
 
