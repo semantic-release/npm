@@ -3,14 +3,14 @@ import * as td from "testdouble";
 
 import { OFFICIAL_REGISTRY } from "../../lib/definitions/constants.js";
 
-let oidcContextEstablished, trustedCiProvider, tokenExchange;
+let oidcContextEstablished, trustedCiProvider, exchangeToken;
 const pkg = {};
 
 test.beforeEach(async (t) => {
   await td.replace(globalThis, "fetch");
   ({ default: trustedCiProvider } = await td.replaceEsm("../../lib/trusted-publishing/supported-ci-provider.js"));
-  ({ default: tokenExchange } = await td.replaceEsm("../../lib/trusted-publishing/token-exchange.js"));
-  td.when(tokenExchange(pkg)).thenResolve(undefined);
+  ({ default: exchangeToken } = await td.replaceEsm("../../lib/trusted-publishing/token-exchange.js"));
+  td.when(exchangeToken(pkg)).thenResolve(undefined);
 
   ({ default: oidcContextEstablished } = await import("../../lib/trusted-publishing/oidc-context.js"));
 });
@@ -24,7 +24,7 @@ test.serial(
   async (t) => {
     td.when(trustedCiProvider()).thenResolve(true);
     td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
-    td.when(tokenExchange(pkg)).thenResolve("token-value");
+    td.when(exchangeToken(pkg)).thenResolve("token-value");
 
     t.true(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
   }
@@ -42,7 +42,7 @@ test.serial(
 test.serial("that `false` is returned when OIDC token exchange fails in a supported CI provider", async (t) => {
   td.when(trustedCiProvider()).thenResolve(true);
   td.when(fetch("https://matt.travi.org")).thenResolve(new Response(null, { status: 401 }));
-  td.when(tokenExchange(pkg)).thenResolve(undefined);
+  td.when(exchangeToken(pkg)).thenResolve(undefined);
 
   t.false(await oidcContextEstablished(OFFICIAL_REGISTRY, pkg));
 });
