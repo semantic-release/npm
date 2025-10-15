@@ -40,10 +40,12 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 ### Official Registry
 
-When publishing to the [official registry](https://registry.npmjs.org/), it is recommended to publish with authentication that is intended for automation:
+When publishing to the [official registry](https://registry.npmjs.org/), it is recommended to publish with authentication intended for automation:
 
-- [OIDC publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a CI provider
-- [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for OIDC publishing, and can be set via [environment variables](#environment-variables)
+- Since access tokens have recently had their [maximum lifetimes restricted](https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/),
+  [trusted publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a [supported CI provider](https://docs.npmjs.com/trusted-publishers#supported-cicd-providers)
+- [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for trusted publishing, and can be set via [environment variables](#environment-variables).
+  Because these access tokens expire, rotation will need to be accounted for in this scenario.
 
 ### Alternative Registries
 
