@@ -19,8 +19,10 @@
     "Gregor Martynus (https://twitter.com/gr2m)"
   ],
   "dependencies": {
+    "@actions/core": "^1.11.1",
     "@semantic-release/error": "^4.0.0",
     "aggregate-error": "^5.0.0",
+    "env-ci": "^11.2.0",
     "execa": "^9.0.0",
     "fs-extra": "^11.0.0",
     "lodash-es": "^4.17.21",

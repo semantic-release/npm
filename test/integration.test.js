@@ -91,7 +91,7 @@ test('Skip npm token verification if "package.private" is true', async (t) => {
   );
 });
 
-test("Throws error if NPM token is invalid", async (t) => {
+test("Throws error if NPM token is invalid when targeting the default registry", async (t) => {
   const cwd = temporaryDirectory();
   const env = { NPM_TOKEN: "wrong_token", DEFAULT_NPM_REGISTRY: npmRegistry.url };
   const pkg = { name: "published", version: "1.0.0", publishConfig: { registry: npmRegistry.url } };
@@ -111,7 +111,7 @@ test("Throws error if NPM token is invalid", async (t) => {
   t.is(error.message, "Invalid npm token.");
 });
 
-test("Throws error if NPM token is not provided", async (t) => {
+test("Throws error if NPM token is not provided when targeting the default registry", async (t) => {
   const cwd = temporaryDirectory();
   const env = { DEFAULT_NPM_REGISTRY: npmRegistry.url };
   const pkg = { name: "published", version: "1.0.0", publishConfig: { registry: npmRegistry.url } };
@@ -131,17 +131,24 @@ test("Throws error if NPM token is not provided", async (t) => {
   t.is(error.message, "No npm token specified.");
 });
 
-test("Skip Token validation if the registry configured is not the default one", async (t) => {
+test("Verify the token with a publish dry-run if the registry configured is not the default one", async (t) => {
   const cwd = temporaryDirectory();
   const env = { NPM_TOKEN: "wrong_token" };
   const pkg = { name: "published", version: "1.0.0", publishConfig: { registry: "http://custom-registry.com/" } };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
-  await t.notThrowsAsync(
+
+  const {
+    errors: [error],
+  } = await t.throwsAsync(
     t.context.m.verifyConditions(
       {},
       { cwd, env, options: {}, stdout: t.context.stdout, stderr: t.context.stderr, logger: t.context.logger }
     )
   );
+
+  t.is(error.name, "SemanticReleaseError");
+  t.is(error.code, "EINVALIDNPMAUTH");
+  t.is(error.message, "Invalid npm authentication.");
 });
 
 test("Verify npm auth and package", async (t) => {
