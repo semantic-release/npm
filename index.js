@@ -30,7 +30,7 @@ export async function verifyConditions(pluginConfig, context) {
 
     // Verify the npm authentication only if `npmPublish` is not false and `pkg.private` is not `true`
     if (pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, pluginConfig, context);
     }
   } catch (error) {
     errors.push(...error.errors);
@@ -50,7 +50,7 @@ export async function prepare(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     const pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, pluginConfig, context);
     }
   } catch (error) {
     errors.push(...error.errors);
@@ -72,7 +72,7 @@ export async function publish(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, pluginConfig, context);
     }
   } catch (error) {
     errors.push(...error.errors);
@@ -97,7 +97,7 @@ export async function addChannel(pluginConfig, context) {
     // Reload package.json in case a previous external step updated it
     pkg = await getPkg(pluginConfig, context);
     if (!verified && pluginConfig.npmPublish !== false && pkg.private !== true) {
-      await verifyNpmAuth(npmrc, pkg, context);
+      await verifyNpmAuth(npmrc, pkg, pluginConfig, context);
     }
   } catch (error) {
     errors.push(...error.errors);

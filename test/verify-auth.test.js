@@ -32,7 +32,7 @@ test.serial(
     td.when(getRegistry(pkg, context)).thenReturn(DEFAULT_NPM_REGISTRY);
     td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY, pkg, context)).thenResolve(true);
 
-    await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
+    await t.notThrowsAsync(verifyAuth(npmrc, pkg, {}, context));
   }
 );
 
@@ -52,7 +52,7 @@ test.serial(
       stderr: { pipe: () => undefined },
     });
 
-    await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
+    await t.notThrowsAsync(verifyAuth(npmrc, pkg, {}, context));
   }
 );
 
@@ -71,7 +71,7 @@ test.serial(
 
     const {
       errors: [error],
-    } = await t.throwsAsync(verifyAuth(npmrc, pkg, context));
+    } = await t.throwsAsync(verifyAuth(npmrc, pkg, {}, context));
 
     t.is(error.name, "SemanticReleaseError");
     t.is(error.code, "EINVALIDNPMTOKEN");
@@ -95,6 +95,7 @@ test.serial(
         "npm",
         [
           "publish",
+          cwd,
           "--dry-run",
           "--tag=semantic-release-auth-check",
           "--userconfig",
@@ -111,12 +112,50 @@ test.serial(
       )
     ).thenReturn(execaResult);
 
-    await t.notThrowsAsync(verifyAuth(npmrc, pkg, context));
+    await t.notThrowsAsync(verifyAuth(npmrc, pkg, {}, context));
+  }
+);
+
+test.serial(
+  "that a publish dry run is performed to validate token presence when publishing to a custom registry from a sub-directory",
+  async (t) => {
+    const otherRegistry = "https://other.registry.org";
+    const pkgRoot = "/dist";
+    const execaResult = Promise.resolve({
+      stderr: ["foo", "bar", "baz"],
+    });
+    execaResult.stderr = { pipe: () => undefined };
+    execaResult.stdout = { pipe: () => undefined };
+    td.when(getRegistry(pkg, context)).thenReturn(otherRegistry);
+    td.when(oidcContextEstablished(DEFAULT_NPM_REGISTRY, pkg, context)).thenResolve(false);
+    td.when(
+      execa(
+        "npm",
+        [
+          "publish",
+          pkgRoot,
+          "--dry-run",
+          "--tag=semantic-release-auth-check",
+          "--userconfig",
+          npmrc,
+          "--registry",
+          otherRegistry,
+        ],
+        {
+          cwd,
+          env: otherEnvVars,
+          preferLocal: true,
+          lines: true,
+        }
+      )
+    ).thenReturn(execaResult);
+
+    await t.notThrowsAsync(verifyAuth(npmrc, pkg, { pkgRoot }, context));
   }
 );
 
 // since alternative registries are not consistent in implementing `npm whoami`,
-// we do not attempt to verify the provided token when publishing to them
+// the best we can attempt to verify is to do a dry run publish and check for auth warnings
 test.serial(
   "that the token is considered invalid when the publish dry run fails when publishing to a custom registry",
   async (t) => {
@@ -133,6 +172,7 @@ test.serial(
         "npm",
         [
           "publish",
+          cwd,
           "--dry-run",
           "--tag=semantic-release-auth-check",
           "--userconfig",
@@ -151,7 +191,7 @@ test.serial(
 
     const {
       errors: [error],
-    } = await t.throwsAsync(verifyAuth(npmrc, pkg, context));
+    } = await t.throwsAsync(verifyAuth(npmrc, pkg, {}, context));
 
     t.is(error.name, "SemanticReleaseError");
     t.is(error.code, "EINVALIDNPMAUTH");
@@ -168,7 +208,7 @@ test.serial("that errors from setting up auth bubble through this function", asy
 
   const {
     errors: [error],
-  } = await t.throwsAsync(verifyAuth(npmrc, pkg, context));
+  } = await t.throwsAsync(verifyAuth(npmrc, pkg, {}, context));
 
   t.is(error, thrownError);
 });
