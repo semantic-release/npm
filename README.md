@@ -42,7 +42,7 @@ The plugin can be configured in the [**semantic-release** configuration file](ht
 
 When publishing to the [official registry](https://registry.npmjs.org/), it is recommended to publish with authentication intended for automation:
 
-- Since access tokens have recently had their [maximum lifetimes restricted](https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/),
+- For improved security, and since access tokens have recently had their [maximum lifetimes restricted](https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/),
   [trusted publishing](https://docs.npmjs.com/trusted-publishers) is recommended when publishing from a [supported CI provider](https://docs.npmjs.com/trusted-publishers#supported-cicd-providers)
 - [Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended when publishing from a CI provider that is not supported by npm for trusted publishing, and can be set via [environment variables](#environment-variables).
   Because these access tokens expire, rotation will need to be accounted for in this scenario.
@@ -82,11 +82,17 @@ id_tokens:
     aud: "npm:registry.npmjs.org"
 ```
 
-See the [npm documentation for more detail about configuring pipeline details](https://docs.npmjs.com/trusted-publishers#gitlab-cicd-configuration)
+See the [npm documentation for more details about configuring pipeline details](https://docs.npmjs.com/trusted-publishers#gitlab-cicd-configuration)
+
+#### Unsupported CI providers
+
+Token authentication is **required** and can be set via [environment variables](#environment-variables).
+[Granular access tokens](https://docs.npmjs.com/creating-and-viewing-access-tokens#creating-granular-access-tokens-on-the-website) are recommended in this scenario, since trusted publishing is not available from all CI providers.
+Because these access tokens expire, rotation will need to be accounted for in your process.
 
 ### Alternative Registries
 
-The npm token authentication configuration is **required** and can be set via [environment variables](#environment-variables).
+Token authentication is **required** and can be set via [environment variables](#environment-variables).
 See the documentation for your registry for details on how to create a token for automation.
 
 ### Environment variables
