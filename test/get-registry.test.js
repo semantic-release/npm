@@ -3,11 +3,12 @@ import test from "ava";
 import fs from "fs-extra";
 import { temporaryDirectory } from "tempy";
 import getRegistry from "../lib/get-registry.js";
+import { OFFICIAL_REGISTRY } from "../lib/definitions/constants.js";
 
 test("Get default registry", (t) => {
   const cwd = temporaryDirectory();
-  t.is(getRegistry({ name: "package-name" }, { cwd, env: {} }), "https://registry.npmjs.org/");
-  t.is(getRegistry({ name: "package-name", publishConfig: {} }, { cwd, env: {} }), "https://registry.npmjs.org/");
+  t.is(getRegistry({ name: "package-name" }, { cwd, env: {} }), OFFICIAL_REGISTRY);
+  t.is(getRegistry({ name: "package-name", publishConfig: {} }, { cwd, env: {} }), OFFICIAL_REGISTRY);
 });
 
 test('Get the registry configured in ".npmrc" and normalize trailing slash', async (t) => {
