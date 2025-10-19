@@ -46,7 +46,7 @@
     "p-retry": "7.1.0",
     "prettier": "3.6.2",
     "publint": "0.3.14",
-    "semantic-release": "25.0.0",
+    "semantic-release": "25.0.1",
     "sinon": "21.0.0",
     "stream-buffers": "3.0.3",
     "strip-ansi": "7.1.2",
