@@ -1,5 +1,6 @@
 import test from "ava";
 import getReleaseInfo from "../lib/get-release-info.js";
+import { OFFICIAL_REGISTRY } from "../lib/definitions/constants.js";
 
 test("Default registry and scoped module", async (t) => {
   t.deepEqual(
@@ -7,7 +8,7 @@ test("Default registry and scoped module", async (t) => {
       { name: "@scope/module" },
       { env: {}, nextRelease: { version: "1.0.0" } },
       "latest",
-      "https://registry.npmjs.org/"
+      OFFICIAL_REGISTRY
     ),
     {
       name: "npm package (@latest dist-tag)",
