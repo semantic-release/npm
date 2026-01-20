@@ -32,8 +32,7 @@
     "rc": "^1.2.8",
     "read-pkg": "^10.0.0",
     "registry-auth-token": "^5.0.0",
-    "semver": "^7.1.2",
-    "tempy": "^3.0.0"
+    "semver": "^7.1.2"
   },
   "devDependencies": {
     "ava": "6.4.1",
