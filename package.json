@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "ava": "6.4.1",
-    "c8": "10.1.3",
+    "c8": "11.0.0",
     "dockerode": "4.0.9",
     "got": "14.6.6",
     "lockfile-lint": "5.0.0",
