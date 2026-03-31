@@ -1,11 +1,7 @@
 import test from "ava";
 import * as td from "testdouble";
 
-import {
-  OFFICIAL_REGISTRY,
-  GITHUB_ACTIONS_PROVIDER_NAME,
-  GITLAB_PIPELINES_PROVIDER_NAME,
-} from "../../lib/definitions/constants.js";
+import { OFFICIAL_REGISTRY, GITHUB_ACTIONS_PROVIDER_NAME } from "../../lib/definitions/constants.js";
 
 // https://api-docs.npmjs.com/#tag/registry.npmjs.org/operation/exchangeOidcToken
 
@@ -69,9 +65,8 @@ test.serial("that `undefined` is returned when token exchange fails on GitHub Ac
   t.is(await exchangeToken(pkg, { logger }), undefined);
 });
 
-test.serial("that an access token is returned when token exchange succeeds on GitLab Pipelines", async (t) => {
+test.serial("that an access token is returned when token exchange succeeds via NPM_ID_TOKEN", async (t) => {
   process.env.NPM_ID_TOKEN = idToken;
-  td.when(envCi()).thenReturn({ name: GITLAB_PIPELINES_PROVIDER_NAME });
   td.when(
     fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
       method: "POST",
@@ -84,15 +79,8 @@ test.serial("that an access token is returned when token exchange succeeds on Gi
   t.is(await exchangeToken(pkg, { logger }), token);
 });
 
-test.serial("that `undefined` is returned when ID token is not available on GitLab Pipelines", async (t) => {
-  td.when(envCi()).thenReturn({ name: GITLAB_PIPELINES_PROVIDER_NAME });
-
-  t.is(await exchangeToken(pkg, { logger }), undefined);
-});
-
-test.serial("that `undefined` is returned when token exchange fails on GitLab Pipelines", async (t) => {
+test.serial("that `undefined` is returned when token exchange fails via NPM_ID_TOKEN", async (t) => {
   process.env.NPM_ID_TOKEN = idToken;
-  td.when(envCi()).thenReturn({ name: GITLAB_PIPELINES_PROVIDER_NAME });
   td.when(
     fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
       method: "POST",
@@ -103,6 +91,36 @@ test.serial("that `undefined` is returned when token exchange fails on GitLab Pi
   );
 
   t.is(await exchangeToken(pkg, { logger }), undefined);
+});
+
+test.serial("that NPM_ID_TOKEN takes priority over GitHub Actions OIDC", async (t) => {
+  process.env.NPM_ID_TOKEN = idToken;
+  td.when(envCi()).thenReturn({ name: GITHUB_ACTIONS_PROVIDER_NAME });
+  td.when(
+    fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}` },
+    })
+  ).thenResolve(
+    new Response(JSON.stringify({ token }), { status: 201, headers: { "Content-Type": "application/json" } })
+  );
+
+  t.is(await exchangeToken(pkg, { logger }), token);
+});
+
+test.serial("that NPM_ID_TOKEN works on unknown CI providers", async (t) => {
+  process.env.NPM_ID_TOKEN = idToken;
+  td.when(envCi()).thenReturn({ name: "CircleCI" });
+  td.when(
+    fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}` },
+    })
+  ).thenResolve(
+    new Response(JSON.stringify({ token }), { status: 201, headers: { "Content-Type": "application/json" } })
+  );
+
+  t.is(await exchangeToken(pkg, { logger }), token);
 });
 
 test.serial("that `undefined` is returned when no supported CI provider is detected", async (t) => {
