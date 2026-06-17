@@ -103,11 +103,11 @@ See the documentation for your registry for details on how to create a token for
 
 ### Options
 
-| Options      | Description                                                                                                        | Default                                                                                                                          |
-| ------------ | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated. | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
-| `pkgRoot`    | Directory path to publish.                                                                                         | `.`                                                                                                                              |
-| `tarballDir` | Directory path in which to write the package tarball. If `false` the tarball is not be kept on the file system.    | `false`                                                                                                                          |
+| Options      | Description                                                                                                            | Default                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `npmPublish` | Whether to publish the `npm` package to the registry. If `false` the `package.json` version will still be updated.     | `false` if the `package.json` [private](https://docs.npmjs.com/files/package.json#private) property is `true`, `true` otherwise. |
+| `pkgRoot`    | Directory path to publish.                                                                                             | `.`                                                                                                                              |
+| `tarballDir` | Directory path in which to write the package tarball. If `undefined` the tarball is not be kept on the file system.    | `undefiend`                                                                                                                      |
 
 **Note**: The `pkgRoot` directory must contain a `package.json`. The version will be updated only in the `package.json` and `npm-shrinkwrap.json` within the `pkgRoot` directory.
 
