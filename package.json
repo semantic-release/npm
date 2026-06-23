@@ -41,7 +41,7 @@
     "dockerode": "5.0.0",
     "got": "15.0.5",
     "lockfile-lint": "5.0.0",
-    "ls-engines": "0.10.0",
+    "ls-engines": "0.10.1",
     "npm-run-all2": "9.0.2",
     "p-retry": "8.0.0",
     "prettier": "3.8.4",
