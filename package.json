@@ -38,7 +38,7 @@
   "devDependencies": {
     "ava": "8.0.1",
     "c8": "11.0.0",
-    "dockerode": "5.0.0",
+    "dockerode": "5.0.1",
     "got": "15.0.6",
     "lockfile-lint": "5.0.0",
     "ls-engines": "0.10.1",
