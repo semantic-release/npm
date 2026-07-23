@@ -47,7 +47,7 @@
     "prettier": "3.9.5",
     "publint": "0.3.21",
     "semantic-release": "25.0.8",
-    "sinon": "22.0.0",
+    "sinon": "22.1.0",
     "stream-buffers": "3.0.3",
     "strip-ansi": "7.2.0",
     "testdouble": "3.20.2"
