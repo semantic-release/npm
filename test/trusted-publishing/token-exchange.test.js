@@ -3,6 +3,7 @@ import * as td from "testdouble";
 
 import {
   OFFICIAL_REGISTRY,
+  CIRCLECI_PROVIDER_NAME,
   GITHUB_ACTIONS_PROVIDER_NAME,
   GITLAB_PIPELINES_PROVIDER_NAME,
 } from "../../lib/definitions/constants.js";
@@ -93,6 +94,42 @@ test.serial("that `undefined` is returned when ID token is not available on GitL
 test.serial("that `undefined` is returned when token exchange fails on GitLab Pipelines", async (t) => {
   process.env.NPM_ID_TOKEN = idToken;
   td.when(envCi()).thenReturn({ name: GITLAB_PIPELINES_PROVIDER_NAME });
+  td.when(
+    fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}` },
+    })
+  ).thenResolve(
+    new Response(JSON.stringify({ message: "foo" }), { status: 401, headers: { "Content-Type": "application/json" } })
+  );
+
+  t.is(await exchangeToken(pkg, { logger }), undefined);
+});
+
+test.serial("that an access token is returned when token exchange succeeds on CircleCI", async (t) => {
+  process.env.NPM_ID_TOKEN = idToken;
+  td.when(envCi()).thenReturn({ name: CIRCLECI_PROVIDER_NAME });
+  td.when(
+    fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${idToken}` },
+    })
+  ).thenResolve(
+    new Response(JSON.stringify({ token }), { status: 201, headers: { "Content-Type": "application/json" } })
+  );
+
+  t.is(await exchangeToken(pkg, { logger }), token);
+});
+
+test.serial("that `undefined` is returned when ID token is not available on CircleCI", async (t) => {
+  td.when(envCi()).thenReturn({ name: CIRCLECI_PROVIDER_NAME });
+
+  t.is(await exchangeToken(pkg, { logger }), undefined);
+});
+
+test.serial("that `undefined` is returned when token exchange fails on CircleCI", async (t) => {
+  process.env.NPM_ID_TOKEN = idToken;
+  td.when(envCi()).thenReturn({ name: CIRCLECI_PROVIDER_NAME });
   td.when(
     fetch(`${OFFICIAL_REGISTRY}-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(packageName)}`, {
       method: "POST",
