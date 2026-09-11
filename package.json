@@ -39,14 +39,14 @@
     "ava": "8.0.1",
     "c8": "12.0.0",
     "dockerode": "5.0.1",
-    "got": "15.1.0",
-    "lockfile-lint": "5.0.0",
+    "got": "16.0.0",
+    "lockfile-lint": "5.0.1",
     "ls-engines": "0.10.1",
-    "npm-run-all2": "9.0.2",
-    "p-retry": "8.0.0",
+    "npm-run-all2": "9.0.3",
+    "p-retry": "8.0.1",
     "prettier": "3.9.6",
-    "publint": "0.3.22",
-    "semantic-release": "25.0.8",
+    "publint": "0.3.24",
+    "semantic-release": "25.0.9",
     "sinon": "22.1.0",
     "stream-buffers": "3.0.3",
     "strip-ansi": "7.2.0",
@@ -122,5 +122,5 @@
       "github>semantic-release/.github:renovate-config"
     ]
   },
-  "packageManager": "npm@11.18.0"
+  "packageManager": "npm@11.19.1"
 }
