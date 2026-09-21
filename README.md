@@ -83,6 +83,12 @@ id_tokens:
 
 See the [npm documentation for more details about configuring pipeline details](https://docs.npmjs.com/trusted-publishers#gitlab-cicd-configuration)
 
+#### Trusted publishing for CircleCI
+
+To leverage trusted publishing and publish with provenance from CircleCI, follow the official guide from CircleCI, no additional configuration is required.
+
+Refer to [Publish to npm using OIDC trusted publishing - CircleCI Docs](https://circleci.com/docs/guides/deploy/deploy-to-npm-registry) for more details.
+
 #### Unsupported CI providers
 
 Token authentication is **required** and can be set via [environment variables](#environment-variables).
