@@ -50,7 +50,7 @@
     "sinon": "22.1.0",
     "stream-buffers": "3.0.3",
     "strip-ansi": "7.2.0",
-    "testdouble": "3.20.2"
+    "testdouble": "3.21.0"
   },
   "engines": {
     "node": "^22.14.0 || >= 24.10.0"
