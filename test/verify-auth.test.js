@@ -1,6 +1,5 @@
 import test from "ava";
 import * as td from "testdouble";
-import AggregateError from "aggregate-error";
 import { OFFICIAL_REGISTRY } from "../lib/definitions/constants.js";
 
 let execa, verifyAuth, getRegistry, setNpmrcAuth, oidcContextEstablished;
