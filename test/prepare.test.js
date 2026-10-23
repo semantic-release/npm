@@ -40,36 +40,7 @@ test("Update package.json", async (t) => {
   t.deepEqual(t.context.log.args[0], ["Write version %s to package.json in %s", "1.0.0", cwd]);
 });
 
-test("Updade package.json and npm-shrinkwrap.json", async (t) => {
-  const cwd = temporaryDirectory();
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const packagePath = path.resolve(cwd, "package.json");
-  const shrinkwrapPath = path.resolve(cwd, "npm-shrinkwrap.json");
-  await fs.outputJson(packagePath, { version: "0.0.0-dev" });
-  // Create a npm-shrinkwrap.json file
-  await execa("npm", ["shrinkwrap"], { cwd });
-
-  await prepare(
-    npmrc,
-    {},
-    {
-      cwd,
-      env: {},
-      stdout: t.context.stdout,
-      stderr: t.context.stderr,
-      nextRelease: { version: "1.0.0" },
-      logger: t.context.logger,
-    }
-  );
-
-  // Verify package.json and npm-shrinkwrap.json have been updated
-  t.is((await fs.readJson(packagePath)).version, "1.0.0");
-  t.is((await fs.readJson(shrinkwrapPath)).version, "1.0.0");
-  // Verify the logger has been called with the version updated
-  t.deepEqual(t.context.log.args[0], ["Write version %s to package.json in %s", "1.0.0", cwd]);
-});
-
-test("Updade package.json and package-lock.json", async (t) => {
+test("Update package.json and package-lock.json", async (t) => {
   const cwd = temporaryDirectory();
   const npmrc = temporaryFile({ name: ".npmrc" });
   const packagePath = path.resolve(cwd, "package.json");
@@ -99,37 +70,7 @@ test("Updade package.json and package-lock.json", async (t) => {
   t.deepEqual(t.context.log.args[0], ["Write version %s to package.json in %s", "1.0.0", cwd]);
 });
 
-test("Updade package.json and npm-shrinkwrap.json in a sub-directory", async (t) => {
-  const cwd = temporaryDirectory();
-  const npmrc = temporaryFile({ name: ".npmrc" });
-  const pkgRoot = "dist";
-  const packagePath = path.resolve(cwd, pkgRoot, "package.json");
-  const shrinkwrapPath = path.resolve(cwd, pkgRoot, "npm-shrinkwrap.json");
-  await fs.outputJson(packagePath, { version: "0.0.0-dev" });
-  // Create a npm-shrinkwrap.json file
-  await execa("npm", ["shrinkwrap"], { cwd: path.resolve(cwd, pkgRoot) });
-
-  await prepare(
-    npmrc,
-    { pkgRoot },
-    {
-      cwd,
-      env: {},
-      stdout: t.context.stdout,
-      stderr: t.context.stderr,
-      nextRelease: { version: "1.0.0" },
-      logger: t.context.logger,
-    }
-  );
-
-  // Verify package.json and npm-shrinkwrap.json have been updated
-  t.is((await fs.readJson(packagePath)).version, "1.0.0");
-  t.is((await fs.readJson(shrinkwrapPath)).version, "1.0.0");
-  // Verify the logger has been called with the version updated
-  t.deepEqual(t.context.log.args[0], ["Write version %s to package.json in %s", "1.0.0", path.resolve(cwd, pkgRoot)]);
-});
-
-test("Updade package.json and package-lock.json in a sub-directory", async (t) => {
+test("Update package.json and package-lock.json in a sub-directory", async (t) => {
   const cwd = temporaryDirectory();
   const npmrc = temporaryFile({ name: ".npmrc" });
   const pkgRoot = "dist";
