@@ -64,3 +64,36 @@ test.serial('Get the registry configured via "NPM_CONFIG_USERCONFIG" for scoped 
     "https://custom4.registry.com/"
   );
 });
+
+test('Normalize the trailing slash of the registry configured from "publishConfig"', (t) => {
+  const cwd = temporaryDirectory();
+
+  t.is(
+    getRegistry(
+      { name: "package-name", publishConfig: { registry: "https://custom3.registry.com" } },
+      { cwd, env: {} }
+    ),
+    "https://custom3.registry.com/"
+  );
+});
+
+test('Normalize the trailing slash of the registry configured in "NPM_CONFIG_REGISTRY"', (t) => {
+  const cwd = temporaryDirectory();
+
+  t.is(
+    getRegistry({ name: "package-name" }, { cwd, env: { NPM_CONFIG_REGISTRY: "https://custom1.registry.com" } }),
+    "https://custom1.registry.com/"
+  );
+});
+
+test('Resolve the official registry from "publishConfig" without a trailing slash, so trusted publishing applies', (t) => {
+  const cwd = temporaryDirectory();
+
+  t.is(
+    getRegistry(
+      { name: "@scope/package-name", publishConfig: { registry: "https://registry.npmjs.org" } },
+      { cwd, env: {} }
+    ),
+    OFFICIAL_REGISTRY
+  );
+});
