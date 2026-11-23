@@ -91,7 +91,7 @@
     ]
   },
   "peerDependencies": {
-    "@semantic-release/core": "^1.0.0"
+    "@semantic-release/core": ">=1.0.0"
   },
   "prettier": {
     "printWidth": 120,
