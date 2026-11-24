@@ -42,7 +42,7 @@
     "got": "16.2.0",
     "lockfile-lint": "5.1.0",
     "ls-engines": "0.10.1",
-    "npm-run-all2": "9.0.4",
+    "npm-run-all2": "9.1.0",
     "p-retry": "9.0.0",
     "prettier": "3.10.1",
     "publint": "0.3.25",
