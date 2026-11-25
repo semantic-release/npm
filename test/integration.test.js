@@ -379,6 +379,36 @@ test('Create the package and skip publish ("package.private" is true)', async (t
   await t.throwsAsync(execa("npm", ["view", pkg.name, "version"], { cwd, env: testEnv }));
 });
 
+test('Create the package and skip publish ("package.private" is "true")', async (t) => {
+  const cwd = temporaryDirectory();
+  const env = npmRegistry.authEnv();
+  const pkg = {
+    name: "skip-publish-private-string",
+    version: "0.0.0",
+    publishConfig: { registry: npmRegistry.url },
+    private: "true",
+  };
+  await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
+
+  const result = await t.context.m.publish(
+    { tarballDir: "tarball" },
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: { version: "1.0.0" },
+    }
+  );
+
+  t.false(result);
+  t.is((await fs.readJson(path.resolve(cwd, "package.json"))).version, "1.0.0");
+  t.true(await fs.pathExists(path.resolve(cwd, `tarball/${pkg.name}-1.0.0.tgz`)));
+  await t.throwsAsync(execa("npm", ["view", pkg.name, "version"], { cwd, env: testEnv }));
+});
+
 test('Create the package and skip publish from a sub-directory ("npmPublish" is false)', async (t) => {
   const cwd = temporaryDirectory();
   const env = npmRegistry.authEnv();
@@ -660,6 +690,34 @@ test('Skip adding the package to a channel ("package.private" is true)', async (
     version: "0.0.0",
     publishConfig: { registry: npmRegistry.url },
     private: true,
+  };
+  await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
+
+  const result = await t.context.m.addChannel(
+    {},
+    {
+      cwd,
+      env,
+      options: {},
+      stdout: t.context.stdout,
+      stderr: t.context.stderr,
+      logger: t.context.logger,
+      nextRelease: { version: "1.0.0" },
+    }
+  );
+
+  t.false(result);
+  await t.throwsAsync(execa("npm", ["view", pkg.name, "version"], { cwd, env }));
+});
+
+test('Skip adding the package to a channel ("package.private" is "true")', async (t) => {
+  const cwd = temporaryDirectory();
+  const env = npmRegistry.authEnv();
+  const pkg = {
+    name: "skip-add-channel-private-string",
+    version: "0.0.0",
+    publishConfig: { registry: npmRegistry.url },
+    private: "true",
   };
   await fs.outputJson(path.resolve(cwd, "package.json"), pkg);
 
